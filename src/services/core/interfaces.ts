@@ -1,8 +1,8 @@
-import { PitchShift, Player, Sampler, Volume } from 'tone'
+import { PitchShift, Player, Sampler, Volume } from "tone";
 
 // TRIGGERS
 
-/** 
+/**
  * convention for slot events -
  * timeId: string (bar:quarter:sixteenth)
  * transportEventId: number
@@ -20,34 +20,34 @@ export enum InstrumentType {
 }
 
 export interface InstrumentDefn {
-  name: string
-  type: InstrumentType
-  source?: string
-  offset?: number
+  name: string;
+  type: InstrumentType;
+  source?: string;
+  offset?: number;
 }
 
 export interface Instrument extends TriggerEnvelop, InstrumentDefn {
-  id: number
-  channelVolume: Volume
-  sampleVolume: Volume
-  playHigh?: Player
-  playLow?: Player
-  playSampler?: Sampler
+  id: number;
+  channelVolume: Volume;
+  sampleVolume: Volume;
+  playHigh?: Player;
+  playLow?: Player;
+  playSampler?: Sampler;
 }
 
 export interface TriggerEnvelop {
-  pitchShift: PitchShift
-  duration?: number
-  fadeIn?: number
-  fadeOut?: number
+  pitchShift: PitchShift;
+  duration?: number;
+  fadeIn?: number;
+  fadeOut?: number;
 }
 
 // PARAMS
 
 export interface TrackParam {
-  mute: boolean
-  volume: number
-  solo: boolean
+  mute: boolean;
+  volume: number;
+  solo: boolean;
 }
 
 export enum EnvelopeParam {
@@ -56,29 +56,29 @@ export enum EnvelopeParam {
   offset,
   fadeIn,
   pitchShift,
-  amplitude
+  amplitude,
 }
 
 export interface InstrumentParam {
-  [EnvelopeParam.duration]: number,
-  [EnvelopeParam.fadeOut]: number,
-  [EnvelopeParam.offset]: number,
-  [EnvelopeParam.fadeIn]: number,
-  [EnvelopeParam.pitchShift]: number,
-  [EnvelopeParam.amplitude]: number,
-  custom: boolean,
-  audioUrl?: string
+  [EnvelopeParam.duration]: number;
+  [EnvelopeParam.fadeOut]: number;
+  [EnvelopeParam.offset]: number;
+  [EnvelopeParam.fadeIn]: number;
+  [EnvelopeParam.pitchShift]: number;
+  [EnvelopeParam.amplitude]: number;
+  custom: boolean;
+  audioUrl?: string;
 }
 
 // STORE INTERFACES
 
 export interface InstrumentParams {
-  [id: number]: InstrumentParam
-};
+  [id: number]: InstrumentParam;
+}
 
 export interface TrackParams {
-  [id: number]: TrackParam
+  [id: number]: TrackParam;
 }
 
 // cycle / bar / chords
-export type SongArrangement = Array<Array<Array<string>>>
+export type SongArrangement = Array<Array<Array<string>>>;

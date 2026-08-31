@@ -1,6 +1,6 @@
-import styled from 'styled-components'
-import useToneStore from '../../store/store'
-import { shallow } from 'zustand/shallow'
+import styled from "styled-components";
+import useToneStore from "../../store/store";
+import { shallow } from "zustand/shallow";
 
 const TempoBox = styled.div`
   display: flex;
@@ -11,7 +11,7 @@ const TempoBox = styled.div`
   & button {
     margin: 0px 0.1rem;
   }
-`
+`;
 
 const ValDisplay = styled.div`
   padding: 0px 5px;
@@ -20,15 +20,18 @@ const ValDisplay = styled.div`
   &.swing {
     width: 105px;
   }
-`
+`;
 
 export default function Tempo() {
-  const [bpm, setBpm] = useToneStore((state) => [state.bpm, state.setBpm], shallow)
+  const [bpm, setBpm] = useToneStore(
+    (state) => [state.bpm, state.setBpm],
+    shallow,
+  );
   const [swing, setSwing] = useToneStore(
     (state) => [state.swing, state.setSwing],
-    shallow
-  )
-  const playback = useToneStore((state) => state.playbackSample)
+    shallow,
+  );
+  const playback = useToneStore((state) => state.playbackSample);
 
   return (
     <TempoBox>
@@ -44,7 +47,9 @@ export default function Tempo() {
           onChange={(e) => setBpm(e.target.value)}
         />
       </div>
-      <ValDisplay className="swing">Swing {swing > 0 ? swing / 100 : '-'}</ValDisplay>
+      <ValDisplay className="swing">
+        Swing {swing > 0 ? swing / 100 : "-"}
+      </ValDisplay>
       <div>
         <input
           type="range"
@@ -56,5 +61,5 @@ export default function Tempo() {
         />
       </div>
     </TempoBox>
-  )
+  );
 }

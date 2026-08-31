@@ -6,7 +6,8 @@ This project is live at https://steps-sampler.de
 
 ## Implementation
 
-This is a `react` project using `Tone.js` to access and manipulate the browsers' `Web Audio Api`
+This is a `react` project using `Tone.js` to access and manipulate the browsers'
+`Web Audio Api`
 
 ## Development Environment
 

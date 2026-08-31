@@ -1,7 +1,7 @@
-import styled from 'styled-components'
-import Pad from './Pad'
-import InstrumentsService from '../../services/core/instruments'
-import { SAMPLER_HEIGHT } from '../../constants'
+import styled from "styled-components";
+import Pad from "./Pad";
+import InstrumentsService from "../../services/core/instruments";
+import { SAMPLER_HEIGHT } from "../../constants";
 
 const Sampler = styled.div`
   display: grid;
@@ -10,14 +10,12 @@ const Sampler = styled.div`
   width: 100%;
   height: ${SAMPLER_HEIGHT}px;
   position: relative;
-`
+`;
 
 export default function SamplerPanel() {
   return (
     <Sampler>
-      {InstrumentsService.pads.map((pad) => (
-        <Pad key={pad.name} pad={pad} />
-      ))}
+      {InstrumentsService.pads.map((pad) => <Pad key={pad.name} pad={pad} />)}
     </Sampler>
-  )
+  );
 }

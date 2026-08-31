@@ -1,6 +1,6 @@
-import styled from 'styled-components'
-import { EnvelopeParam } from '../../services/core/interfaces'
-import useToneStore from '../../store/store'
+import styled from "styled-components";
+import { EnvelopeParam } from "../../services/core/interfaces";
+import useToneStore from "../../store/store";
 
 const Box = styled.div`
   width: 100%;
@@ -12,7 +12,7 @@ const Box = styled.div`
   z-index: 13;
   background: var(--main-light);
   border-radius: 0px 0px 6px 6px;
-`
+`;
 
 const Param = styled.div`
   margin: 0.5rem;
@@ -22,32 +22,38 @@ const Param = styled.div`
   & input {
     width: 80%;
   }
-`
+`;
 
-const ParamLabel = styled.div``
+const ParamLabel = styled.div``;
 const ParamInput = styled.div`
   flex: 1;
-`
+`;
 
 interface ParamCfg {
-  displayName: string
-  name: EnvelopeParam
-  min: number
-  max: number
-  step: number
+  displayName: string;
+  name: EnvelopeParam;
+  min: number;
+  max: number;
+  step: number;
 }
 const paramConfigObj: { [key: string]: ParamCfg } = {
-  offset: { displayName: 'start', name: EnvelopeParam.offset, min: 0, max: 99, step: 1 },
+  offset: {
+    displayName: "start",
+    name: EnvelopeParam.offset,
+    min: 0,
+    max: 99,
+    step: 1,
+  },
   // fadeIn: {displayName: 'f-in', name: EnvelopeParam.fadeIn, min: 0, max: 99, step: 1},
   duration: {
-    displayName: 'duration',
+    displayName: "duration",
     name: EnvelopeParam.duration,
     min: 0,
     max: 99,
     step: 1,
   },
   fadeIn: {
-    displayName: 'attack',
+    displayName: "attack",
     name: EnvelopeParam.fadeIn,
     min: 0,
     max: 99,
@@ -68,27 +74,31 @@ const paramConfigObj: { [key: string]: ParamCfg } = {
   //   step: 1,
   // },
   pitchShift: {
-    displayName: 'pitch',
+    displayName: "pitch",
     name: EnvelopeParam.pitchShift,
     min: -48,
     max: 48,
     step: 1,
   },
-}
-const paramConfigs: Array<ParamCfg> = Array.from(Object.values(paramConfigObj))
+};
+const paramConfigs: Array<ParamCfg> = Array.from(Object.values(paramConfigObj));
 
 interface CmpProps {
-  padId: number
+  padId: number;
 }
 
 export default function PadControl({ padId }: CmpProps) {
   const [padParams, setPadParams] = useToneStore((state) => [
     state.instrumentParams[padId],
     state.setInstrumentParams,
-  ])
+  ]);
 
   function updateParams(value: string, paramName: EnvelopeParam) {
-    setPadParams(padId, { ...padParams, [paramName]: parseInt(value), custom: true })
+    setPadParams(padId, {
+      ...padParams,
+      [paramName]: parseInt(value),
+      custom: true,
+    });
   }
 
   return (
@@ -109,5 +119,5 @@ export default function PadControl({ padId }: CmpProps) {
         </Param>
       ))}
     </Box>
-  )
+  );
 }

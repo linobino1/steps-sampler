@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 const BlockingMask = styled.div`
   position: absolute;
@@ -25,12 +25,12 @@ const BlockingMask = styled.div`
   @media only screen and (max-width: 800px) {
     display: table;
   }
-`
+`;
 
 export default function Mask() {
   return (
     <BlockingMask>
-      <div>please use this app with a wider screen 👺 </div>
+      <div>please use this app with a wider screen 👺</div>
     </BlockingMask>
-  )
+  );
 }

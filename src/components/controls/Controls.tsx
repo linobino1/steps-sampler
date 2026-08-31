@@ -1,13 +1,19 @@
-import styled from 'styled-components'
-import SequencerService from '../../services/transport/sequencer'
-import useToneStore from '../../store/store'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faStop, faPlay, faCopy, faAdd, faMinus } from '@fortawesome/free-solid-svg-icons'
-import InstrumentsService from '../../services/core/instruments'
-import SampleService from '../../services/sampling/sample'
+import styled from "styled-components";
+import SequencerService from "../../services/transport/sequencer";
+import useToneStore from "../../store/store";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faAdd,
+  faCopy,
+  faMinus,
+  faPlay,
+  faStop,
+} from "@fortawesome/free-solid-svg-icons";
+import InstrumentsService from "../../services/core/instruments";
+import SampleService from "../../services/sampling/sample";
 
-import { shallow } from 'zustand/shallow'
-import NoteIcon from './NoteIcon'
+import { shallow } from "zustand/shallow";
+import NoteIcon from "./NoteIcon";
 
 const ControlBox = styled.div`
   border: solid black 2px;
@@ -20,7 +26,7 @@ const ControlBox = styled.div`
     height: 100%;
     border: 2px solid black;
   }
-`
+`;
 
 const ControlSection = styled.div<{ disabled?: boolean }>`
   border-right: solid black 2px;
@@ -33,7 +39,7 @@ const ControlSection = styled.div<{ disabled?: boolean }>`
   &:last-child {
     border-right: 0px;
   }
-`
+`;
 
 const MultiSelectBtn = styled.button`
   margin-left: 5px;
@@ -50,7 +56,7 @@ const MultiSelectBtn = styled.button`
     background: var(--main);
     color: var(--white);
   }
-`
+`;
 
 const PlaybackSelect = styled.label`
   color: black;
@@ -69,7 +75,7 @@ const PlaybackSelect = styled.label`
     padding-left: 33px;
     font-family: 'RoobertMono';
   }
-`
+`;
 
 const IconBox = styled.div`
   position: absolute;
@@ -79,7 +85,7 @@ const IconBox = styled.div`
   > svg {
     height: 14px;
   }
-`
+`;
 
 const DisableMask = styled.div`
   position: absolute;
@@ -89,39 +95,39 @@ const DisableMask = styled.div`
   right: 0;
   opacity: 0.4;
   background: var(--off-color-1);
-`
+`;
 
 export default function Controls() {
-  const changeBars = useToneStore((state) => state.changeBars)
+  const changeBars = useToneStore((state) => state.changeBars);
   const [res, toggleRes] = useToneStore(
     (state) => [state.resolution, state.toggleResolution],
-    shallow
-  )
+    shallow,
+  );
   const [sig, toggleSig] = useToneStore(
     (state) => [state.signature, state.setGridSignature],
-    shallow
-  )
-  const dupeBar = useToneStore((state) => state.duplicateBarEvents)
-  const resetSequencer = useToneStore((state) => state.resetSequencer)
-  const clearSchedule = useToneStore((state) => state.clearSchedule)
+    shallow,
+  );
+  const dupeBar = useToneStore((state) => state.duplicateBarEvents);
+  const resetSequencer = useToneStore((state) => state.resetSequencer);
+  const clearSchedule = useToneStore((state) => state.clearSchedule);
   const [playback, setPlayback] = useToneStore(
     (state) => [state.playbackSample, state.setPlaybackSample],
-    shallow
-  )
+    shallow,
+  );
 
   function toggleTransporter() {
-    SequencerService.toggleTransport()
-    const e = document.activeElement as HTMLInputElement
-    if ('blur' in e) {
-      e.blur() // to avoid cross-canceling with spacebar listener
+    SequencerService.toggleTransport();
+    const e = document.activeElement as HTMLInputElement;
+    if ("blur" in e) {
+      e.blur(); // to avoid cross-canceling with spacebar listener
     }
   }
 
   function clearAll() {
-    resetSequencer()
+    resetSequencer();
     InstrumentsService.pads.forEach((i) => {
-      SampleService.removeSample(i.id)
-    })
+      SampleService.removeSample(i.id);
+    });
   }
 
   return (
@@ -150,7 +156,7 @@ export default function Controls() {
 
       {/* <Stretch /> */}
 
-      <ControlSection className={'playback'}>
+      <ControlSection className={"playback"}>
         <PlaybackSelect>
           <IconBox>
             <NoteIcon />
@@ -173,14 +179,14 @@ export default function Controls() {
       <ControlSection disabled={playback !== -1}>
         {/* {playback !== -1 && <DisableMask />} */}
         <MultiSelectBtn
-          className={sig === '3' ? 'active' : ''}
-          onClick={(e) => toggleSig('3')}
+          className={sig === "3" ? "active" : ""}
+          onClick={(e) => toggleSig("3")}
         >
           3/4
         </MultiSelectBtn>
         <MultiSelectBtn
-          className={sig === '4' ? 'active' : ''}
-          onClick={(e) => toggleSig('4')}
+          className={sig === "4" ? "active" : ""}
+          onClick={(e) => toggleSig("4")}
         >
           4/4
         </MultiSelectBtn>
@@ -188,24 +194,24 @@ export default function Controls() {
 
       <ControlSection>
         <MultiSelectBtn
-          className={res === '8n' ? 'active' : ''}
-          onClick={(e) => toggleRes('8n')}
+          className={res === "8n" ? "active" : ""}
+          onClick={(e) => toggleRes("8n")}
         >
           8THS
         </MultiSelectBtn>
         <MultiSelectBtn
-          className={res === '8t' ? 'active' : ''}
-          onClick={(e) => toggleRes('8t')}
+          className={res === "8t" ? "active" : ""}
+          onClick={(e) => toggleRes("8t")}
         >
           TRIPLETS
         </MultiSelectBtn>
         <MultiSelectBtn
-          className={res === '16n' ? 'active' : ''}
-          onClick={(e) => toggleRes('16n')}
+          className={res === "16n" ? "active" : ""}
+          onClick={(e) => toggleRes("16n")}
         >
           16THS
         </MultiSelectBtn>
       </ControlSection>
     </ControlBox>
-  )
+  );
 }

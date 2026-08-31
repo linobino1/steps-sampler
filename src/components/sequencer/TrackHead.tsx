@@ -1,14 +1,14 @@
-import styled from 'styled-components'
-import useToneStore from '../../store/store'
+import styled from "styled-components";
+import useToneStore from "../../store/store";
 import {
   Instrument,
   InstrumentParam,
   InstrumentType,
   TrackParam,
-} from '../../services/core/interfaces'
-import { TRACK_HEIGHT } from '../../constants'
+} from "../../services/core/interfaces";
+import { TRACK_HEIGHT } from "../../constants";
 
-const TRACK_SECTION_HEIGHT = TRACK_HEIGHT / 3
+const TRACK_SECTION_HEIGHT = TRACK_HEIGHT / 3;
 
 const TrackHeadBox = styled.div<{ trackName: string }>`
   height: 100%;
@@ -26,13 +26,13 @@ const TrackHeadBox = styled.div<{ trackName: string }>`
     height: 50%;
     padding-top: 1px;
   }
-`
+`;
 
 const LabelName = styled.div`
   font-size: 0.8rem;
   width: 100%;
   text-align: center;
-`
+`;
 
 const ButtonSection = styled.div`
   display: flex;
@@ -43,7 +43,7 @@ const ButtonSection = styled.div`
   > button {
     flex: 1;
   }
-`
+`;
 
 const TrackIcon = styled.button<{ active: string | null; clickable: boolean }>`
   border-radius: 3px;
@@ -52,44 +52,44 @@ const TrackIcon = styled.button<{ active: string | null; clickable: boolean }>`
   padding: 0px 4px;
   overflow: hidden;
   text-align: center;
-  background: ${(props) => (props.active ? 'var(--main)' : 'null')};
-  color: var(${(props) => (props.active ? '--white' : '--black')});
+  background: ${(props) => (props.active ? "var(--main)" : "null")};
+  color: var(${(props) => (props.active ? "--white" : "--black")});
   font-famiy: RoobertMono;
   font-size: 12.6px;
-`
+`;
 const VolSection = styled.div`
   text-align: center;
-`
+`;
 
 const VolInput = styled.input`
   width: calc(100% - 10px);
   height: ${TRACK_SECTION_HEIGHT}px;
   left: 3px;
-`
+`;
 
 interface TrackHeadProps {
-  instrument: Instrument
-  instrumentParam: InstrumentParam
-  trackParam: TrackParam
+  instrument: Instrument;
+  instrumentParam: InstrumentParam;
+  trackParam: TrackParam;
 }
 
 export default function TrackHead({ instrument, trackParam }: TrackHeadProps) {
-  const toggleTrackMute = useToneStore((state) => state.toggleTrackMute)
-  const toggleTrackSolo = useToneStore((state) => state.toggleTrackSolo)
-  const setTrackVolume = useToneStore((state) => state.setTrackVolume)
+  const toggleTrackMute = useToneStore((state) => state.toggleTrackMute);
+  const toggleTrackSolo = useToneStore((state) => state.toggleTrackSolo);
+  const setTrackVolume = useToneStore((state) => state.setTrackVolume);
   return (
     <TrackHeadBox trackName={instrument.name}>
       <LabelName color={instrument.name}>{instrument.name}</LabelName>
       <ButtonSection>
         <TrackIcon
-          active={trackParam?.mute ? '--black' : null}
+          active={trackParam?.mute ? "--black" : null}
           clickable={true}
           onClick={() => toggleTrackMute(instrument.id)}
         >
           M
         </TrackIcon>
         <TrackIcon
-          active={trackParam?.solo ? '--black' : null}
+          active={trackParam?.solo ? "--black" : null}
           clickable={true}
           onClick={() => toggleTrackSolo(instrument.id)}
         >
@@ -102,9 +102,10 @@ export default function TrackHead({ instrument, trackParam }: TrackHeadProps) {
           max={100}
           min={0}
           value={trackParam.volume}
-          onChange={(e) => setTrackVolume(instrument.id, parseInt(e.target.value))}
+          onChange={(e) =>
+            setTrackVolume(instrument.id, parseInt(e.target.value))}
         />
       </VolSection>
     </TrackHeadBox>
-  )
+  );
 }

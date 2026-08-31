@@ -1,7 +1,7 @@
-import styled from 'styled-components'
-import { saveFile } from '../../services/exports/midi'
-import { recordAudio } from '../../services/exports/audioExport'
-import Tempo from './Tempo'
+import styled from "styled-components";
+import { saveFile } from "../../services/exports/midi";
+import { recordAudio } from "../../services/exports/audioExport";
+import Tempo from "./Tempo";
 
 const HeaderDiv = styled.div`
   box-sizing: border-box;
@@ -9,23 +9,23 @@ const HeaderDiv = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-`
+`;
 
 const HeaderButton = styled.button`
   background: var(--black);
   color: var(--white);
-`
+`;
 
 const Title = styled.div`
   font-family: 'Roobert';
   font-size: 26px;
   font-weight: 600;
   line-height: 26px;
-`
+`;
 
 const Stretch = styled.div`
   flex: 1;
-`
+`;
 
 export default function Header() {
   return (
@@ -37,5 +37,5 @@ export default function Header() {
       <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
       <HeaderButton onClick={() => recordAudio()}>Save Audio</HeaderButton>
     </HeaderDiv>
-  )
+  );
 }
