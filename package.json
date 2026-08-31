@@ -18,7 +18,7 @@
     "serve": "vite preview",
     "lint:fix": "deno lint --fix",
     "lint": "deno lint",
-    "prettify": "prettier src/**/*.tsx src/**/*.ts src/**/*.js --write"
+    "fmt": "deno fmt"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
@@ -26,15 +26,7 @@
     "@types/react-dom": "^18.0.0",
     "@types/styled-components": "^5.1.25",
     "@vitejs/plugin-react": "^6.1.1",
-    "prettier": "^2.6.2",
     "typescript": "^4.6.3",
     "vite": "^8.2.2"
-  },
-  "prettier": {
-    "printWidth": 90,
-    "bracketSpacing": true,
-    "trailingComma": "es5",
-    "semi": false,
-    "singleQuote": true
   }
 }
