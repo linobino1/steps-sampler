@@ -212,7 +212,7 @@ export default function Pad(props: { pad: Instrument }) {
 
       <RecordingBox
         onMouseDown={() => recordOrPlay()}
-        onMouseMove={(e) => e.buttons > 0 && console.log(e.clientX)}
+        onMouseMove={(e) => e.buttons > 0}
         onDragStart={console.log}
         onTouchStart={(e) => e.preventDefault()}
       >
