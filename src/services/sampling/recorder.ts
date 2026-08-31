@@ -26,12 +26,20 @@ async function setupRecorder(
     throw new Error("This browser does not support audio recording.");
   }
 
-  const mediaRecorder = new MediaRecorder(mediaDeviceStream);
+  const mimeType = [
+    "audio/webm;codecs=opus",
+    "audio/mp4",
+    "audio/ogg;codecs=opus",
+  ].find((type) => MediaRecorder.isTypeSupported(type));
+  const mediaRecorder = new MediaRecorder(
+    mediaDeviceStream,
+    mimeType ? { mimeType } : undefined,
+  );
 
   let chunks: Array<Blob> = [];
 
   mediaRecorder.onstop = function (_e) {
-    const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+    const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
     const url = BlobService.storeBlob(blob, id);
     PadService.addSample(url, InstrumentsService.instruments[id]);
     mediaDeviceStream.getTracks().forEach((track) => track.stop());
