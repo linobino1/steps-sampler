@@ -1,4 +1,4 @@
-import { PitchShift, Player, PolySynth, Recorder, Sampler, Volume } from "tone";
+import { PitchShift, Player, Recorder, Sampler, Volume } from "tone";
 import {
   EnvelopeParam,
   Instrument,
@@ -15,7 +15,7 @@ const masterVolume = new Volume(0).toDestination();
 
 // SEQUENCED INST
 
-let instDef: Array<InstrumentDefn> = [
+const instDef: Array<InstrumentDefn> = [
   {
     type: InstrumentType.stock,
     name: "kick",
@@ -43,7 +43,12 @@ let instDef: Array<InstrumentDefn> = [
 ];
 
 const instruments: Array<Instrument> = instDef.map((defn, index) => {
-  let inst: any = {
+  let inst: InstrumentDefn & {
+    id: number;
+    channelVolume: Volume;
+    pitchShift: PitchShift;
+    sampleVolume: Volume;
+  } = {
     ...defn,
     id: index,
     channelVolume: new Volume(0),
@@ -132,7 +137,7 @@ function wireSignalChain(instrument: Instrument) {
   }
 }
 
-async function syncInstrumentParam(id: number) {
+function syncInstrumentParam(id: number) {
   const param = useToneStore.getState().instrumentParams[id];
   const i = InstrumentsService.instruments[id];
 
@@ -142,7 +147,7 @@ async function syncInstrumentParam(id: number) {
   }
 
   if (i.playHigh) {
-    let unity = i.playHigh.buffer.duration / 100;
+    const unity = i.playHigh.buffer.duration / 100;
     i.offset = param[EnvelopeParam.offset] * unity;
     i.duration = param[EnvelopeParam.duration] * unity;
     i.fadeOut = param[EnvelopeParam.fadeOut] * unity;
@@ -155,10 +160,10 @@ async function syncInstrumentParam(id: number) {
 }
 
 function syncParams() {
-  instruments.forEach(async (i) => syncInstrumentParam(i.id));
+  instruments.forEach((i) => syncInstrumentParam(i.id));
 }
 
-async function connectInstruments() {
+function connectInstruments() {
   instruments.forEach((instrument) => wireSignalChain(instrument));
   syncParams();
   useToneStore.subscribe((state) => state.instrumentParams, syncParams);

@@ -54,11 +54,15 @@ export default function Chords() {
   );
   const activeBars = useToneStore((state) => state.activeBars);
 
-  function ondrop(e: any, bar: number, cycleIndex: number) {
+  function ondrop(
+    e: React.DragEvent,
+    bar: number,
+    cycleIndex: number,
+  ) {
     e.preventDefault();
     if (currentDrag.current) {
       const barArr = songArrangement[cycleIndex][bar] || [];
-      const prunedBarArr = barArr.filter((c, i) => i < 1);
+      const prunedBarArr = barArr.filter((_c, i) => i < 1);
       const newArragement = [...songArrangement];
       newArragement[cycleIndex][bar] = [currentDrag.current].concat(
         prunedBarArr,
@@ -75,7 +79,7 @@ export default function Chords() {
     }
   }
 
-  function onover(e: any) {
+  function onover(e: React.DragEvent) {
     e.preventDefault();
   }
 
@@ -93,8 +97,8 @@ export default function Chords() {
         </Arrangment>
       ))}
       <ChordPallete>
-        <button onClick={() => onCycleChange(true)}>Add</button>
-        <button onClick={() => onCycleChange(false)}>Sub</button>
+        <button type="button" onClick={() => onCycleChange(true)}>Add</button>
+        <button type="button" onClick={() => onCycleChange(false)}>Sub</button>
         {chords.map((name: string) => (
           <ChordChip
             draggable

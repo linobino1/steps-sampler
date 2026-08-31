@@ -43,7 +43,7 @@ function getAnimationDuration(bars: number, bpm: number) {
 }
 
 interface CursorProps {
-  showCursor: Boolean;
+  showCursor: boolean;
   activeBars: number;
 }
 
@@ -68,7 +68,7 @@ function PlayCursor({ showCursor, activeBars }: CursorProps) {
 
   return (playing && showCursor)
     ? <TransportPosition duration={getAnimationDuration(activeBars, bpm)} />
-    : <></>;
+    : null;
 }
 
 export default function DubTrack() {

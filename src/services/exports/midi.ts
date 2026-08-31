@@ -1,7 +1,7 @@
 import { Header, Midi } from "@tonejs/midi";
 import useToneStore from "../../store/store.ts";
 
-let midiJson: any;
+let midiJson: unknown;
 const ppq = 96;
 const midiCodes: { [key: number]: number } = {
   0: 36, // kick
@@ -19,7 +19,7 @@ const headerJson = {
 };
 
 export async function createMidiJson(file: File) {
-  const fileUrl = await URL.createObjectURL(file);
+  const fileUrl = URL.createObjectURL(file);
   midiJson = await Midi.fromUrl(fileUrl);
   console.log(midiJson);
 }
@@ -66,12 +66,14 @@ function is16th(timeId: string) {
 
 function convertTimeIdToSlotNumber(timeId: string, grid: number): number {
   const timeArray = timeId.split(":").map((i) => parseInt(i));
-  const slot = timeArray[0] * grid + timeArray[1] * (grid / 4) +
+  const slot =
+    timeArray[0] * grid +
+    timeArray[1] * (grid / 4) +
     timeArray[2] * (grid / 16);
   return slot;
 }
 
-export async function saveFile() {
+export function saveFile() {
   const a = document.createElement("a");
   a.download = "toness_export.mid";
   const midiObj = createMidi();
@@ -79,7 +81,7 @@ export async function saveFile() {
     // @ts-expect-error this feature will be removed, so we'll ignore this type error
     new Blob([midiObj.toArray()], { type: "application/octet-stream" }),
   );
-  a.addEventListener("click", (e) => {
+  a.addEventListener("click", () => {
     setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
   });
   a.click();

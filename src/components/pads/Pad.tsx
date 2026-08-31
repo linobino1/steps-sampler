@@ -115,7 +115,7 @@ const PadTitle = styled.div`
   margin-left: 8px;
 `;
 
-const Slice = styled.div`
+const _Slice = styled.div`
   height: 100%;
   position: absolute;
   top: 0;
@@ -186,7 +186,7 @@ export default function Pad(props: { pad: Instrument }) {
     >
       <TopBar>
         {audioUrl && (
-          <button onClick={clearPad}>
+          <button type="button" onClick={clearPad}>
             <TrashIcon />
           </button>
         )}
@@ -227,7 +227,10 @@ export default function Pad(props: { pad: Instrument }) {
         <PadTitle>{props.pad.name}</PadTitle>
         <ButtonBox>
           {audioUrl && (
-            <button onClick={() => setShowPadCtrl(!showPadCtrl)}>
+            <button
+              type="button"
+              onClick={() => setShowPadCtrl(!showPadCtrl)}
+            >
               <SliderIcon />
             </button>
           )}

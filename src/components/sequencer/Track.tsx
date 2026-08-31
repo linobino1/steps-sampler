@@ -1,14 +1,12 @@
 import { useCallback } from "react";
 import useToneStore, { GridSignature } from "../../store/store.ts";
 import styled from "styled-components";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { Instrument, InstrumentType } from "../../services/core/interfaces.ts";
 import GridService from "../../services/transport/grid.ts";
 import Chords from "../chords/Chords.tsx";
 import Toggle from "./Toggle.tsx";
 import TrackHead from "./TrackHead.tsx";
 import { TRACK_HEIGHT } from "../../constants.ts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const TrackDiv = styled.div`
   display: flex;
@@ -62,14 +60,14 @@ export function Track({
   gridSignature,
 }: TrackProps) {
   // we trigger rerenders on all trackSetting due to solo settings
-  const trackSettings = useToneStore((state) => state.trackSettings);
+  const _trackSettings = useToneStore((state) => state.trackSettings);
   const instrumentParam = useToneStore(
     useCallback((state) => state.instrumentParams[instrument.id], [instrument]),
   );
   const trackParam = useToneStore(
     useCallback((state) => state.trackSettings[instrument.id], [instrument.id]),
   );
-  const activeBars = useToneStore((state) => state.activeBars);
+  const _activeBars = useToneStore((state) => state.activeBars);
   const hasSound = instrumentParam.audioUrl ||
     instrument.id < 3 ||
     instrument.type === InstrumentType.chords;
@@ -87,7 +85,7 @@ export function Track({
         ? <Chords />
         : (
           <Grid signature={gridSignature}>
-            {GridService.timeIdsByBar(timeIds).map((barInfo, index, arr) => (
+            {GridService.timeIdsByBar(timeIds).map((barInfo, _index, _arr) => (
               <Bar key={barInfo.bar} togglesPerBeat={togglesPerBeat}>
                 {barInfo.timeIds.map((timeId) => (
                   <Toggle

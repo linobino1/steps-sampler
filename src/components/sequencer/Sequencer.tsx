@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import useToneStore, { GridSignature } from "../../store/store.ts";
+import useToneStore from "../../store/store.ts";
 import InstrumentsService from "../../services/core/instruments.ts";
 import { Track } from "./Track.tsx";
 

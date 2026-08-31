@@ -15,7 +15,7 @@ async function setStream() {
 
 async function setupRecorder(
   id: number,
-  parentEl: Element,
+  _parentEl: Element,
 ): Promise<MediaRecorder | undefined> {
   const mediaDeviceStream = await setStream();
   if (!mediaDeviceStream) return;
@@ -23,7 +23,7 @@ async function setupRecorder(
 
   let chunks: Array<Blob> = [];
 
-  mediaRecorder.onstop = function (e) {
+  mediaRecorder.onstop = function (_e) {
     const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
     const url = BlobService.storeBlob(blob, id);
     PadService.addSample(url, InstrumentsService.instruments[id]);

@@ -3,7 +3,6 @@ import useToneStore from "../../store/store.ts";
 import {
   Instrument,
   InstrumentParam,
-  InstrumentType,
   TrackParam,
 } from "../../services/core/interfaces.ts";
 import { TRACK_HEIGHT } from "../../constants.ts";

@@ -2,7 +2,7 @@ import { Transport } from "tone";
 import useToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import GridService from "./grid.ts";
-import { VoiceLeading, Voicing, VoicingDictionary } from "tonal";
+import { Voicing, VoicingDictionary } from "tonal";
 
 const triggerEventIds: { [key: string]: number } = {}; // the key is a scheduledEvent
 const prevChords: Array<number> = [];
@@ -48,7 +48,7 @@ function getActiveEvents() {
     }
   }).filter((event) => {
     const timeId = parseTrigger(event).timeId;
-    const { bar, quarter, sixteenth } = GridService.parseTimeId(timeId);
+    const { bar, quarter } = GridService.parseTimeId(timeId);
     return bar < activeBars && quarter < parseInt(signature);
   });
 }
@@ -92,7 +92,7 @@ function setArrangement() {
         );
         const triggerBar = barIndex + (cycleIndex * barsPercussion);
         const triggerEights = chordIndex === 1 ? 2 : 0;
-        const scheduled = Transport.schedule((time) => {
+        const scheduled = Transport.schedule((_time) => {
           InstrumentsService.chords.playSampler?.triggerAttackRelease(
             toPlay[0],
             0.60,

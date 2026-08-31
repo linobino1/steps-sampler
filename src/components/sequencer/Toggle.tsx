@@ -5,7 +5,7 @@ import useToneStore from "../../store/store.ts";
 import { useCallback, useEffect, useState } from "react";
 import SequencerService from "../../services/transport/sequencer.ts";
 
-let colors = {
+const colors = {
   odd: "var(--main-faded)",
   free: "rgba(0,0,0,0)",
   toggled: "black",
@@ -59,7 +59,7 @@ interface ToggleProps {
 }
 
 export default function Toggle(props: ToggleProps) {
-  const { bar, quarter, sixteenth } = GridService.parseTimeId(props.timeId);
+  const { bar } = GridService.parseTimeId(props.timeId);
   const guideName = props.instrumentId === 0
     ? GridService.timeIdToGuideName(props.timeId)
     : null;

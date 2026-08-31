@@ -41,8 +41,8 @@ function setGridTimeIds() {
   useToneStore.getState().setActiveTimeIds(activeTimeIds);
 }
 
-function timeIdToGuideName(timeId: any): string | undefined {
-  const { bar, quarter, sixteenth } = parseTimeId(timeId);
+function timeIdToGuideName(timeId: string): string | undefined {
+  const { quarter, sixteenth } = parseTimeId(timeId);
   const str16 = sixteenth.split(".")[0] as "1" | "2" | "3";
   return sixteenth === "0"
     ? (quarter + 1).toString()

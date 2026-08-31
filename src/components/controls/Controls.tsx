@@ -73,7 +73,7 @@ const PlaybackSelect = styled.label`
     font-size: 12px;
     cursor: pointer;
     padding-left: 33px;
-    font-family: 'RoobertMono';
+    font-family: "RoobertMono";
   }
 `;
 
@@ -87,7 +87,7 @@ const IconBox = styled.div`
   }
 `;
 
-const DisableMask = styled.div`
+const _DisableMask = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -123,7 +123,7 @@ export default function Controls() {
     }
   }
 
-  function clearAll() {
+  function _clearAll() {
     resetSequencer();
     InstrumentsService.pads.forEach((i) => {
       SampleService.removeSample(i.id);
@@ -133,22 +133,22 @@ export default function Controls() {
   return (
     <ControlBox>
       <ControlSection>
-        <button onClick={toggleTransporter}>
+        <button type="button" onClick={toggleTransporter}>
           <FontAwesomeIcon icon={faPlay} /> <span></span>
           <FontAwesomeIcon icon={faStop} />
         </button>
-        <button onClick={clearSchedule}>Clear Steps</button>
+        <button type="button" onClick={clearSchedule}>Clear Steps</button>
       </ControlSection>
       <ControlSection>
-        <button onClick={() => changeBars(1)}>
+        <button type="button" onClick={() => changeBars(1)}>
           <FontAwesomeIcon icon={faAdd} />
           <span style={{ paddingLeft: 5 }}>Add</span>
         </button>
-        <button onClick={dupeBar}>
+        <button type="button" onClick={dupeBar}>
           <FontAwesomeIcon icon={faCopy} />
           <span style={{ paddingLeft: 5 }}>Bar</span>
         </button>
-        <button onClick={() => changeBars(-1)}>
+        <button type="button" onClick={() => changeBars(-1)}>
           <FontAwesomeIcon icon={faMinus} />
           <span style={{ paddingLeft: 5 }}>Remove</span>
         </button>
@@ -180,13 +180,13 @@ export default function Controls() {
         {/* {playback !== -1 && <DisableMask />} */}
         <MultiSelectBtn
           className={sig === "3" ? "active" : ""}
-          onClick={(e) => toggleSig("3")}
+          onClick={() => toggleSig("3")}
         >
           3/4
         </MultiSelectBtn>
         <MultiSelectBtn
           className={sig === "4" ? "active" : ""}
-          onClick={(e) => toggleSig("4")}
+          onClick={() => toggleSig("4")}
         >
           4/4
         </MultiSelectBtn>
@@ -195,19 +195,19 @@ export default function Controls() {
       <ControlSection>
         <MultiSelectBtn
           className={res === "8n" ? "active" : ""}
-          onClick={(e) => toggleRes("8n")}
+          onClick={() => toggleRes("8n")}
         >
           8THS
         </MultiSelectBtn>
         <MultiSelectBtn
           className={res === "8t" ? "active" : ""}
-          onClick={(e) => toggleRes("8t")}
+          onClick={() => toggleRes("8t")}
         >
           TRIPLETS
         </MultiSelectBtn>
         <MultiSelectBtn
           className={res === "16n" ? "active" : ""}
-          onClick={(e) => toggleRes("16n")}
+          onClick={() => toggleRes("16n")}
         >
           16THS
         </MultiSelectBtn>

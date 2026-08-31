@@ -52,7 +52,7 @@ interface TonesState {
   setBpm: (bpm: string) => void;
   toggleResolution: (res: GridResolutions) => void;
   setActiveTimeIds: (slots: Array<string>) => void;
-  setInstrumentParams: (id: number, params?: any) => void;
+  setInstrumentParams: (id: number, params?: unknown) => void;
   setTrackVolume: (id: number, vol: number) => void;
   toggleTrackMute: (id: number) => void;
   toggleTrackSolo: (id: number) => void;
@@ -120,9 +120,9 @@ const useToneStore = create<TonesState>()(
       subscribeWithSelector(
         (set, get) => ({
           ...initialState,
-          resetStore: () => set((state) => initialState, true, "resetStore"),
+          resetStore: () => set((_state) => initialState, true, "resetStore"),
           resetSequencer: () =>
-            set((state) => ({ ...cleanSequencer }), false, "resetSequencer"),
+            set((_state) => ({ ...cleanSequencer }), false, "resetSequencer"),
           setInstrumentParams: (id, params) => {
             // when instrument params are reverted we reset scheduling and track params
             if (!params) {
@@ -152,22 +152,22 @@ const useToneStore = create<TonesState>()(
             set((state) => ({
               activeTracks: getNewTracks(state.activeTracks, tracks),
             })),
-          setBpm: (bpm: string) => set((state) => ({ bpm: parseInt(bpm) })),
+          setBpm: (bpm: string) => set((_state) => ({ bpm: parseInt(bpm) })),
           setSwing: (swing: number) =>
-            set((state) => ({ swing }), false, "setSwing"),
+            set((_state) => ({ swing }), false, "setSwing"),
           setGridSignature: (signature: GridSignature) =>
-            set((state) => ({ signature }), false, "setSignature"),
+            set((_state) => ({ signature }), false, "setSignature"),
           toggleResolution: (res: GridResolutions) =>
-            set((state) => ({ resolution: res }), false, "toggleResolution"),
+            set((_state) => ({ resolution: res }), false, "toggleResolution"),
           setActiveTimeIds: (timeIds: Array<string>) =>
             set(
-              (state) => (
+              (_state) => (
                 { activeTimeIds: timeIds }
               ),
               false,
               "setActiveTimeIds",
             ),
-          clearSchedule: () => set((state) => ({ scheduledEvents: [] })),
+          clearSchedule: () => set((_state) => ({ scheduledEvents: [] })),
           // TRACK SETTINGS
           toggleTrackMute: (id) =>
             set(
@@ -293,11 +293,15 @@ const useToneStore = create<TonesState>()(
               get().setBpm(InstrumentsService.playbacks[s].bpm.toString());
               get().setGridSignature("4");
             }
-            set((state) => ({ playbackSample: s }), false, "setPlaybackSample");
+            set(
+              (_state) => ({ playbackSample: s }),
+              false,
+              "setPlaybackSample",
+            );
           },
           updateArrangement: (arr: SongArrangement) => {
             set(
-              (state) => ({ songArrangement: arr }),
+              (_state) => ({ songArrangement: arr }),
               false,
               "updateArrangement",
             );
@@ -338,7 +342,7 @@ function getEventsWithDuplicates(
 function getNewParams(
   existingParams: InstrumentParams,
   id: number,
-  params?: any,
+  params?: unknown,
 ) {
   const newParam = {
     [id]: { ...existingParams[id], ...(params || defaultInstrument) },

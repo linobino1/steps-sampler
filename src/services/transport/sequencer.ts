@@ -22,7 +22,7 @@ function syncBpm(val: number): void {
 function syncTrackSettings() {
   const trackSettings = ToneStore.getState().trackSettings;
   const activeTracks = ToneStore.getState().activeTracks;
-  const activeSoloIds = Object.entries(trackSettings).filter(([id, setting]) =>
+  const activeSoloIds = Object.entries(trackSettings).filter(([_id, setting]) =>
     setting.solo
   ).map((s) => s[0]);
   InstrumentsService.instruments.forEach((i, index) => {
@@ -87,7 +87,7 @@ function addKeyboardListener() {
 
 // EMITTERS
 
-let stepEmitter = new Emitter();
+const stepEmitter = new Emitter();
 let stepper: Loop | null;
 
 function syncStepEmitter() {
@@ -97,7 +97,7 @@ function syncStepEmitter() {
 }
 
 function linkStepEmitter() {
-  stepper = new Loop((time) => {
+  stepper = new Loop((_time) => {
     stepEmitter.emit("step", (Transport.position as string).split(".")[0]);
   }, ToneStore.getState().resolution);
   stepper.start(0);

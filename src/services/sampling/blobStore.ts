@@ -3,9 +3,9 @@ function storeBlob(blob: Blob, id: number) {
   return globalThis.URL.createObjectURL(blob);
 }
 
-async function saveBlob(blob: Blob, id: number) {
+function saveBlob(blob: Blob, id: number) {
   const reader = new FileReader();
-  reader.addEventListener("loadend", (event: ProgressEvent) => {
+  reader.addEventListener("loadend", (_event: ProgressEvent) => {
     if (typeof (reader.result) === "string") {
       localStorage.setItem(`audioBlob_${id}`, reader.result);
     }
