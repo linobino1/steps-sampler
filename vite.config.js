@@ -7,5 +7,8 @@ export default defineConfig(() => {
       outDir: "build",
     },
     plugins: [react()],
+    server: {
+      allowedHosts: ["localhost", "steps.leohilsheimer.com"],
+    },
   };
 });

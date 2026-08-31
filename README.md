@@ -12,3 +12,8 @@ This is a `react` project using `Tone.js` to access and manipulate the browsers'
 ## Development Environment
 
 We're using the Deno runtime.
+
+### iOS Development
+
+For development on iOS, the app must be served over HTTPS. We'll use a
+Cloudflare Tunnel to provide a secure URL for the local development server.
