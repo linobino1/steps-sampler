@@ -2,7 +2,7 @@ import styled from "styled-components";
 import GridService from "../../services/transport/grid.ts";
 import TriggersService from "../../services/transport/triggers.ts";
 import useToneStore from "../../store/store.ts";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import SequencerService from "../../services/transport/sequencer.ts";
 
 const colors = {
@@ -82,7 +82,7 @@ export default function Toggle(props: ToggleProps) {
     [props.muted, activeBars, props.timeId],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     SequencerService.stepEmitter.on("step", setStep);
     return () => {
       SequencerService.stepEmitter.off("step", setStep);
