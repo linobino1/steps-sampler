@@ -9,6 +9,11 @@ This project is live at https://steps-sampler.de
 This is a `react` project using `Tone.js` to access and manipulate the browsers'
 `Web Audio Api`
 
+Production builds contain both a modern bundle and a transpiled legacy bundle
+with usage-based JavaScript polyfills. The supported browser versions are
+defined in `package.json` under `browserslist`. Browser APIs such as Web Audio,
+microphone access, and `MediaRecorder` cannot be polyfilled.
+
 ## Development Environment
 
 We're using the Deno runtime.
