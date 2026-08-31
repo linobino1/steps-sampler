@@ -31,6 +31,9 @@ const RecordingBox = styled.div`
 
 const Blur = styled.div`
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 5px;
   backdrop-filter: blur(4px);
   top: 0;
@@ -42,7 +45,32 @@ const Blur = styled.div`
   & div {
     text-align: center;
     font-style: italic;
-    margin-top: 1rem;
+  }
+`;
+
+const RecordingNotice = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-style: italic;
+  pointer-events: none;
+
+  & .touch-instruction {
+    display: none;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    & .desktop-instruction {
+      display: none;
+    }
+
+    & .touch-instruction {
+      display: inline;
+    }
   }
 `;
 
@@ -223,6 +251,16 @@ export default function Pad(props: { pad: Instrument }) {
           recordOrPlay();
         }}
       >
+        {!audioUrl && !recording && (
+          <RecordingNotice>
+            <span className="desktop-instruction">
+              Click to start recording
+            </span>
+            <span className="touch-instruction">
+              Touch and hold to record
+            </span>
+          </RecordingNotice>
+        )}
         <WaveViewPort>
           <Wave ref={elementRef}>
             <canvas className="wave" height="0px" width="0px"></canvas>
