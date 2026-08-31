@@ -141,10 +141,14 @@ export default function Pad(props: { pad: Instrument }) {
   const [showPadCtrl, setShowPadCtrl] = useState(false);
   const windowSize = useWindowResize();
 
-  const startRecording = useCallback(() => {
+  const startRecording = useCallback(async () => {
     if (!elementRef.current) return;
+    const started = await RecorderService.startRecorder(
+      props.pad.id,
+      elementRef.current,
+    );
+    if (!started || !elementRef.current) return;
     DrawerService.clearAllCanvas(elementRef.current);
-    RecorderService.startRecorder(props.pad.id, elementRef.current);
     setRecording(true);
     setPadParams(props.pad.id);
   }, [props.pad.id, setPadParams]);
