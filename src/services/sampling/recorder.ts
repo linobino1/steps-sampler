@@ -4,6 +4,11 @@ import BlobService from "./blobStore.ts";
 
 // RECORDER
 let mediaRecorder: MediaRecorder | undefined;
+let recordingStartedAt = 0;
+let hasTimesliceData = false;
+let stopRequested = false;
+const minimumRecordingDuration = 250;
+const recordingTimeslice = 100;
 
 async function setStream(): Promise<MediaStream> {
   if (!navigator.mediaDevices?.getUserMedia) {
@@ -40,9 +45,10 @@ async function setupRecorder(
 
   mediaRecorder.onstop = function (_e) {
     const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+    console.debug({ size: blob.size, mimeType: blob.type });
+    mediaDeviceStream.getTracks().forEach((track) => track.stop());
     const url = BlobService.storeBlob(blob, id);
     PadService.addSample(url, InstrumentsService.instruments[id]);
-    mediaDeviceStream.getTracks().forEach((track) => track.stop());
 
     // reset buffer
     chunks = [];
@@ -50,6 +56,10 @@ async function setupRecorder(
 
   mediaRecorder.ondataavailable = function (e) {
     chunks.push(e.data);
+    if (mediaRecorder.state === "recording" && e.data.size > 0) {
+      hasTimesliceData = true;
+      if (stopRequested) stopRecorder();
+    }
   };
 
   return mediaRecorder;
@@ -58,9 +68,13 @@ async function setupRecorder(
 // EXPORTS
 
 async function startRecorder(id: number, parentEl: Element): Promise<boolean> {
+  stopRequested = false;
   try {
     mediaRecorder = await setupRecorder(id, parentEl);
-    mediaRecorder.start();
+    hasTimesliceData = false;
+    mediaRecorder.start(recordingTimeslice);
+    recordingStartedAt = performance.now();
+    if (stopRequested) stopRecorder();
     return true;
   } catch (error) {
     mediaRecorder = undefined;
@@ -70,8 +84,18 @@ async function startRecorder(id: number, parentEl: Element): Promise<boolean> {
 }
 
 function stopRecorder() {
-  if (mediaRecorder) {
-    mediaRecorder.stop();
+  stopRequested = true;
+  if (!mediaRecorder || mediaRecorder.state !== "recording") return;
+
+  const recorder = mediaRecorder;
+  const remaining = minimumRecordingDuration -
+    (performance.now() - recordingStartedAt);
+  if (remaining > 0) {
+    globalThis.setTimeout(() => {
+      if (recorder.state === "recording") stopRecorder();
+    }, remaining);
+  } else if (hasTimesliceData) {
+    recorder.stop();
   }
 }
 

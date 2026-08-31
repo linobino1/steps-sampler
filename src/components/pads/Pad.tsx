@@ -38,6 +38,7 @@ const Blur = styled.div`
   left: 0;
   right: 0;
   z-index: 2;
+  pointer-events: none;
   & div {
     text-align: center;
     font-style: italic;
@@ -143,13 +144,16 @@ export default function Pad(props: { pad: Instrument }) {
 
   const startRecording = useCallback(async () => {
     if (!elementRef.current) return;
+    setRecording(true);
     const started = await RecorderService.startRecorder(
       props.pad.id,
       elementRef.current,
     );
-    if (!started || !elementRef.current) return;
+    if (!started || !elementRef.current) {
+      setRecording(false);
+      return;
+    }
     DrawerService.clearAllCanvas(elementRef.current);
-    setRecording(true);
     setPadParams(props.pad.id);
   }, [props.pad.id, setPadParams]);
 
@@ -168,14 +172,18 @@ export default function Pad(props: { pad: Instrument }) {
       props.pad.id,
       true,
     );
-    audioUrl ? trigger(0) : startRecording();
+    if (audioUrl) {
+      trigger(0);
+    } else if (recording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   }
 
   function stopRecording() {
-    if (recording) {
-      RecorderService.stopRecorder();
-      setRecording(false);
-    }
+    RecorderService.stopRecorder();
+    setRecording(false);
   }
 
   function clearPad() {
@@ -183,11 +191,7 @@ export default function Pad(props: { pad: Instrument }) {
   }
 
   return (
-    <PadBox
-      onMouseLeave={() => stopRecording()}
-      onMouseUp={() => stopRecording()}
-      onTouchEnd={() => stopRecording()}
-    >
+    <PadBox onTouchEnd={() => stopRecording()}>
       <TopBar>
         {audioUrl && (
           <button type="button" onClick={clearPad}>
@@ -211,10 +215,13 @@ export default function Pad(props: { pad: Instrument }) {
       {/* <Slice style={{ width: '50px' }} /> */}
 
       <RecordingBox
-        onMouseDown={() => recordOrPlay()}
+        onClick={() => recordOrPlay()}
         onMouseMove={(e) => e.buttons > 0}
         onDragStart={console.log}
-        onTouchStart={(e) => e.preventDefault()}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          recordOrPlay();
+        }}
       >
         <WaveViewPort>
           <Wave ref={elementRef}>
