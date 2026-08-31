@@ -1,6 +1,6 @@
 function storeBlob(blob: Blob, id: number) {
   saveBlob(blob, id);
-  return window.URL.createObjectURL(blob);
+  return globalThis.URL.createObjectURL(blob);
 }
 
 async function saveBlob(blob: Blob, id: number) {
@@ -18,7 +18,7 @@ async function loadBlob(id: number) {
   if (existingBlobStr) {
     const res = await fetch(existingBlobStr);
     const blob = await res.blob();
-    return window.URL.createObjectURL(blob);
+    return globalThis.URL.createObjectURL(blob);
   }
 }
 

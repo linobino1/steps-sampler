@@ -1,10 +1,10 @@
 import { context, Emitter, Loop, start, Transport } from "tone";
-import ToneStore from "../../store/store";
-import InstrumentsService from "../core/instruments";
-import TriggersService from "./triggers";
-import GridService from "./grid";
-import PadService from "../sampling/sample";
-import useToneStore from "../../store/store";
+import ToneStore from "../../store/store.ts";
+import InstrumentsService from "../core/instruments.ts";
+import TriggersService from "./triggers.ts";
+import GridService from "./grid.ts";
+import PadService from "../sampling/sample.ts";
+import useToneStore from "../../store/store.ts";
 
 // SETTING SYNCS
 

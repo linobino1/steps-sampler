@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import RecorderService from "../../services/sampling/recorder";
-import SampleService from "../../services/sampling/sample";
-import { Instrument } from "../../services/core/interfaces";
-import useToneStore, { selectPadAudioUrl } from "../../store/store";
-import DrawerService from "../../services/sampling/waveRender";
-import InstrumentsService from "../../services/core/instruments";
-import useWindowResize from "../useWindowResize";
-import TrashIcon from "./trashIcon";
-import WavesIcon from "./wavesIcon";
-import PadControl from "./PadControl";
-import SliderIcon from "./sliderlcon";
-import { SAMPLER_PAD_HEIGHT } from "../../constants";
+import RecorderService from "../../services/sampling/recorder.ts";
+import SampleService from "../../services/sampling/sample.ts";
+import { Instrument } from "../../services/core/interfaces.ts";
+import useToneStore, { selectPadAudioUrl } from "../../store/store.ts";
+import DrawerService from "../../services/sampling/waveRender.ts";
+import InstrumentsService from "../../services/core/instruments.ts";
+import useWindowResize from "../useWindowResize.ts";
+import TrashIcon from "./trashIcon.tsx";
+import WavesIcon from "./wavesIcon.tsx";
+import PadControl from "./PadControl.tsx";
+import SliderIcon from "./sliderlcon.tsx";
+import { SAMPLER_PAD_HEIGHT } from "../../constants.ts";
 
 const PadBox = styled.div`
   position: relative;

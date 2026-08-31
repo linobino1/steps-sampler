@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import Controls from "./components/controls/Controls";
-import Sequencer from "./components/sequencer/Sequencer";
-import Header from "./components/controls/Header";
+import Controls from "./components/controls/Controls.tsx";
+import Sequencer from "./components/sequencer/Sequencer.tsx";
+import Header from "./components/controls/Header.tsx";
 
-import Mask from "./components/misc/Mask";
+import Mask from "./components/misc/Mask.tsx";
 
-import SamplerPanel from "./components/pads/Sampler";
-import SequencerService from "./services/transport/sequencer";
-import useToneStore, { STORE_VERSION } from "./store/store";
+import SamplerPanel from "./components/pads/Sampler.tsx";
+import SequencerService from "./services/transport/sequencer.ts";
+import useToneStore, { STORE_VERSION } from "./store/store.ts";
 import {
   APP_HEADER_HEIGHT,
   CTRLS_HEADER_HEIGHT,
   SAMPLER_HEIGHT,
-} from "./constants";
+} from "./constants.ts";
 
 const AppLayout = styled.div`
   display: grid;

@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import SequencerService from "../../services/transport/sequencer";
-import useToneStore from "../../store/store";
+import SequencerService from "../../services/transport/sequencer.ts";
+import useToneStore from "../../store/store.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAdd,
@@ -9,11 +9,11 @@ import {
   faPlay,
   faStop,
 } from "@fortawesome/free-solid-svg-icons";
-import InstrumentsService from "../../services/core/instruments";
-import SampleService from "../../services/sampling/sample";
+import InstrumentsService from "../../services/core/instruments.ts";
+import SampleService from "../../services/sampling/sample.ts";
 
 import { shallow } from "zustand/shallow";
-import NoteIcon from "./NoteIcon";
+import NoteIcon from "./NoteIcon.tsx";
 
 const ControlBox = styled.div`
   border: solid black 2px;
@@ -156,7 +156,7 @@ export default function Controls() {
 
       {/* <Stretch /> */}
 
-      <ControlSection className={"playback"}>
+      <ControlSection className="playback">
         <PlaybackSelect>
           <IconBox>
             <NoteIcon />

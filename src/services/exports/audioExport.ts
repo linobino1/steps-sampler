@@ -1,6 +1,6 @@
 import { context, start, Transport } from "tone";
-import useToneStore from "../../store/store";
-import InstrumentsService from "../core/instruments";
+import useToneStore from "../../store/store.ts";
+import InstrumentsService from "../core/instruments.ts";
 
 async function saveRecording() {
   // the recorded audio is returned as a blob

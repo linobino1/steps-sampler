@@ -1,7 +1,7 @@
 import useToneStore, {
   GridResolutions,
   GridSignature,
-} from "../../store/store";
+} from "../../store/store.ts";
 
 // TimeIds set the ActiveSlots in the store are used
 // to generate the UI Grid displayed in the Sequencer component

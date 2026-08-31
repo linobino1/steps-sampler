@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import useToneStore, { GridSignature } from "../../store/store";
-import InstrumentsService from "../../services/core/instruments";
-import { Track } from "./Track";
+import useToneStore, { GridSignature } from "../../store/store.ts";
+import InstrumentsService from "../../services/core/instruments.ts";
+import { Track } from "./Track.tsx";
 
 const SequencerBox = styled.div`
   margin-top: 24px;

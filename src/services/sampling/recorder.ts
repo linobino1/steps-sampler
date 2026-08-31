@@ -1,6 +1,6 @@
-import PadService from "./sample";
-import InstrumentsService from "../core/instruments";
-import BlobService from "./blobStore";
+import PadService from "./sample.ts";
+import InstrumentsService from "../core/instruments.ts";
+import BlobService from "./blobStore.ts";
 
 // RECORDER
 let mediaRecorder: MediaRecorder | undefined;

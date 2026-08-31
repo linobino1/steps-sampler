@@ -1,7 +1,7 @@
-import { Instrument } from "../core/interfaces";
-import useToneStore from "../../store/store";
-import InstrumentsService from "../core/instruments";
-import BlobService from "./blobStore";
+import { Instrument } from "../core/interfaces.ts";
+import useToneStore from "../../store/store.ts";
+import InstrumentsService from "../core/instruments.ts";
+import BlobService from "./blobStore.ts";
 
 function loadSavedSamples() {
   InstrumentsService.instruments.forEach(async (instrument) => {

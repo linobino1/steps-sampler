@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import GridService from "../../services/transport/grid";
-import TriggersService from "../../services/transport/triggers";
-import useToneStore from "../../store/store";
+import GridService from "../../services/transport/grid.ts";
+import TriggersService from "../../services/transport/triggers.ts";
+import useToneStore from "../../store/store.ts";
 import { useCallback, useEffect, useState } from "react";
-import SequencerService from "../../services/transport/sequencer";
+import SequencerService from "../../services/transport/sequencer.ts";
 
 let colors = {
   odd: "var(--main-faded)",

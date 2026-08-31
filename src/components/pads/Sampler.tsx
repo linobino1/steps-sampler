@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import Pad from "./Pad";
-import InstrumentsService from "../../services/core/instruments";
-import { SAMPLER_HEIGHT } from "../../constants";
+import Pad from "./Pad.tsx";
+import InstrumentsService from "../../services/core/instruments.ts";
+import { SAMPLER_HEIGHT } from "../../constants.ts";
 
 const Sampler = styled.div`
   display: grid;

@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import InstrumentsService from "../../services/core/instruments";
-import useToneStore from "../../store/store";
+import InstrumentsService from "../../services/core/instruments.ts";
+import useToneStore from "../../store/store.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
-import DrawerService from "../../services/sampling/waveRender";
+import DrawerService from "../../services/sampling/waveRender.ts";
 import { Transport } from "tone";
-import useWindowResize from "../useWindowResize";
+import useWindowResize from "../useWindowResize.ts";
 
 const WaveTrack = styled.div<{ activeBars: number }>`
   position: relative;

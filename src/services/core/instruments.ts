@@ -4,8 +4,8 @@ import {
   Instrument,
   InstrumentDefn,
   InstrumentType,
-} from "./interfaces";
-import useToneStore from "../../store/store";
+} from "./interfaces.ts";
+import useToneStore from "../../store/store.ts";
 
 // GLOBAL NODES
 

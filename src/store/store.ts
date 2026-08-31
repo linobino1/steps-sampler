@@ -7,10 +7,10 @@ import {
   SongArrangement,
   TrackParam,
   TrackParams,
-} from "../services/core/interfaces";
-import InstrumentsService from "../services/core/instruments";
-import TriggersService from "../services/transport/triggers";
-import GridService from "../services/transport/grid";
+} from "../services/core/interfaces.ts";
+import InstrumentsService from "../services/core/instruments.ts";
+import TriggersService from "../services/transport/triggers.ts";
+import GridService from "../services/transport/grid.ts";
 
 export type GridResolutions = "16n" | "8n" | "8t";
 export type GridSignature = "4" | "3";

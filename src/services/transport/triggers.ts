@@ -1,7 +1,7 @@
 import { Transport } from "tone";
-import useToneStore from "../../store/store";
-import InstrumentsService from "../core/instruments";
-import GridService from "./grid";
+import useToneStore from "../../store/store.ts";
+import InstrumentsService from "../core/instruments.ts";
+import GridService from "./grid.ts";
 import { VoiceLeading, Voicing, VoicingDictionary } from "tonal";
 
 const triggerEventIds: { [key: string]: number } = {}; // the key is a scheduledEvent

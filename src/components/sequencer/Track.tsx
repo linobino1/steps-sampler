@@ -1,13 +1,13 @@
 import { useCallback } from "react";
-import useToneStore, { GridSignature } from "../../store/store";
+import useToneStore, { GridSignature } from "../../store/store.ts";
 import styled from "styled-components";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import { Instrument, InstrumentType } from "../../services/core/interfaces";
-import GridService from "../../services/transport/grid";
-import Chords from "../chords/Chords";
-import Toggle from "./Toggle";
-import TrackHead from "./TrackHead";
-import { TRACK_HEIGHT } from "../../constants";
+import { Instrument, InstrumentType } from "../../services/core/interfaces.ts";
+import GridService from "../../services/transport/grid.ts";
+import Chords from "../chords/Chords.tsx";
+import Toggle from "./Toggle.tsx";
+import TrackHead from "./TrackHead.tsx";
+import { TRACK_HEIGHT } from "../../constants.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const TrackDiv = styled.div`

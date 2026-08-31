@@ -4,11 +4,11 @@ export default function useWindowResize() {
   const [size, setSize] = useState([0, 0]);
   useLayoutEffect(() => {
     function updateSize() {
-      setSize([window.innerWidth, window.innerHeight]);
+      setSize([globalThis.innerWidth, globalThis.innerHeight]);
     }
-    window.addEventListener("resize", updateSize);
+    globalThis.addEventListener("resize", updateSize);
     updateSize();
-    return () => window.removeEventListener("resize", updateSize);
+    return () => globalThis.removeEventListener("resize", updateSize);
   }, []);
   return size;
 }

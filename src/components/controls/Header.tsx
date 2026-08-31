@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { saveFile } from "../../services/exports/midi";
-import { recordAudio } from "../../services/exports/audioExport";
-import Tempo from "./Tempo";
+import { saveFile } from "../../services/exports/midi.ts";
+import { recordAudio } from "../../services/exports/audioExport.ts";
+import Tempo from "./Tempo.tsx";
 
 const HeaderDiv = styled.div`
   box-sizing: border-box;

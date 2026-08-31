@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { EnvelopeParam } from "../../services/core/interfaces";
-import useToneStore from "../../store/store";
+import { EnvelopeParam } from "../../services/core/interfaces.ts";
+import useToneStore from "../../store/store.ts";
 
 const Box = styled.div`
   width: 100%;

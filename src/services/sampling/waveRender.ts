@@ -1,5 +1,5 @@
 import { ToneAudioBuffer } from "tone";
-import { EnvelopeParam, InstrumentParam } from "../core/interfaces";
+import { EnvelopeParam, InstrumentParam } from "../core/interfaces.ts";
 
 function clearAllCanvas(parentEl: Element) {
   clearSample(parentEl, "wave");

@@ -1,7 +1,7 @@
 import { Key } from "tonal";
 import styled from "styled-components";
 import { useRef } from "react";
-import useToneStore from "../../store/store";
+import useToneStore from "../../store/store.ts";
 
 const ChordPlay = styled.div`
   margin-top: 2px;
@@ -97,7 +97,7 @@ export default function Chords() {
         <button onClick={() => onCycleChange(false)}>Sub</button>
         {chords.map((name: string) => (
           <ChordChip
-            draggable={true}
+            draggable
             onDrag={() => currentDrag.current = name}
           >
             {name}

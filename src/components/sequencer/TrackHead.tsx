@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import useToneStore from "../../store/store";
+import useToneStore from "../../store/store.ts";
 import {
   Instrument,
   InstrumentParam,
   InstrumentType,
   TrackParam,
-} from "../../services/core/interfaces";
-import { TRACK_HEIGHT } from "../../constants";
+} from "../../services/core/interfaces.ts";
+import { TRACK_HEIGHT } from "../../constants.ts";
 
 const TRACK_SECTION_HEIGHT = TRACK_HEIGHT / 3;
 
@@ -83,14 +83,14 @@ export default function TrackHead({ instrument, trackParam }: TrackHeadProps) {
       <ButtonSection>
         <TrackIcon
           active={trackParam?.mute ? "--black" : null}
-          clickable={true}
+          clickable
           onClick={() => toggleTrackMute(instrument.id)}
         >
           M
         </TrackIcon>
         <TrackIcon
           active={trackParam?.solo ? "--black" : null}
-          clickable={true}
+          clickable
           onClick={() => toggleTrackSolo(instrument.id)}
         >
           S

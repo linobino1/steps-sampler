@@ -1,8 +1,8 @@
 import { context, start, Transport } from "tone";
-import useToneStore from "../../store/store";
-import InstrumentsService from "../core/instruments";
-import BlobService from "./blobStore";
-import PadService from "./sample";
+import useToneStore from "../../store/store.ts";
+import InstrumentsService from "../core/instruments.ts";
+import BlobService from "./blobStore.ts";
+import PadService from "./sample.ts";
 
 async function saveRecording() {
   Transport.off("stop", saveRecording);

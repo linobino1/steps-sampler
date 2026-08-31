@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import useToneStore from "../../store/store";
+import useToneStore from "../../store/store.ts";
 import { shallow } from "zustand/shallow";
 
 const TempoBox = styled.div`
