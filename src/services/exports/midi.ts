@@ -66,8 +66,7 @@ function is16th(timeId: string) {
 
 function convertTimeIdToSlotNumber(timeId: string, grid: number): number {
   const timeArray = timeId.split(":").map((i) => parseInt(i));
-  const slot =
-    timeArray[0] * grid +
+  const slot = timeArray[0] * grid +
     timeArray[1] * (grid / 4) +
     timeArray[2] * (grid / 16);
   return slot;
