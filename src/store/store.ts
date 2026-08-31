@@ -308,9 +308,9 @@ const useToneStore = create<TonesState>()(
           },
         }),
       ),
-      { name: "toness" },
+      { name: "steps-sampler" },
     ),
-    { name: "toness" },
+    { name: "steps-sampler" },
   ),
 );
 

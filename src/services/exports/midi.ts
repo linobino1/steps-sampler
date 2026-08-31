@@ -10,7 +10,7 @@ const midiCodes: { [key: number]: number } = {
 };
 
 const headerJson = {
-  name: "toness",
+  name: "steps-sampler",
   ppq: ppq,
   meta: [],
   tempos: [],
@@ -75,7 +75,7 @@ function convertTimeIdToSlotNumber(timeId: string, grid: number): number {
 
 export function saveFile() {
   const a = document.createElement("a");
-  a.download = "toness_export.mid";
+  a.download = "steps-sampler_export.mid";
   const midiObj = createMidi();
   a.href = URL.createObjectURL(
     // @ts-expect-error this feature will be removed, so we'll ignore this type error
