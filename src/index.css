@@ -1,4 +1,4 @@
-@import url('input.css');
+@import url("input.css");
 
 html {
   font-size: 16px;
@@ -9,31 +9,31 @@ html {
 }
 
 @font-face {
-  font-family: 'RoobertMono';
-  src: local('RoobertMono'),
-    url(../public/fonts/RoobertMonoTRIAL-SemiBold.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Roobert';
-  src: local('Roobert'), url(../public/fonts/RoobertTRIAL-SemiBold.woff)
-    format('woff');
+  font-family: "RoobertMono";
+  src:
+    url("/fonts/RoobertMono-SemiBold.woff2") format("woff2"),
+    url("/fonts/RoobertMono-SemiBold.woff") format("woff");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
 }
 
 body {
   margin: 0;
 
-  font-family: 'RoobertMono';
+  font-family: "RoobertMono";
+  font-weight: 600;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
   height: 100vh;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.8) 18.84%,
-    rgba(255, 255, 255, 0.47) 49.45%,
-    rgba(255, 255, 255, 0) 94.2%
-  ),
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.8) 18.84%,
+      rgba(255, 255, 255, 0.47) 49.45%,
+      rgba(255, 255, 255, 0) 94.2%
+    ),
     linear-gradient(87deg, #ffcdcd 2.61%, #ffedd8 48.87%, #fbeec3 95.12%);
 
   color: black;

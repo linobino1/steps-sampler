@@ -17,7 +17,6 @@ const HeaderButton = styled.button`
 `;
 
 const Title = styled.div`
-  font-family: 'Roobert';
   font-size: 26px;
   font-weight: 600;
   line-height: 26px;

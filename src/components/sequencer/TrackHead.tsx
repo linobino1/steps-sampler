@@ -53,7 +53,6 @@ const TrackIcon = styled.button<{ active: string | null; clickable: boolean }>`
   text-align: center;
   background: ${(props) => (props.active ? "var(--main)" : "null")};
   color: var(${(props) => (props.active ? "--white" : "--black")});
-  font-famiy: RoobertMono;
   font-size: 12.6px;
 `;
 const VolSection = styled.div`
