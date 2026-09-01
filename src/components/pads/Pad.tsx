@@ -314,6 +314,7 @@ export default function Pad(props: { pad: Instrument }) {
   }
 
   function clearPad() {
+    setShowPadCtrl(false);
     SampleService.removeSample(props.pad.id);
   }
 
