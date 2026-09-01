@@ -1,4 +1,4 @@
-import { PitchShift, Player, Recorder, Sampler, Volume } from "tone";
+import { now, PitchShift, Player, Recorder, Sampler, Volume } from "tone";
 import {
   EnvelopeParam,
   Instrument,
@@ -90,6 +90,21 @@ const playbacks = [
   },
 ];
 
+interface PadPlayback {
+  id: number;
+  startTime: number;
+  offset: number;
+  duration: number;
+  bufferDuration: number;
+}
+
+const padPlaybackListeners = new Set<(playback: PadPlayback) => void>();
+
+function subscribePadPlayback(listener: (playback: PadPlayback) => void) {
+  padPlaybackListeners.add(listener);
+  return () => padPlaybackListeners.delete(listener);
+}
+
 // TRIGGER
 
 // triggers are scheduled using Transport.schedule in SequencerService
@@ -106,6 +121,18 @@ function getPlayInstrumentTrigger(
     if (!instrument.source || !player) return;
     if (instrument.fadeOut) player.fadeOut = instrument.fadeOut;
     player.start(time, instrument.offset, instrument.duration);
+    if (instrument.type === InstrumentType.pad && player.buffer.duration) {
+      const offset = instrument.offset || 0;
+      const duration = instrument.duration || player.buffer.duration - offset;
+      const playback = {
+        id,
+        startTime: time > 0 ? time : now(),
+        offset,
+        duration,
+        bufferDuration: player.buffer.duration,
+      };
+      padPlaybackListeners.forEach((listener) => listener(playback));
+    }
   };
 }
 
@@ -178,6 +205,7 @@ const InstrumentsService = {
   playbacks,
   connectInstruments,
   getPlayInstrumentTrigger,
+  subscribePadPlayback,
   // nodes
   masterVolume,
   keyboardRecorder,

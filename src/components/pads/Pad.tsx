@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import RecorderService from "../../services/sampling/recorder.ts";
 import SampleService from "../../services/sampling/sample.ts";
 import { Instrument } from "../../services/core/interfaces.ts";
@@ -12,9 +12,16 @@ import WavesIcon from "./wavesIcon.tsx";
 import PadControl from "./PadControl.tsx";
 import SliderIcon from "./sliderlcon.tsx";
 import { SAMPLER_PAD_HEIGHT } from "../../constants.ts";
+import { now } from "tone";
+
+const padPulse = keyframes`
+  0%, 100% { filter: opacity(0.07); }
+  50% { filter: opacity(0.15); }
+`;
 
 const PadBox = styled.div`
   position: relative;
+  z-index: 1;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -22,6 +29,32 @@ const PadBox = styled.div`
   border: 1.5px solid var(--black);
   background: var(--main);
   border-radius: 3px;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    animation: ${padPulse} 1000ms ease-in-out infinite;
+    transition: opacity 500ms ease-out;
+  }
+
+  &.playing::before {
+    opacity: 1;
+    transition-duration: 100ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      animation: none;
+      filter: opacity(0.25);
+    }
+  }
 `;
 
 const RecordingBox = styled.div`
@@ -87,8 +120,21 @@ const WaveViewPort = styled.div`
 `;
 
 const Wave = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
+`;
+
+const Playhead = styled.div`
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1.3px;
+  background: rgb(194, 109, 109);
+  pointer-events: none;
+  display: none;
 `;
 
 const TopBar = styled.div`
@@ -156,7 +202,9 @@ const _Slice = styled.div`
 `;
 
 export default function Pad(props: { pad: Instrument }) {
+  const padBoxRef = useRef<HTMLDivElement>(null);
   const elementRef = useRef<HTMLDivElement>(null);
+  const playheadRef = useRef<HTMLDivElement>(null);
   const audioUrl = useToneStore(
     useCallback((state) => selectPadAudioUrl(state, props.pad.id), [
       props.pad.id,
@@ -195,6 +243,45 @@ export default function Pad(props: { pad: Instrument }) {
     DrawerService.updateEditLayer(padParams, elementRef.current);
   }, [elementRef, padParams, windowSize]);
 
+  useEffect(() => {
+    let animationFrame = 0;
+    const unsubscribe = InstrumentsService.subscribePadPlayback((playback) => {
+      if (playback.id !== props.pad.id) return;
+      cancelAnimationFrame(animationFrame);
+
+      const drawPlayhead = () => {
+        const playhead = playheadRef.current;
+        if (!playhead) return;
+
+        const elapsed = now() - playback.startTime;
+        if (elapsed < 0) {
+          animationFrame = requestAnimationFrame(drawPlayhead);
+          return;
+        }
+        if (elapsed >= playback.duration) {
+          playhead.style.display = "none";
+          padBoxRef.current?.classList.remove("playing");
+          return;
+        }
+
+        const position = (playback.offset + elapsed) /
+          playback.bufferDuration * 100;
+        padBoxRef.current?.classList.add("playing");
+        playhead.style.display = "block";
+        playhead.style.left = `${Math.min(position, 100)}%`;
+        animationFrame = requestAnimationFrame(drawPlayhead);
+      };
+
+      drawPlayhead();
+    });
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      padBoxRef.current?.classList.remove("playing");
+      unsubscribe();
+    };
+  }, [props.pad.id]);
+
   function recordOrPlay() {
     const trigger = InstrumentsService.getPlayInstrumentTrigger(
       props.pad.id,
@@ -219,7 +306,7 @@ export default function Pad(props: { pad: Instrument }) {
   }
 
   return (
-    <PadBox onTouchEnd={() => stopRecording()}>
+    <PadBox ref={padBoxRef} onTouchEnd={() => stopRecording()}>
       <TopBar>
         {audioUrl && (
           <button type="button" onClick={clearPad}>
@@ -265,6 +352,7 @@ export default function Pad(props: { pad: Instrument }) {
           <Wave ref={elementRef}>
             <canvas className="wave" height="0px" width="0px"></canvas>
             <canvas className="edit" height="0px" width="0px"></canvas>
+            <Playhead ref={playheadRef} aria-hidden="true" />
           </Wave>
         </WaveViewPort>
       </RecordingBox>
