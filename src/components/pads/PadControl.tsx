@@ -78,8 +78,8 @@ const paramConfigObj: { [key: string]: ParamCfg } = {
   pitchShift: {
     displayName: "pitch",
     name: EnvelopeParam.pitchShift,
-    min: -48,
-    max: 48,
+    min: -24,
+    max: 24,
     step: 1,
   },
 };

@@ -115,7 +115,8 @@ function getPlayInstrumentTrigger(
     // note: by clearing the source we can prevent an instrument from triggering
     if (!instrument.source || !player) return;
     const startTime = time > 0 ? time : now();
-    if (instrument.fadeOut) player.fadeOut = instrument.fadeOut;
+    player.fadeIn = instrument.fadeIn ?? 0;
+    player.fadeOut = instrument.fadeOut ?? 0;
     if (instrument.type === InstrumentType.pad) {
       instrument.playHigh?.stop(startTime);
       instrument.playLow?.stop(startTime);
@@ -181,7 +182,7 @@ function syncInstrumentParam(id: number) {
     i.fadeIn = param[EnvelopeParam.fadeIn] * unity;
     if (i.sampleVolume && i.pitchShift) {
       i.sampleVolume.volume.value = param[EnvelopeParam.amplitude];
-      i.pitchShift.pitch = param[EnvelopeParam.pitchShift] / 2;
+      i.pitchShift.pitch = param[EnvelopeParam.pitchShift];
     }
   }
 }
