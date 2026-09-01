@@ -44,7 +44,7 @@ input[type='range']::-webkit-slider-thumb {
   height: var(--thumb-size);
   width: var(--thumb-size);
   position: relative;
-  bottom: 4.5px;
+  bottom: calc((var(--thumb-size) - var(--track-height)) / 2);
   background: var(--contrast);
   cursor: grab;
 
@@ -61,7 +61,7 @@ input[type='range']::-moz-range-thumb {
   height: var(--thumb-size);
   width: var(--thumb-size);
   position: relative;
-  bottom: 8px;
+  bottom: calc((var(--thumb-size) - var(--track-height)) / 2);
   background: var(--contrast);
   cursor: grab;
 
@@ -79,7 +79,7 @@ input[type='range']::-ms-thumb {
   height: var(--thumb-size);
   width: var(--thumb-size);
   position: relative;
-  bottom: 8px;
+  bottom: calc((var(--thumb-size) - var(--track-height)) / 2);
   background: var(--contrast);
   cursor: grab;
 

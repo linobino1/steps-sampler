@@ -19,8 +19,23 @@ const Param = styled.div`
   text-align: center;
   display: flex;
   font-size: 0.8rem;
+
   & input {
     width: 80%;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    flex-direction: column;
+    margin: 0.25rem 0.5rem;
+
+    & input {
+      --thumb-size: 24px;
+      width: 100%;
+      height: 52px;
+      margin-top: -16px;
+      margin-bottom: -4px;
+      touch-action: none;
+    }
   }
 `;
 
