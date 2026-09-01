@@ -30,6 +30,7 @@ export default function Footer() {
   return (
     <FooterFrame>
       <FooterLink href="/about">About</FooterLink>
+      <FooterLink href="/legal">Legal</FooterLink>
       <FooterLink
         href="https://github.com/linobino1/steps-sampler"
         target="_blank"

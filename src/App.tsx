@@ -6,6 +6,7 @@ import Header from "./components/controls/Header.tsx";
 
 import About from "./components/misc/About.tsx";
 import Footer from "./components/misc/Footer.tsx";
+import Legal from "./components/misc/Legal.tsx";
 import Mask from "./components/misc/Mask.tsx";
 
 import SamplerPanel from "./components/pads/Sampler.tsx";
@@ -66,16 +67,21 @@ function Sampler() {
 }
 
 export default function App() {
-  const isAboutPage = globalThis.location.pathname === "/about";
+  const path = globalThis.location.pathname;
+  const isInfoPage = path === "/about" || path === "/legal";
 
   return (
     <>
-      {!isAboutPage && <Mask />}
+      {!isInfoPage && <Mask />}
       <AppLayout>
         <HeaderFrame>
-          <Header showControls={!isAboutPage} />
+          <Header showControls={!isInfoPage} />
         </HeaderFrame>
-        {isAboutPage ? <About /> : <Sampler />}
+        {path === "/about"
+          ? <About />
+          : path === "/legal"
+          ? <Legal />
+          : <Sampler />}
         <Footer />
       </AppLayout>
     </>
