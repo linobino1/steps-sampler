@@ -61,7 +61,10 @@ function syncPlaybackSample() {
   }
   if (playback !== -1) {
     const i = InstrumentsService.playbacks[playback];
-    playbackEventId = Transport.scheduleOnce((time) => i.player.start(time), "0:0:0");
+    playbackEventId = Transport.scheduleOnce(
+      (time) => i.player.start(time),
+      "0:0:0",
+    );
   }
 }
 

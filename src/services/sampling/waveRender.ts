@@ -35,9 +35,9 @@ function updateEditLayer(params: InstrumentParam, parentEl: Element) {
   const durationX = startX + params[EnvelopeParam.duration] * unity;
   const fadeIn = params[EnvelopeParam.fadeIn];
   const fillFullX = startX + Math.min(
-    fadeIn,
-    params[EnvelopeParam.duration],
-  ) * unity;
+        fadeIn,
+        params[EnvelopeParam.duration],
+      ) * unity;
   const fillLevel = fadeIn > params[EnvelopeParam.duration]
     ? HEIGHT_PARAM_LOW +
       (HEIGHT_PARAM_HIGH - HEIGHT_PARAM_LOW) *
