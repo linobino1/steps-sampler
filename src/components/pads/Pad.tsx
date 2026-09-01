@@ -210,6 +210,7 @@ export default function Pad(props: { pad: Instrument }) {
     padParams[EnvelopeParam.offset],
     padParams[EnvelopeParam.duration],
   );
+  const sampleVolume = padParams[EnvelopeParam.amplitude];
 
   const startRecording = useCallback(async () => {
     if (!elementRef.current) return;
@@ -228,8 +229,12 @@ export default function Pad(props: { pad: Instrument }) {
 
   useEffect(() => {
     if (!elementRef.current) return;
-    DrawerService.drawAudioUrl(elementRef.current, audioUrl);
-  }, [elementRef, audioUrl, windowSize]);
+    DrawerService.drawAudioUrl(
+      elementRef.current,
+      audioUrl,
+      sampleVolume,
+    );
+  }, [audioUrl, sampleVolume, windowSize]);
 
   useEffect(() => {
     if (!elementRef.current) return;

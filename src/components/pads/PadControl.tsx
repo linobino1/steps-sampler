@@ -68,18 +68,18 @@ const paramConfigObj: { [key: string]: ParamCfg } = {
   //   max: 99,
   //   step: 1,
   // },
-  // volume: {
-  //   displayName: 'amplitude',
-  //   name: EnvelopeParam.amplitude,
-  //   min: -24,
-  //   max: 24,
-  //   step: 1,
-  // },
   pitchShift: {
     displayName: "pitch",
     name: EnvelopeParam.pitchShift,
     min: -24,
     max: 24,
+    step: 1,
+  },
+  volume: {
+    displayName: "volume",
+    name: EnvelopeParam.amplitude,
+    min: -12,
+    max: 12,
     step: 1,
   },
 };

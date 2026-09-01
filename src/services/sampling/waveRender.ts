@@ -60,16 +60,20 @@ function updateEditLayer(params: InstrumentParam, parentEl: Element) {
   ctx.stroke();
 }
 
-function drawAudioUrl(parentEl: Element, audioURL?: string) {
+function drawAudioUrl(parentEl: Element, audioURL?: string, volume = 0) {
   if (!audioURL) {
     clearAllCanvas(parentEl);
   }
   const buffer = new ToneAudioBuffer(audioURL, () => {
-    drawSample(buffer.getChannelData(0), parentEl);
+    drawSample(buffer.getChannelData(0), parentEl, volume);
   });
 }
 
-function drawSample(channelBuffer: Float32Array, parentEl: Element) {
+function drawSample(
+  channelBuffer: Float32Array,
+  parentEl: Element,
+  volume: number,
+) {
   const waveCanvas = parentEl.querySelector(".wave") as HTMLCanvasElement;
   waveCanvas.width = parentEl.clientWidth;
   waveCanvas.height = parentEl.clientHeight;
@@ -85,6 +89,7 @@ function drawSample(channelBuffer: Float32Array, parentEl: Element) {
   waveCtx.strokeStyle = "rgb(255, 255, 255)"; //white
 
   const stepSize = WIDTH / channelBuffer.length;
+  const gain = 10 ** (volume / 20);
   let currentX = 0;
 
   waveCtx.beginPath();
@@ -92,7 +97,10 @@ function drawSample(channelBuffer: Float32Array, parentEl: Element) {
 
   for (let i = 0; i < channelBuffer.length; i++) {
     currentX += stepSize;
-    waveCtx.lineTo(currentX, ((channelBuffer[i] + 1) / 2) * HEIGHT);
+    waveCtx.lineTo(
+      currentX,
+      ((channelBuffer[i] * gain + 1) / 2) * HEIGHT,
+    );
   }
 
   waveCtx.stroke();
