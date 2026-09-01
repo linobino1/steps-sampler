@@ -4,6 +4,8 @@ import Controls from "./components/controls/Controls.tsx";
 import Sequencer from "./components/sequencer/Sequencer.tsx";
 import Header from "./components/controls/Header.tsx";
 
+import About from "./components/misc/About.tsx";
+import Footer from "./components/misc/Footer.tsx";
 import Mask from "./components/misc/Mask.tsx";
 
 import SamplerPanel from "./components/pads/Sampler.tsx";
@@ -17,8 +19,8 @@ import {
 
 const AppLayout = styled.div`
   display: grid;
-  grid-template-rows: ${APP_HEADER_HEIGHT}px 1fr;
-  height: 100vh;
+  grid-template-rows: ${APP_HEADER_HEIGHT}px minmax(min-content, 1fr) auto;
+  min-height: 100vh;
 `;
 
 const MainFrame = styled.div`
@@ -39,7 +41,7 @@ const SequencerFrame = styled.div`
   grid-gap: 5px;
 `;
 
-export default function App() {
+function Sampler() {
   const [sequencerOn, setSequencerOn] = useState(false);
   useEffect(() => {
     if (useToneStore.getState().storeVersion !== STORE_VERSION) {
@@ -51,22 +53,32 @@ export default function App() {
   }, [setSequencerOn]);
 
   return (
-    <div>
-      <Mask />
+    <MainFrame>
+      {sequencerOn && (
+        <SequencerFrame>
+          <SamplerPanel />
+          <Controls />
+          <Sequencer />
+        </SequencerFrame>
+      )}
+    </MainFrame>
+  );
+}
+
+export default function App() {
+  const isAboutPage = globalThis.location.pathname === "/about";
+
+  return (
+    <>
+      <div className="app-background" aria-hidden="true" />
+      {!isAboutPage && <Mask />}
       <AppLayout>
         <HeaderFrame>
-          <Header />
+          <Header showControls={!isAboutPage} />
         </HeaderFrame>
-        <MainFrame>
-          {sequencerOn && (
-            <SequencerFrame>
-              <SamplerPanel />
-              <Controls />
-              <Sequencer />
-            </SequencerFrame>
-          )}
-        </MainFrame>
+        {isAboutPage ? <About /> : <Sampler />}
+        <Footer />
       </AppLayout>
-    </div>
+    </>
   );
 }

@@ -16,25 +16,33 @@ const HeaderButton = styled.button`
   color: var(--white);
 `;
 
-const Title = styled.div`
+const Title = styled.a`
+  color: inherit;
   font-size: 26px;
   font-weight: 600;
   line-height: 26px;
+  text-decoration: none;
 `;
 
 const Stretch = styled.div`
   flex: 1;
 `;
 
-export default function Header() {
+export default function Header(
+  { showControls = true }: { showControls?: boolean },
+) {
   return (
     <HeaderDiv>
-      <Title>STEPS</Title>
-      <Stretch />
-      <Tempo />
-      <Stretch />
-      <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
-      <HeaderButton onClick={() => recordAudio()}>Save Audio</HeaderButton>
+      <Title href="/">STEPS</Title>
+      {showControls && (
+        <>
+          <Stretch />
+          <Tempo />
+          <Stretch />
+          <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
+          <HeaderButton onClick={() => recordAudio()}>Save Audio</HeaderButton>
+        </>
+      )}
     </HeaderDiv>
   );
 }
