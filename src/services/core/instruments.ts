@@ -43,12 +43,7 @@ const instDef: Array<InstrumentDefn> = [
 ];
 
 const instruments: Array<Instrument> = instDef.map((defn, index) => {
-  let inst: InstrumentDefn & {
-    id: number;
-    channelVolume: Volume;
-    pitchShift: PitchShift;
-    sampleVolume: Volume;
-  } = {
+  let inst: Instrument = {
     ...defn,
     id: index,
     channelVolume: new Volume(0),
