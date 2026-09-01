@@ -50,12 +50,18 @@ function syncSignature() {
   Transport.timeSignature = parseInt(useToneStore.getState().signature);
 }
 
+let playbackEventId: number | undefined;
+
 function syncPlaybackSample() {
   const playback = useToneStore.getState().playbackSample;
   InstrumentsService.playbacks.forEach((pb) => pb.player.stop());
+  if (playbackEventId !== undefined) {
+    Transport.clear(playbackEventId);
+    playbackEventId = undefined;
+  }
   if (playback !== -1) {
     const i = InstrumentsService.playbacks[playback];
-    Transport.scheduleOnce((time) => i.player.start(time), "0:0:0");
+    playbackEventId = Transport.scheduleOnce((time) => i.player.start(time), "0:0:0");
   }
 }
 

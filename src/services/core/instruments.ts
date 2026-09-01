@@ -120,6 +120,8 @@ function getPlayInstrumentTrigger(
     if (instrument.type === InstrumentType.pad) {
       instrument.playHigh?.stop(startTime);
       instrument.playLow?.stop(startTime);
+    } else {
+      player.stop(startTime);
     }
     player.start(startTime, instrument.offset, instrument.duration);
     if (instrument.type === InstrumentType.pad && player.buffer.duration) {
