@@ -71,6 +71,11 @@ function toggleTransport(): void {
 
 function stopTransport() {
   InstrumentsService.playbacks.forEach((pb) => pb.player.stop());
+  InstrumentsService.pads.forEach((pad) => {
+    pad.sampleVolume.mute = true;
+    pad.playHigh?.stop();
+    pad.playLow?.stop();
+  });
   Transport.stop();
 }
 
