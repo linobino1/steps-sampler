@@ -181,7 +181,7 @@ function syncInstrumentParam(id: number) {
     const unity = i.playHigh.buffer.duration / 100;
     i.offset = param[EnvelopeParam.offset] * unity;
     i.duration = param[EnvelopeParam.duration] * unity;
-    i.fadeOut = param[EnvelopeParam.fadeOut] * unity;
+    i.fadeOut = param[EnvelopeParam.fadeOut] * i.duration / 100;
     i.fadeIn = param[EnvelopeParam.fadeIn] * unity;
     if (i.sampleVolume && i.pitchShift) {
       i.sampleVolume.volume.value = param[EnvelopeParam.amplitude];
