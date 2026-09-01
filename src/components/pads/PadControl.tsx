@@ -39,7 +39,8 @@ const Param = styled.div`
   }
 `;
 
-const ParamLabel = styled.div``;
+const ParamLabel = styled.div`
+`;
 const ParamInput = styled.div`
   flex: 1;
 `;
@@ -52,21 +53,7 @@ interface ParamCfg {
   step: number;
 }
 const paramConfigObj: { [key: string]: ParamCfg } = {
-  offset: {
-    displayName: "start",
-    name: EnvelopeParam.offset,
-    min: 0,
-    max: 99,
-    step: 1,
-  },
   // fadeIn: {displayName: 'f-in', name: EnvelopeParam.fadeIn, min: 0, max: 99, step: 1},
-  duration: {
-    displayName: "duration",
-    name: EnvelopeParam.duration,
-    min: 0,
-    max: 99,
-    step: 1,
-  },
   fadeIn: {
     displayName: "attack",
     name: EnvelopeParam.fadeIn,

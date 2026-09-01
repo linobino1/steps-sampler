@@ -32,16 +32,27 @@ function updateEditLayer(params: InstrumentParam, parentEl: Element) {
 
   const unity = WIDTH / 100;
   const startX = params[EnvelopeParam.offset] * unity;
-  const fillFullX = startX + params[EnvelopeParam.fadeIn] * unity;
   const durationX = startX + params[EnvelopeParam.duration] * unity;
+  const fadeIn = params[EnvelopeParam.fadeIn];
+  const fillFullX = startX + Math.min(
+    fadeIn,
+    params[EnvelopeParam.duration],
+  ) * unity;
+  const fillLevel = fadeIn > params[EnvelopeParam.duration]
+    ? HEIGHT_PARAM_LOW +
+      (HEIGHT_PARAM_HIGH - HEIGHT_PARAM_LOW) *
+        (params[EnvelopeParam.duration] / fadeIn)
+    : HEIGHT_PARAM_HIGH;
   const fillDropX = durationX; // - params[EnvelopeParam.fadeOut] * unity
 
   ctx.strokeStyle = "rgba(0,0,0,0)";
 
   ctx.beginPath();
   ctx.moveTo(startX, HEIGHT_PARAM_LOW);
-  ctx.lineTo(fillFullX, HEIGHT_PARAM_HIGH);
-  ctx.lineTo(fillDropX, HEIGHT_PARAM_HIGH);
+  ctx.lineTo(fillFullX, fillLevel);
+  if (fillFullX < fillDropX) {
+    ctx.lineTo(fillDropX, HEIGHT_PARAM_HIGH);
+  }
   ctx.lineTo(durationX, HEIGHT_PARAM_LOW);
   ctx.lineTo(startX, HEIGHT_PARAM_LOW);
   ctx.fillStyle = "rgba(248,248,255, 0.5)";

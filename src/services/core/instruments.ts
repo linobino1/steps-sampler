@@ -114,14 +114,19 @@ function getPlayInstrumentTrigger(
     const player = emphasis ? instrument.playHigh : instrument.playLow;
     // note: by clearing the source we can prevent an instrument from triggering
     if (!instrument.source || !player) return;
+    const startTime = time > 0 ? time : now();
     if (instrument.fadeOut) player.fadeOut = instrument.fadeOut;
-    player.start(time, instrument.offset, instrument.duration);
+    if (instrument.type === InstrumentType.pad) {
+      instrument.playHigh?.stop(startTime);
+      instrument.playLow?.stop(startTime);
+    }
+    player.start(startTime, instrument.offset, instrument.duration);
     if (instrument.type === InstrumentType.pad && player.buffer.duration) {
       const offset = instrument.offset || 0;
       const duration = instrument.duration || player.buffer.duration - offset;
       const playback = {
         id,
-        startTime: time > 0 ? time : now(),
+        startTime,
         offset,
         duration,
         bufferDuration: player.buffer.duration,

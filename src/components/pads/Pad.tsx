@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import RecorderService from "../../services/sampling/recorder.ts";
 import SampleService from "../../services/sampling/sample.ts";
-import { Instrument } from "../../services/core/interfaces.ts";
+import { EnvelopeParam, Instrument } from "../../services/core/interfaces.ts";
 import useToneStore, { selectPadAudioUrl } from "../../store/store.ts";
 import DrawerService from "../../services/sampling/waveRender.ts";
 import InstrumentsService from "../../services/core/instruments.ts";
@@ -13,6 +13,7 @@ import PadControl from "./PadControl.tsx";
 import SliderIcon from "./sliderlcon.tsx";
 import { SAMPLER_PAD_HEIGHT } from "../../constants.ts";
 import { now } from "tone";
+import SampleSlice, { normalizeSlice } from "./SampleSlice.tsx";
 
 const padPulse = keyframes`
   0%, 100% { filter: opacity(0.07); }
@@ -189,17 +190,6 @@ const PadTitle = styled.div`
   margin-left: 8px;
 `;
 
-const _Slice = styled.div`
-  height: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50px;
-  background: #92d5fb;
-  opacity: 0.9;
-  z-index: 10;
-`;
-
 export default function Pad(props: { pad: Instrument }) {
   const padBoxRef = useRef<HTMLDivElement>(null);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -216,6 +206,10 @@ export default function Pad(props: { pad: Instrument }) {
   const [recording, setRecording] = useState(false);
   const [showPadCtrl, setShowPadCtrl] = useState(false);
   const windowSize = useWindowResize();
+  const slice = normalizeSlice(
+    padParams[EnvelopeParam.offset],
+    padParams[EnvelopeParam.duration],
+  );
 
   const startRecording = useCallback(async () => {
     if (!elementRef.current) return;
@@ -241,6 +235,25 @@ export default function Pad(props: { pad: Instrument }) {
     if (!elementRef.current) return;
     DrawerService.updateEditLayer(padParams, elementRef.current);
   }, [elementRef, padParams, windowSize]);
+
+  useEffect(() => {
+    const duration = slice.end - slice.start;
+    if (
+      slice.start === padParams[EnvelopeParam.offset] &&
+      duration === padParams[EnvelopeParam.duration]
+    ) return;
+    setPadParams(props.pad.id, {
+      [EnvelopeParam.offset]: slice.start,
+      [EnvelopeParam.duration]: duration,
+      custom: true,
+    });
+  }, [
+    padParams,
+    props.pad.id,
+    setPadParams,
+    slice.end,
+    slice.start,
+  ]);
 
   useEffect(() => {
     let animationFrame = 0;
@@ -287,7 +300,7 @@ export default function Pad(props: { pad: Instrument }) {
       true,
     );
     if (audioUrl) {
-      trigger(0);
+      trigger(now());
     } else if (recording) {
       stopRecording();
     } else {
@@ -326,13 +339,8 @@ export default function Pad(props: { pad: Instrument }) {
           </Blur>
         )}
 
-      {/* <Slice style={{ width: '50px' }} /> */}
-
       <RecordingBox
-        onClick={() => recordOrPlay()}
-        onMouseMove={(e) => e.buttons > 0}
-        onDragStart={console.log}
-        onTouchStart={(e) => {
+        onPointerDown={(e) => {
           e.preventDefault();
           recordOrPlay();
         }}
@@ -352,6 +360,18 @@ export default function Pad(props: { pad: Instrument }) {
             <canvas className="wave" height="0px" width="0px"></canvas>
             <canvas className="edit" height="0px" width="0px"></canvas>
             <Playhead ref={playheadRef} aria-hidden="true" />
+            {showPadCtrl && audioUrl && (
+              <SampleSlice
+                offset={slice.start}
+                duration={slice.end - slice.start}
+                onChange={(offset, duration) =>
+                  setPadParams(props.pad.id, {
+                    [EnvelopeParam.offset]: offset,
+                    [EnvelopeParam.duration]: duration,
+                    custom: true,
+                  })}
+              />
+            )}
           </Wave>
         </WaveViewPort>
       </RecordingBox>

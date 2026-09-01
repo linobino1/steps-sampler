@@ -4,7 +4,7 @@ import InstrumentsService from "../core/instruments.ts";
 import GridService from "./grid.ts";
 import { Voicing, VoicingDictionary } from "tonal";
 
-const triggerEventIds: { [key: string]: number } = {}; // the key is a scheduledEvent
+const triggerEventIds = new Set<number>();
 const prevChords: Array<number> = [];
 
 function scheduleActiveTriggers() {
@@ -18,11 +18,17 @@ function scheduleActiveTriggers() {
 
   setArrangement();
 
-  const activeScheduledEvents = Object.keys(triggerEventIds);
-  activeScheduledEvents.forEach((event) => unschedule(event));
+  triggerEventIds.forEach((id) => Transport.clear(id));
+  triggerEventIds.clear();
+
+  const activeEvents = new Map<string, string>();
+  getActiveEvents().forEach((event) => {
+    const { timeId, instrumentId } = parseTrigger(event);
+    activeEvents.set(`${timeId}|${instrumentId}`, event);
+  });
 
   for (let i = 0; i < cycles; i++) {
-    getActiveEvents().map((event) => {
+    activeEvents.forEach((event) => {
       const cycleBar = parseInt(event[0]) + (i * barsPercussion);
       schedule(`${cycleBar}${event.substring(1)}`);
     });
@@ -59,15 +65,9 @@ function schedule(scheduledEvent: string) {
     parseInt(instrumentId),
     emphasis === "1",
   );
-  triggerEventIds[scheduledEvent] = Transport.schedule(
-    (time) => triggerFunction(time),
-    timeId,
+  triggerEventIds.add(
+    Transport.schedule((time) => triggerFunction(time), timeId),
   );
-}
-
-function unschedule(scheduledEvent: string) {
-  Transport.clear(triggerEventIds[scheduledEvent]);
-  delete triggerEventIds[scheduledEvent];
 }
 
 function parseTrigger(scheduledEvent: string) {
