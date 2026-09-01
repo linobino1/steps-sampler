@@ -5,9 +5,6 @@ import {
   InstrumentParam,
   TrackParam,
 } from "../../services/core/interfaces.ts";
-import { TRACK_HEIGHT } from "../../constants.ts";
-
-const TRACK_SECTION_HEIGHT = TRACK_HEIGHT / 3;
 
 const TrackHeadBox = styled.div<{ trackName: string }>`
   height: 100%;
@@ -16,8 +13,9 @@ const TrackHeadBox = styled.div<{ trackName: string }>`
   color: var(--black);
   cursor: default;
   box-sizing: border-box;
-  display: grid;
-  grid-auto-rows: ${TRACK_SECTION_HEIGHT}px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   background: ${(props) => `var(--${props.trackName});`};
 
   & svg {
@@ -37,7 +35,7 @@ const ButtonSection = styled.div`
   display: flex;
   gap: 5px;
   justify-content: center;
-  margin: auto;
+  margin: 0 auto;
   width: 80%;
   > button {
     flex: 1;
@@ -55,15 +53,6 @@ const TrackIcon = styled.button<{ active: string | null; clickable: boolean }>`
   color: var(${(props) => (props.active ? "--white" : "--black")});
   font-size: 12.6px;
 `;
-const VolSection = styled.div`
-  text-align: center;
-`;
-
-const VolInput = styled.input`
-  width: calc(100% - 10px);
-  height: ${TRACK_SECTION_HEIGHT}px;
-  left: 3px;
-`;
 
 interface TrackHeadProps {
   instrument: Instrument;
@@ -74,7 +63,6 @@ interface TrackHeadProps {
 export default function TrackHead({ instrument, trackParam }: TrackHeadProps) {
   const toggleTrackMute = useToneStore((state) => state.toggleTrackMute);
   const toggleTrackSolo = useToneStore((state) => state.toggleTrackSolo);
-  const setTrackVolume = useToneStore((state) => state.setTrackVolume);
   return (
     <TrackHeadBox trackName={instrument.name}>
       <LabelName color={instrument.name}>{instrument.name}</LabelName>
@@ -94,16 +82,6 @@ export default function TrackHead({ instrument, trackParam }: TrackHeadProps) {
           S
         </TrackIcon>
       </ButtonSection>
-      <VolSection>
-        <VolInput
-          type="range"
-          max={100}
-          min={0}
-          value={trackParam.volume}
-          onChange={(e) =>
-            setTrackVolume(instrument.id, parseInt(e.target.value))}
-        />
-      </VolSection>
     </TrackHeadBox>
   );
 }
