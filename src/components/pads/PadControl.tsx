@@ -9,7 +9,7 @@ const Box = styled.div`
   top: 100%;
   margin-top: 1px;
   padding: 5px;
-  z-index: 13;
+  z-index: 1;
   background: var(--main-light);
   border-radius: 0px 0px 6px 6px;
 `;

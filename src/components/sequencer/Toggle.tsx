@@ -37,7 +37,6 @@ const Guide = styled.div`
   font-size: 0.7rem;
   text-align: center;
   width: 100%;
-  z-index: 4;
 `;
 const StrongGuide = styled.div`
   font-weight: 600;
@@ -101,7 +100,7 @@ export default function Toggle(props: ToggleProps) {
   }
 
   return (
-    <StepMargin style={{ opacity: isActive ? "0.2" : "1" }}>
+    <StepMargin>
       {guideName
         ? (
           <Guide>
@@ -113,7 +112,12 @@ export default function Toggle(props: ToggleProps) {
         : (
           ""
         )}
-      <Step style={{ backgroundColor: getBackgroundColor() }}>
+      <Step
+        style={{
+          backgroundColor: getBackgroundColor(),
+          opacity: isActive ? "0.2" : "1",
+        }}
+      >
         {scheduled && (
           <Head emph={TriggersService.parseTrigger(scheduled)?.emphasized} />
         )}

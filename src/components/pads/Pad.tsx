@@ -21,7 +21,6 @@ const padPulse = keyframes`
 
 const PadBox = styled.div`
   position: relative;
-  z-index: 1;
   border-radius: 5px;
   display: flex;
   flex-direction: column;

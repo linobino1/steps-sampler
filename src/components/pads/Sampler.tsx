@@ -10,6 +10,7 @@ const Sampler = styled.div`
   width: 100%;
   height: ${SAMPLER_HEIGHT}px;
   position: relative;
+  z-index: 1;
 `;
 
 export default function SamplerPanel() {

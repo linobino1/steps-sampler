@@ -12,6 +12,7 @@ const TrackDiv = styled.div`
   display: flex;
   position: relative;
   height: ${TRACK_HEIGHT}px;
+  isolation: isolate;
 `;
 
 const Head = styled.div`
@@ -38,7 +39,7 @@ const Mask = styled.div`
   height: 100%;
   opacity: 0.5;
   background: white;
-  z-index: 9;
+  z-index: 1;
 `;
 
 interface TrackProps {

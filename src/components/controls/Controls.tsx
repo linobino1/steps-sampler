@@ -79,7 +79,6 @@ const PlaybackSelect = styled.label`
 
 const IconBox = styled.div`
   position: absolute;
-  z-index: 2;
   left: 13px;
   top: 2px;
   > svg {

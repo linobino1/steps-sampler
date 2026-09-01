@@ -70,7 +70,6 @@ export default function App() {
 
   return (
     <>
-      <div className="app-background" aria-hidden="true" />
       {!isAboutPage && <Mask />}
       <AppLayout>
         <HeaderFrame>
