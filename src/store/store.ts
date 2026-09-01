@@ -242,29 +242,28 @@ const useToneStore = create<TonesState>()(
             timeId: string,
             instrumentId: number,
             emphasis: boolean,
-          ) => {
-            get().removeTriggerEvent(timeId, instrumentId);
+          ) =>
             set(
-              (state) => (
-                {
+              (state) => {
+                const eventPrefix = `${timeId}|${instrumentId}|`;
+                return {
                   scheduledEvents: [
-                    ...state.scheduledEvents,
-                    `${timeId}|${instrumentId}|${emphasis ? "1" : "0"}`,
+                    ...state.scheduledEvents.filter((event) =>
+                      !event.startsWith(eventPrefix)
+                    ),
+                    `${eventPrefix}${emphasis ? "1" : "0"}`,
                   ],
-                }
-              ),
+                };
+              },
               false,
               "addTriggerEvent",
-            );
-          },
+            ),
           removeTriggerEvent: (timeId: string, instrumentId: number) =>
             set((state) => {
-              const existingTrigger = state.scheduledEvents.find((e) =>
-                e.slice(0, -2) === `${timeId}|${instrumentId}`
-              );
+              const eventPrefix = `${timeId}|${instrumentId}|`;
               return {
-                scheduledEvents: state.scheduledEvents.filter((trigger) =>
-                  trigger !== existingTrigger
+                scheduledEvents: state.scheduledEvents.filter((event) =>
+                  !event.startsWith(eventPrefix)
                 ),
               };
             }),
