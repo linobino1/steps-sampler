@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { saveFile } from "../../services/exports/midi.ts";
 import AudioExportDialog from "./AudioExportDialog.tsx";
 
 const HeaderDiv = styled.div`
@@ -8,11 +7,6 @@ const HeaderDiv = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-`;
-
-const HeaderButton = styled.button`
-  background: var(--black);
-  color: var(--white);
 `;
 
 const Title = styled.a`
@@ -36,7 +30,6 @@ export default function Header(
       {showControls && (
         <>
           <Stretch />
-          <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
           <AudioExportDialog />
         </>
       )}

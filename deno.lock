@@ -5,7 +5,6 @@
     "npm:@fortawesome/fontawesome-svg-core@^7.3.1": "7.3.1",
     "npm:@fortawesome/free-solid-svg-icons@^7.3.1": "7.3.1",
     "npm:@fortawesome/react-fontawesome@^3.5.0": "3.5.0_@fortawesome+fontawesome-svg-core@7.3.1_react@19.2.8",
-    "npm:@tonejs/midi@^2.0.28": "2.0.28",
     "npm:@types/node@^17.0.23": "17.0.23",
     "npm:@types/react-dom@^19.2.5": "19.2.5_@types+react@19.2.18",
     "npm:@types/react@^19.2.18": "19.2.18",
@@ -1349,13 +1348,6 @@
         "@tonaljs/voicing-dictionary"
       ]
     },
-    "@tonejs/midi@2.0.28": {
-      "integrity": "sha512-RII6YpInPsOZ5t3Si/20QKpNqB1lZ2OCFJSOzJxz38YdY/3zqDr3uaml4JuCWkdixuPqP1/TBnXzhQ39csyoVg==",
-      "dependencies": [
-        "array-flatten",
-        "midi-file"
-      ]
-    },
     "@trickfilm400/rollup-plugin-off-main-thread@3.0.0-pre1": {
       "integrity": "sha512-/67zpWDBLV+oYAEL682s1ktXL0HgqX76f6gaVGkGnVZlBbm1zd0v4Bz8MFF2GGhoX9rvfq3KSQHubFHwa6w6/Q==",
       "dependencies": [
@@ -1549,9 +1541,6 @@
         "call-bound",
         "is-array-buffer"
       ]
-    },
-    "array-flatten@3.0.0": {
-      "integrity": "sha512-zPMVc3ZYlGLNk4mpK1NzP2wg0ml9t7fUgDsayR5Y5rSzxQilzR9FGu/EH2jQOcKSAeAfWeylyW8juy3OkWRvNA=="
     },
     "arraybuffer.prototype.slice@1.0.4": {
       "integrity": "sha512-BNoCY6SXXPQ7gF2opIP4GBE+Xw7U+pHMYKuzjgCN3GwiaIR09UUeKfheyIry77QtrCBlC0KK0q5/TER/tYh3PQ==",
@@ -2389,9 +2378,6 @@
     },
     "meow@13.2.0": {
       "integrity": "sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA=="
-    },
-    "midi-file@1.2.3": {
-      "integrity": "sha512-JsOv9cajkVkR1gbL9Jvplz6X4lPuyVfcci0kSLzXZ2WKs7TJF72m9U5rmp45/H/1As+96dXY8xgvNLiIfGOU4w=="
     },
     "minimatch@10.2.6": {
       "integrity": "sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==",
@@ -3288,7 +3274,6 @@
         "npm:@fortawesome/fontawesome-svg-core@^7.3.1",
         "npm:@fortawesome/free-solid-svg-icons@^7.3.1",
         "npm:@fortawesome/react-fontawesome@^3.5.0",
-        "npm:@tonejs/midi@^2.0.28",
         "npm:@types/node@^17.0.23",
         "npm:@types/react-dom@^19.2.5",
         "npm:@types/react@^19.2.18",

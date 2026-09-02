@@ -14,7 +14,6 @@
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
     "@breezystack/lamejs": "^1.2.7",
-    "@tonejs/midi": "^2.0.28",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "styled-components": "^6.5.3",
