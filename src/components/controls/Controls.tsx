@@ -6,6 +6,7 @@ import useToneStore, { type GridResolutions } from "../../store/store.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAdd,
+  faCaretDown,
   faMinus,
   faPlay,
   faStop,
@@ -131,6 +132,7 @@ const PlaybackSelect = styled.label`
   margin: 2px 0px;
   position: relative;
   select {
+    appearance: none;
     margin: 0px 5px;
     width: calc(100% - 10px);
     height: 100%;
@@ -139,18 +141,30 @@ const PlaybackSelect = styled.label`
     border-radius: 5px;
     font-size: 12px;
     cursor: pointer;
-    padding-left: 33px;
+    padding: 0 16px 0 33px;
     font-family: "RoobertMono";
   }
 `;
 
 const IconBox = styled.div`
+  align-items: center;
+  display: flex;
   position: absolute;
   left: 13px;
-  top: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   > svg {
     height: 14px;
   }
+`;
+
+const PlaybackCaret = styled(FontAwesomeIcon)`
+  font-size: 10px;
+  pointer-events: none;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
 `;
 
 const _DisableMask = styled.div`
@@ -294,6 +308,7 @@ export default function Controls() {
               </option>
             ))}
           </select>
+          <PlaybackCaret icon={faCaretDown} aria-hidden="true" />
         </PlaybackSelect>
       </ControlSection>
 
