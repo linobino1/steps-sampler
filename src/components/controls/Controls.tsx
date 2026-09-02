@@ -6,7 +6,6 @@ import useToneStore from "../../store/store.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAdd,
-  faCopy,
   faMinus,
   faPlay,
   faStop,
@@ -167,13 +166,9 @@ export default function Controls() {
         <button type="button" onClick={clearSchedule}>Clear Steps</button>
       </ControlSection>
       <ControlSection>
-        <button type="button" onClick={() => changeBars(1)}>
+        <button type="button" onClick={dupeBar}>
           <FontAwesomeIcon icon={faAdd} />
           <span style={{ paddingLeft: 5 }}>Add</span>
-        </button>
-        <button type="button" onClick={dupeBar}>
-          <FontAwesomeIcon icon={faCopy} />
-          <span style={{ paddingLeft: 5 }}>Bar</span>
         </button>
         <button type="button" onClick={() => changeBars(-1)}>
           <FontAwesomeIcon icon={faMinus} />
