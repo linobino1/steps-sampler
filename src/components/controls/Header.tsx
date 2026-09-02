@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { saveFile } from "../../services/exports/midi.ts";
 import { recordAudio } from "../../services/exports/audioExport.ts";
-import Tempo from "./Tempo.tsx";
 
 const HeaderDiv = styled.div`
   box-sizing: border-box;
@@ -34,12 +33,10 @@ export default function Header(
   return (
     <HeaderDiv>
       <Title href="/">STEPS</Title>
-      {showControls && (
-        <>
-          <Stretch />
-          <Tempo />
-          <Stretch />
-          <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
+       {showControls && (
+         <>
+           <Stretch />
+           <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
           <HeaderButton onClick={() => recordAudio()}>Save Audio</HeaderButton>
         </>
       )}
