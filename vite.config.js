@@ -16,7 +16,11 @@ export default defineConfig(() => {
       VitePWA({
         registerType: "autoUpdate",
         manifestFilename: "site.webmanifest",
-        includeAssets: ["sounds/*.{mp3,wav}"],
+        includeAssets: [
+          "sounds/*.{mp3,wav}",
+          "fonts/*.{woff,woff2}",
+          "img/*.{png,svg}",
+        ],
         manifest: {
           id: "/",
           name: "Steps Sampler",
