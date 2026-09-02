@@ -9,8 +9,6 @@ import TriggersService from "../transport/triggers.ts";
 
 export type AudioFormat = "mp3" | "wav";
 
-let mp3EncoderRegistered = false;
-
 export async function recordAudio(
   format: AudioFormat = "wav",
   repetitions = 1,
@@ -89,33 +87,44 @@ function offsetMeasures(time: string, offset: number) {
 }
 
 async function encodeMp3(audioBuffer: AudioBuffer) {
-  const [mediabunny, mp3Encoder] = await Promise.all([
-    import("mediabunny"),
-    import("@mediabunny/mp3-encoder"),
-  ]);
+  const { Mp3Encoder } = await import("@breezystack/lamejs");
+  const channelCount = Math.min(2, audioBuffer.numberOfChannels);
+  const encoder = new Mp3Encoder(channelCount, audioBuffer.sampleRate, 192);
+  const channels = Array.from(
+    { length: channelCount },
+    (_, channel) => audioBuffer.getChannelData(channel),
+  );
+  const chunks: Uint8Array[] = [];
 
-  if (!mp3EncoderRegistered) {
-    mp3Encoder.registerMp3Encoder();
-    mp3EncoderRegistered = true;
+  for (let offset = 0; offset < audioBuffer.length; offset += 1152) {
+    const samples = channels.map((channel) =>
+      floatToPcm16(channel.subarray(offset, offset + 1152))
+    );
+    const chunk = encoder.encodeBuffer(samples[0], samples[1]);
+    if (chunk.length > 0) chunks.push(chunk);
   }
 
-  const target = new mediabunny.BufferTarget();
-  const output = new mediabunny.Output({
-    format: new mediabunny.Mp3OutputFormat(),
-    target,
-  });
-  const source = new mediabunny.AudioBufferSource({
-    codec: "mp3",
-    bitrate: 192_000,
-  });
+  const finalChunk = encoder.flush();
+  if (finalChunk.length > 0) chunks.push(finalChunk);
 
-  output.addAudioTrack(source);
-  await output.start();
-  await source.add(audioBuffer);
-  await output.finalize();
+  const mp3 = new Uint8Array(
+    chunks.reduce((size, chunk) => size + chunk.length, 0),
+  );
+  let offset = 0;
+  for (const chunk of chunks) {
+    mp3.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return mp3.buffer;
+}
 
-  if (!target.buffer) throw new Error("MP3 encoding produced no output");
-  return target.buffer;
+function floatToPcm16(samples: Float32Array) {
+  const pcm = new Int16Array(samples.length);
+  for (let index = 0; index < samples.length; index++) {
+    const sample = Math.max(-1, Math.min(1, samples[index]));
+    pcm[index] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+  }
+  return pcm;
 }
 
 function downloadWav(audioBuffer: AudioBuffer, bpm: number) {

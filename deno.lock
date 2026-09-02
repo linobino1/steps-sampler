@@ -1,10 +1,10 @@
 {
   "version": "5",
   "specifiers": {
+    "npm:@breezystack/lamejs@^1.2.7": "1.2.7",
     "npm:@fortawesome/fontawesome-svg-core@^7.3.1": "7.3.1",
     "npm:@fortawesome/free-solid-svg-icons@^7.3.1": "7.3.1",
     "npm:@fortawesome/react-fontawesome@^3.5.0": "3.5.0_@fortawesome+fontawesome-svg-core@7.3.1_react@19.2.8",
-    "npm:@mediabunny/mp3-encoder@^1.55.5": "1.55.5_mediabunny@1.55.5",
     "npm:@tonejs/midi@^2.0.28": "2.0.28",
     "npm:@types/node@^17.0.23": "17.0.23",
     "npm:@types/react-dom@^19.2.5": "19.2.5_@types+react@19.2.18",
@@ -12,7 +12,6 @@
     "npm:@types/styled-components@^5.1.36": "5.1.36",
     "npm:@vitejs/plugin-legacy@^8.2.3": "8.2.3_terser@5.51.2_vite@8.2.2__@types+node@17.0.23__terser@5.51.2",
     "npm:@vitejs/plugin-react@^6.1.1": "6.1.1_vite@8.2.2__@types+node@17.0.23__terser@5.51.2_terser@5.51.2",
-    "npm:mediabunny@^1.55.5": "1.55.5",
     "npm:prettier@^3.9.6": "3.9.6",
     "npm:react-dom@^19.2.8": "19.2.8_react@19.2.8",
     "npm:react@^19.2.8": "19.2.8",
@@ -802,6 +801,9 @@
         "@babel/helper-validator-identifier"
       ]
     },
+    "@breezystack/lamejs@1.2.7": {
+      "integrity": "sha512-6wc7ck65ctA75Hq7FYHTtTvGnYs6msgdxiSUICQ+A01nVOWg6rqouZB8IdyteRlfpYYiFovkf67dIeOgWIUzTA=="
+    },
     "@emotion/is-prop-valid@1.4.0": {
       "integrity": "sha512-QgD4fyscGcbbKwJmqNvUMSE02OsHUa+lAWKdEUIJKgqe5IwRSKd7+KhibEWdaKwgjLj0DRSHA9biAIqGBk05lw==",
       "dependencies": [
@@ -868,12 +870,6 @@
       "dependencies": [
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
-      ]
-    },
-    "@mediabunny/mp3-encoder@1.55.5_mediabunny@1.55.5": {
-      "integrity": "sha512-WNdWY40KXy6P23iXboIJ8IuLaUsukEF3m+kQ4jCXnDwHTOlyRd+hyq4trTDq7g9kVwB+rpj5ZSzsBq8LKsRYwQ==",
-      "dependencies": [
-        "mediabunny"
       ]
     },
     "@napi-rs/lzma-linux-x64-gnu@1.5.1": {
@@ -1368,15 +1364,6 @@
         "magic-string@0.30.21",
         "string.prototype.matchall"
       ]
-    },
-    "@types/dom-mediacapture-transform@0.1.12": {
-      "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw==",
-      "dependencies": [
-        "@types/dom-webcodecs"
-      ]
-    },
-    "@types/dom-webcodecs@0.1.13": {
-      "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
     },
     "@types/estree@1.0.9": {
       "integrity": "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg=="
@@ -2400,13 +2387,6 @@
     "math-intrinsics@1.1.0": {
       "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g=="
     },
-    "mediabunny@1.55.5": {
-      "integrity": "sha512-m0v6y8FGXiK+HKOc3AZqU+kJPLYsSKaLitmQNQIIHZKIGlTwQ34OF+X6Ul0K8iV4b03oPse10apwuoqbvmKeAA==",
-      "dependencies": [
-        "@types/dom-mediacapture-transform",
-        "@types/dom-webcodecs"
-      ]
-    },
     "meow@13.2.0": {
       "integrity": "sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA=="
     },
@@ -3304,10 +3284,10 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@breezystack/lamejs@^1.2.7",
         "npm:@fortawesome/fontawesome-svg-core@^7.3.1",
         "npm:@fortawesome/free-solid-svg-icons@^7.3.1",
         "npm:@fortawesome/react-fontawesome@^3.5.0",
-        "npm:@mediabunny/mp3-encoder@^1.55.5",
         "npm:@tonejs/midi@^2.0.28",
         "npm:@types/node@^17.0.23",
         "npm:@types/react-dom@^19.2.5",
@@ -3315,7 +3295,6 @@
         "npm:@types/styled-components@^5.1.36",
         "npm:@vitejs/plugin-legacy@^8.2.3",
         "npm:@vitejs/plugin-react@^6.1.1",
-        "npm:mediabunny@^1.55.5",
         "npm:prettier@^3.9.6",
         "npm:react-dom@^19.2.8",
         "npm:react@^19.2.8",
