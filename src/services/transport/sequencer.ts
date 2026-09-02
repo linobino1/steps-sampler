@@ -91,12 +91,15 @@ async function startTransport() {
   Transport.start();
 }
 
+function handleTransportKeydown(e: KeyboardEvent) {
+  if (e.code !== "Space" || e.repeat) return;
+
+  e.preventDefault();
+  toggleTransport();
+}
+
 function addKeyboardListener() {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === " ") {
-      toggleTransport();
-    }
-  });
+  document.addEventListener("keydown", handleTransportKeydown);
 }
 
 // EMITTERS
@@ -182,6 +185,7 @@ function initSequencer() {
 
 function unsubSequencerSubscriptions() {
   unSubs.forEach((unsub) => unsub());
+  document.removeEventListener("keydown", handleTransportKeydown);
 }
 
 const SequencerService = {
