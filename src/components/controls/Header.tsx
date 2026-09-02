@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { saveFile } from "../../services/exports/midi.ts";
-import { recordAudio } from "../../services/exports/audioExport.ts";
+import AudioExportDialog from "./AudioExportDialog.tsx";
 
 const HeaderDiv = styled.div`
   box-sizing: border-box;
@@ -37,8 +37,7 @@ export default function Header(
         <>
           <Stretch />
           <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
-          <HeaderButton onClick={() => recordAudio("wav")}>Save WAV</HeaderButton>
-          <HeaderButton onClick={() => recordAudio("mp3")}>Save MP3</HeaderButton>
+          <AudioExportDialog />
         </>
       )}
     </HeaderDiv>

@@ -7,16 +7,21 @@ import {
 } from "../transport/sequencer.ts";
 import TriggersService from "../transport/triggers.ts";
 
-type AudioFormat = "mp3" | "wav";
+export type AudioFormat = "mp3" | "wav";
 
 let mp3EncoderRegistered = false;
 
-export async function recordAudio(format: AudioFormat = "wav") {
+export async function recordAudio(
+  format: AudioFormat = "wav",
+  repetitions = 1,
+) {
   await loaded();
 
   const state = useToneStore.getState();
   const plan = TriggersService.createPlaybackPlan(state);
-  const duration = plan.measures * parseInt(state.signature) * 60 / state.bpm;
+  const repetitionCount = Math.max(1, Math.min(99, Math.floor(repetitions)));
+  const duration = plan.measures * repetitionCount *
+    parseInt(state.signature) * 60 / state.bpm;
 
   const rendered = await Offline(
     async ({ transport }) => {
@@ -37,11 +42,29 @@ export async function recordAudio(format: AudioFormat = "wav") {
           output,
         );
         if (player) {
-          transport.schedule((time) => player.start(time), "0:0:0");
+          for (let repetition = 0; repetition < repetitionCount; repetition++) {
+            transport.schedule(
+              (time) => player.start(time),
+              `${repetition * plan.measures}:0:0`,
+            );
+          }
         }
       }
 
-      schedulePlaybackPlan(transport, instruments, plan);
+      for (let repetition = 0; repetition < repetitionCount; repetition++) {
+        const measureOffset = repetition * plan.measures;
+        schedulePlaybackPlan(transport, instruments, {
+          ...plan,
+          instrumentEvents: plan.instrumentEvents.map((event) => ({
+            ...event,
+            time: offsetMeasures(event.time, measureOffset),
+          })),
+          chordEvents: plan.chordEvents.map((event) => ({
+            ...event,
+            time: offsetMeasures(event.time, measureOffset),
+          })),
+        });
+      }
       await loaded();
       transport.start(0);
     },
@@ -58,6 +81,11 @@ export async function recordAudio(format: AudioFormat = "wav") {
   } else {
     downloadWav(audioBuffer, state.bpm);
   }
+}
+
+function offsetMeasures(time: string, offset: number) {
+  const [measure, ...position] = time.split(":");
+  return [parseInt(measure) + offset, ...position].join(":");
 }
 
 async function encodeMp3(audioBuffer: AudioBuffer) {
