@@ -93,7 +93,9 @@ function setArrangement() {
         const triggerBar = barIndex + (cycleIndex * barsPercussion);
         const triggerEights = chordIndex === 1 ? 2 : 0;
         const scheduled = Transport.schedule((_time) => {
-          InstrumentsService.chords.playSampler?.triggerAttackRelease(
+          const sampler = InstrumentsService.chords.playSampler;
+          if (!sampler?.loaded) return;
+          sampler.triggerAttackRelease(
             toPlay[0],
             0.60,
           );

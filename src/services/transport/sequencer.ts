@@ -1,4 +1,4 @@
-import { context, Emitter, Loop, start, Transport } from "tone";
+import { context, Emitter, loaded, Loop, start, Transport } from "tone";
 import ToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import TriggersService from "./triggers.ts";
@@ -62,17 +62,26 @@ function syncPlaybackSample() {
   if (playback !== -1) {
     const i = InstrumentsService.playbacks[playback];
     playbackEventId = Transport.scheduleOnce(
-      (time) => i.player.start(time),
+      (time) => {
+        if (i.player.loaded) i.player.start(time);
+      },
       "0:0:0",
     );
   }
 }
 
+let transportStartPending = false;
+let transportStartRequest = 0;
+
 function toggleTransport(): void {
-  Transport.state === "stopped" ? startTransport() : stopTransport();
+  Transport.state === "stopped" && !transportStartPending
+    ? startTransport()
+    : stopTransport();
 }
 
 function stopTransport() {
+  transportStartPending = false;
+  transportStartRequest++;
   InstrumentsService.playbacks.forEach((pb) => pb.player.stop());
   InstrumentsService.pads.forEach((pad) => {
     pad.sampleVolume.mute = true;
@@ -83,12 +92,21 @@ function stopTransport() {
 }
 
 async function startTransport() {
-  if (context.state !== "running") {
-    await start();
+  const request = ++transportStartRequest;
+  transportStartPending = true;
+  try {
+    if (context.state !== "running") {
+      await start();
+    }
+    await loaded();
+    if (request !== transportStartRequest) return;
+
+    syncPlaybackSample();
+    Transport.loop = true;
+    Transport.start();
+  } finally {
+    if (request === transportStartRequest) transportStartPending = false;
   }
-  syncPlaybackSample();
-  Transport.loop = true;
-  Transport.start();
 }
 
 function handleTransportKeydown(e: KeyboardEvent) {
@@ -190,6 +208,8 @@ function initSequencer() {
 }
 
 function unsubSequencerSubscriptions() {
+  transportStartPending = false;
+  transportStartRequest++;
   unSubs.forEach((unsub) => unsub());
   unSubs = [];
   stepper?.dispose();

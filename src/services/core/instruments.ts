@@ -113,7 +113,7 @@ function getPlayInstrumentTrigger(
     const instrument = instruments[id];
     const player = emphasis ? instrument.playHigh : instrument.playLow;
     // note: by clearing the source we can prevent an instrument from triggering
-    if (!instrument.source || !player) return;
+    if (!instrument.source || !player?.loaded) return;
     const startTime = time > 0 ? time : now();
     instrument.sampleVolume.mute = false;
     player.fadeIn = instrument.fadeIn ?? 0;
