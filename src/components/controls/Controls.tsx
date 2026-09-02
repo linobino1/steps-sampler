@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import { useEffect, useState } from "react";
+import { Transport } from "tone";
 import SequencerService from "../../services/transport/sequencer.ts";
 import useToneStore from "../../store/store.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -58,6 +60,11 @@ const MultiSelectBtn = styled.button`
   }
 `;
 
+const TransportButton = styled.button<{ $playing: boolean }>`
+  background: ${(props) => props.$playing ? "var(--main)" : "initial"};
+  color: ${(props) => props.$playing ? "var(--white)" : "initial"};
+`;
+
 const PlaybackSelect = styled.label`
   color: black;
   font-weight: bold;
@@ -97,6 +104,7 @@ const _DisableMask = styled.div`
 `;
 
 export default function Controls() {
+  const [isPlaying, setIsPlaying] = useState(Transport.state === "started");
   const changeBars = useToneStore((state) => state.changeBars);
   const [res, toggleRes] = useToneStore(
     (state) => [state.resolution, state.toggleResolution],
@@ -113,6 +121,21 @@ export default function Controls() {
     (state) => [state.playbackSample, state.setPlaybackSample],
     shallow,
   );
+
+  useEffect(() => {
+    const showPlaying = () => setIsPlaying(true);
+    const showStopped = () => setIsPlaying(false);
+
+    Transport.on("start", showPlaying);
+    Transport.on("stop", showStopped);
+    Transport.on("pause", showStopped);
+
+    return () => {
+      Transport.off("start", showPlaying);
+      Transport.off("stop", showStopped);
+      Transport.off("pause", showStopped);
+    };
+  }, []);
 
   function toggleTransporter() {
     SequencerService.toggleTransport();
@@ -132,10 +155,15 @@ export default function Controls() {
   return (
     <ControlBox>
       <ControlSection>
-        <button type="button" onClick={toggleTransporter}>
+        <TransportButton
+          type="button"
+          $playing={isPlaying}
+          aria-pressed={isPlaying}
+          onClick={toggleTransporter}
+        >
           <FontAwesomeIcon icon={faPlay} /> <span></span>
           <FontAwesomeIcon icon={faStop} />
-        </button>
+        </TransportButton>
         <button type="button" onClick={clearSchedule}>Clear Steps</button>
       </ControlSection>
       <ControlSection>
