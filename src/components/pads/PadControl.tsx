@@ -73,14 +73,14 @@ const paramConfigObj: { [key: string]: ParamCfg } = {
     name: EnvelopeParam.pitchShift,
     min: -24,
     max: 24,
-    step: 1,
+    step: 0.1,
   },
   volume: {
     displayName: "volume",
     name: EnvelopeParam.amplitude,
     min: -12,
     max: 12,
-    step: 1,
+    step: 0.1,
   },
 };
 const paramConfigs: Array<ParamCfg> = Array.from(Object.values(paramConfigObj));
@@ -98,7 +98,7 @@ export default function PadControl({ padId }: CmpProps) {
   function updateParams(value: string, paramName: EnvelopeParam) {
     setPadParams(padId, {
       ...padParams,
-      [paramName]: parseInt(value),
+      [paramName]: parseFloat(value),
       custom: true,
     });
   }
