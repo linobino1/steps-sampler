@@ -52,7 +52,7 @@ export default function SwingControl() {
     (state) => [state.swing, state.setSwing],
     shallow,
   );
-  const playback = useToneStore((state) => state.playbackSample);
+  const resolution = useToneStore((state) => state.resolution);
   const swingPercent = Math.round(MIN_SWING_PERCENT + swing / 3);
   const dragStart = useRef({ y: 0, swingPercent });
 
@@ -67,7 +67,7 @@ export default function SwingControl() {
   return (
     <SwingScrubber
       type="button"
-      disabled={playback > -1}
+      disabled={resolution === "8t"}
       aria-label={`Swing ${swingPercent} percent. Drag up or down to adjust.`}
       onPointerDown={(event) => {
         dragStart.current = { y: event.clientY, swingPercent };

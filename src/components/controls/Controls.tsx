@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Transport } from "tone";
 import SequencerService from "../../services/transport/sequencer.ts";
-import useToneStore from "../../store/store.ts";
+import useToneStore, { type GridResolutions } from "../../store/store.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAdd,
@@ -171,6 +171,7 @@ export default function Controls() {
     (state) => [state.resolution, state.toggleResolution],
     shallow,
   );
+  const straightSwing = useRef(useToneStore.getState().swing);
   const [sig, toggleSig] = useToneStore(
     (state) => [state.signature, state.setGridSignature],
     shallow,
@@ -198,12 +199,35 @@ export default function Controls() {
     };
   }, []);
 
+  useEffect(() => {
+    if (res !== "8t") return;
+
+    const { setSwing, swing } = useToneStore.getState();
+    if (swing !== 0) {
+      straightSwing.current = swing;
+      setSwing(0);
+    }
+  }, [res]);
+
   function toggleTransporter() {
     SequencerService.toggleTransport();
     const e = document.activeElement as HTMLInputElement;
     if ("blur" in e) {
       e.blur(); // to avoid cross-canceling with spacebar listener
     }
+  }
+
+  function setGridResolution(resolution: GridResolutions) {
+    const { setSwing, swing } = useToneStore.getState();
+
+    if (resolution === "8t") {
+      if (res !== "8t") straightSwing.current = swing;
+      setSwing(0);
+    } else if (res === "8t") {
+      setSwing(straightSwing.current);
+    }
+
+    toggleRes(resolution);
   }
 
   function _clearAll() {
@@ -292,19 +316,19 @@ export default function Controls() {
       <ControlSection>
         <MultiSelectBtn
           className={res === "8n" ? "active" : ""}
-          onClick={() => toggleRes("8n")}
+          onClick={() => setGridResolution("8n")}
         >
           8THS
         </MultiSelectBtn>
         <MultiSelectBtn
           className={res === "8t" ? "active" : ""}
-          onClick={() => toggleRes("8t")}
+          onClick={() => setGridResolution("8t")}
         >
           TRIPLETS
         </MultiSelectBtn>
         <MultiSelectBtn
           className={res === "16n" ? "active" : ""}
-          onClick={() => toggleRes("16n")}
+          onClick={() => setGridResolution("16n")}
         >
           16THS
         </MultiSelectBtn>
