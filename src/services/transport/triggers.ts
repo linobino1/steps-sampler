@@ -1,73 +1,86 @@
-import { Transport } from "tone";
-import useToneStore from "../../store/store.ts";
-import InstrumentsService from "../core/instruments.ts";
-import GridService from "./grid.ts";
 import { Voicing, VoicingDictionary } from "tonal";
+import { SongArrangement } from "../core/interfaces.ts";
+import { parseTimeId } from "./time.ts";
 
-const triggerEventIds = new Set<number>();
-const prevChords: Array<number> = [];
+interface PlaybackPlanState {
+  activeBars: number;
+  signature: string;
+  resolution: string;
+  scheduledEvents: Array<string>;
+  songArrangement: SongArrangement;
+}
 
-function scheduleActiveTriggers() {
-  // from the scheduled events set in the store we take the subset available
-  // based on resolution and bars in grid and schedule/unschedule them to the Transport
+export interface InstrumentEvent {
+  time: string;
+  instrumentId: number;
+  emphasis: boolean;
+}
 
-  const arrangement = useToneStore.getState().songArrangement;
-  const cycles = arrangement.length || 1;
-  const barsPercussion = useToneStore.getState().activeBars;
-  Transport.setLoopPoints(0, `${barsPercussion * cycles}m`);
+export interface ChordEvent {
+  time: string;
+  notes: Array<string>;
+}
 
-  setArrangement();
+export interface PlaybackPlan {
+  measures: number;
+  instrumentEvents: Array<InstrumentEvent>;
+  chordEvents: Array<ChordEvent>;
+}
 
-  triggerEventIds.forEach((id) => Transport.clear(id));
-  triggerEventIds.clear();
-
+function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
+  const cycles = state.songArrangement.length || 1;
   const activeEvents = new Map<string, string>();
-  getActiveEvents().forEach((event) => {
+  state.scheduledEvents.filter((event) => {
+    const { bar, quarter, sixteenth } = parseTimeId(event);
+    if (bar >= state.activeBars || quarter >= parseInt(state.signature)) {
+      return false;
+    }
+    if (state.resolution === "8n") return ["0", "2"].includes(sixteenth);
+    if (state.resolution === "16n") return !sixteenth.includes(".");
+    return !["1", "2", "3"].includes(sixteenth);
+  }).forEach((event) => {
     const { timeId, instrumentId } = parseTrigger(event);
     activeEvents.set(`${timeId}|${instrumentId}`, event);
   });
 
-  for (let i = 0; i < cycles; i++) {
+  const instrumentEvents: Array<InstrumentEvent> = [];
+  for (let cycle = 0; cycle < cycles; cycle++) {
     activeEvents.forEach((event) => {
-      const cycleBar = parseInt(event[0]) + (i * barsPercussion);
-      schedule(`${cycleBar}${event.substring(1)}`);
+      const { timeId, instrumentId, emphasized } = parseTrigger(event);
+      const { bar, quarter, sixteenth } = parseTimeId(timeId);
+      instrumentEvents.push({
+        time: `${bar + cycle * state.activeBars}:${quarter}:${sixteenth}`,
+        instrumentId: parseInt(instrumentId),
+        emphasis: emphasized,
+      });
     });
   }
-}
 
-function getActiveEvents() {
-  const resolution = useToneStore.getState().resolution;
-  const activeBars = useToneStore.getState().activeBars;
-  const signature = useToneStore.getState().signature;
-  const allEvents = useToneStore.getState().scheduledEvents;
-  return allEvents.filter((event) => {
-    const sixteenth = parseTrigger(event).timeId.split(":")[2];
-    switch (resolution) {
-      case "8n":
-        return ["0", "2"].indexOf(sixteenth) !== -1; // only keep eigths
-      case "16n":
-        return sixteenth.indexOf(".") === -1; // remove triplets
-      case "8t":
-        return ["1", "2", "3"].indexOf(sixteenth) === -1; // remove straight 16 and 8
-      default:
-        return true;
-    }
-  }).filter((event) => {
-    const timeId = parseTrigger(event).timeId;
-    const { bar, quarter } = GridService.parseTimeId(timeId);
-    return bar < activeBars && quarter < parseInt(signature);
+  const chordEvents: Array<ChordEvent> = [];
+  state.songArrangement.forEach((cycle, cycleIndex) => {
+    cycle.forEach((bar, barIndex) => {
+      (bar || []).forEach((chord, chordIndex) => {
+        const notes = Voicing.search(
+          chord,
+          ["B3", "D5"],
+          VoicingDictionary.defaultDictionary,
+        )[0];
+        if (!notes) return;
+        chordEvents.push({
+          time: `${barIndex + cycleIndex * state.activeBars}:${
+            chordIndex === 1 ? 2 : 0
+          }:0`,
+          notes,
+        });
+      });
+    });
   });
-}
 
-function schedule(scheduledEvent: string) {
-  const [timeId, instrumentId, emphasis] = scheduledEvent.split("|");
-  const triggerFunction = InstrumentsService.getPlayInstrumentTrigger(
-    parseInt(instrumentId),
-    emphasis === "1",
-  );
-  triggerEventIds.add(
-    Transport.schedule((time) => triggerFunction(time), timeId),
-  );
+  return {
+    measures: state.activeBars * cycles,
+    instrumentEvents,
+    chordEvents,
+  };
 }
 
 function parseTrigger(scheduledEvent: string) {
@@ -79,35 +92,8 @@ function parseTrigger(scheduledEvent: string) {
   };
 }
 
-function setArrangement() {
-  const barsPercussion = useToneStore.getState().activeBars;
-  prevChords.forEach((id) => Transport.clear(id));
-  useToneStore.getState().songArrangement.forEach((cycle, cycleIndex) => {
-    cycle.forEach((bar, barIndex) => {
-      (bar || []).forEach((chord, chordIndex) => {
-        const toPlay = Voicing.search(
-          chord,
-          ["B3", "D5"],
-          VoicingDictionary.defaultDictionary,
-        );
-        const triggerBar = barIndex + (cycleIndex * barsPercussion);
-        const triggerEights = chordIndex === 1 ? 2 : 0;
-        const scheduled = Transport.schedule((_time) => {
-          const sampler = InstrumentsService.chords.playSampler;
-          if (!sampler?.loaded) return;
-          sampler.triggerAttackRelease(
-            toPlay[0],
-            0.60,
-          );
-        }, `${triggerBar}:${triggerEights}:0`);
-        prevChords.push(scheduled);
-      });
-    });
-  });
-}
-
 const TriggersService = {
-  scheduleActiveTriggers,
+  createPlaybackPlan,
   parseTrigger,
 };
 

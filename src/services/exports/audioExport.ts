@@ -1,148 +1,43 @@
-import { loaded, Offline, PitchShift, Player, Sampler, Volume } from "tone";
-import { Voicing, VoicingDictionary } from "tonal";
+import { loaded, Offline, Volume } from "tone";
 import useToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
-import { EnvelopeParam, InstrumentType } from "../core/interfaces.ts";
-import GridService from "../transport/grid.ts";
+import {
+  configureTransport,
+  schedulePlaybackPlan,
+} from "../transport/sequencer.ts";
+import TriggersService from "../transport/triggers.ts";
 
 export async function recordAudio() {
   await loaded();
 
   const state = useToneStore.getState();
-  const cycles = state.songArrangement.length || 1;
-  const measures = state.activeBars * cycles;
-  const duration = measures * parseInt(state.signature) * 60 / state.bpm;
+  const plan = TriggersService.createPlaybackPlan(state);
+  const duration = plan.measures * parseInt(state.signature) * 60 / state.bpm;
 
   const rendered = await Offline(
     async ({ transport }) => {
-      transport.bpm.value = state.bpm;
-      transport.timeSignature = parseInt(state.signature);
-      transport.swing = state.swing / 100;
+      configureTransport(transport, state);
 
-      const soloedTracks = Object.entries(state.trackSettings)
-        .filter(([, setting]) => setting.solo)
-        .map(([id]) => id);
-
-      const players = InstrumentsService.instruments.map(
-        (instrument, index) => {
-          const track = state.trackSettings[instrument.id];
-          const channelVolume = new Volume({
-            mute: index >= state.activeTracks || track.mute ||
-              (soloedTracks.length > 0 &&
-                !soloedTracks.includes(`${instrument.id}`)),
-            volume: -12 * (100 - track.volume) / 100,
-          }).toDestination();
-          const params = state.instrumentParams[instrument.id];
-          const pitchShift = new PitchShift(params[EnvelopeParam.pitchShift]);
-          const sampleVolume = new Volume(params[EnvelopeParam.amplitude]);
-          const output = pitchShift.chain(sampleVolume, channelVolume);
-
-          if (instrument.type === InstrumentType.chords) {
-            const sampler = new Sampler({
-              urls: {
-                C2: "sounds/piano_C2.wav",
-                D4: "sounds/piano_D4.wav",
-              },
-            }).chain(new Volume(-8), output);
-            return { sampler };
-          }
-
-          if (!instrument.source || !instrument.playHigh?.loaded) return {};
-
-          let offset = instrument.offset || 0;
-          let sampleDuration = instrument.duration;
-          let fadeIn = instrument.fadeIn || 0;
-          let fadeOut = instrument.fadeOut || 0;
-          if (instrument.type === InstrumentType.pad) {
-            const bufferDuration = instrument.playHigh.buffer.duration;
-            const unity = bufferDuration / 100;
-            offset = params[EnvelopeParam.offset] * unity;
-            sampleDuration = params[EnvelopeParam.duration] * unity;
-            fadeIn = params[EnvelopeParam.fadeIn] * unity;
-            fadeOut = params[EnvelopeParam.fadeOut] * sampleDuration / 100;
-          }
-
-          const high = new Player({
-            url: instrument.playHigh.buffer,
-            fadeIn,
-            fadeOut,
-          }).chain(new Volume(0), output);
-          const low = new Player({
-            url: instrument.playHigh.buffer,
-            fadeIn,
-            fadeOut,
-          }).chain(new Volume(-8), output);
-          return { high, low, offset, duration: sampleDuration };
-        },
+      const output = new Volume(0).toDestination();
+      const instruments = InstrumentsService.createInstrumentGraph(output);
+      InstrumentsService.syncParams(state.instrumentParams, instruments);
+      InstrumentsService.syncTrackSettings(
+        state.trackSettings,
+        state.activeTracks,
+        instruments,
       );
 
-      const backing = state.playbackSample >= 0
-        ? InstrumentsService.playbacks[state.playbackSample]
-        : undefined;
-      if (backing?.player.loaded) {
-        const player = new Player(backing.player.buffer).toDestination();
-        transport.schedule((time) => player.start(time), "0:0:0");
-      }
-
-      const activeEvents = new Map<string, string>();
-      state.scheduledEvents.filter((event) => {
-        const { bar, quarter, sixteenth } = GridService.parseTimeId(event);
-        if (bar >= state.activeBars || quarter >= parseInt(state.signature)) {
-          return false;
+      if (state.playbackSample >= 0) {
+        const player = InstrumentsService.createPlaybackPlayer(
+          state.playbackSample,
+          output,
+        );
+        if (player) {
+          transport.schedule((time) => player.start(time), "0:0:0");
         }
-        if (state.resolution === "8n") return ["0", "2"].includes(sixteenth);
-        if (state.resolution === "16n") return !sixteenth.includes(".");
-        return !["1", "2", "3"].includes(sixteenth);
-      }).forEach((event) => {
-        const [timeId, instrumentId] = event.split("|");
-        activeEvents.set(`${timeId}|${instrumentId}`, event);
-      });
-
-      for (let cycle = 0; cycle < cycles; cycle++) {
-        activeEvents.forEach((event) => {
-          const [timeId, instrumentId, emphasis] = event.split("|");
-          const { bar, quarter, sixteenth } = GridService.parseTimeId(timeId);
-          const player = players[parseInt(instrumentId)];
-          transport.schedule((time) => {
-            const source = emphasis === "1" ? player.high : player.low;
-            if (!source) return;
-            if (
-              InstrumentsService.instruments[parseInt(instrumentId)].type ===
-                InstrumentType.pad
-            ) {
-              player.high?.stop(time);
-              player.low?.stop(time);
-            } else {
-              source.stop(time);
-            }
-            source.start(time, player.offset, player.duration);
-          }, `${bar + cycle * state.activeBars}:${quarter}:${sixteenth}`);
-        });
       }
 
-      state.songArrangement.forEach((cycle, cycleIndex) => {
-        cycle.forEach((bar, barIndex) => {
-          (bar || []).forEach((chord, chordIndex) => {
-            const voicing = Voicing.search(
-              chord,
-              ["B3", "D5"],
-              VoicingDictionary.defaultDictionary,
-            )[0];
-            if (!voicing) return;
-            const triggerBar = barIndex + cycleIndex * state.activeBars;
-            const triggerEighth = chordIndex === 1 ? 2 : 0;
-            transport.schedule((time) => {
-              players[InstrumentsService.chords.id].sampler
-                ?.triggerAttackRelease(
-                  voicing,
-                  0.6,
-                  time,
-                );
-            }, `${triggerBar}:${triggerEighth}:0`);
-          });
-        });
-      });
-
+      schedulePlaybackPlan(transport, instruments, plan);
       await loaded();
       transport.start(0);
     },

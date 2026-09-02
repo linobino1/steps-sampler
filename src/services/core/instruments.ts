@@ -1,11 +1,21 @@
-import { now, PitchShift, Player, Recorder, Sampler, Volume } from "tone";
+import {
+  now,
+  PitchShift,
+  Player,
+  Recorder,
+  Sampler,
+  ToneAudioBuffer,
+  ToneAudioNode,
+  Volume,
+} from "tone";
 import {
   EnvelopeParam,
   Instrument,
   InstrumentDefn,
+  InstrumentParams,
   InstrumentType,
+  TrackParams,
 } from "./interfaces.ts";
-import useToneStore from "../../store/store.ts";
 
 // GLOBAL NODES
 
@@ -105,45 +115,58 @@ function subscribePadPlayback(listener: (playback: PadPlayback) => void) {
 // triggers are scheduled using Transport.schedule in SequencerService
 // alternatively this could be done by syncing with instrument.sync()
 
+function triggerInstrument(
+  targetInstruments: Array<Instrument>,
+  id: number,
+  emphasis: boolean,
+  time: number,
+  notify = false,
+) {
+  const instrument = targetInstruments[id];
+  const player = emphasis ? instrument.playHigh : instrument.playLow;
+  if (!instrument.source || !player?.loaded) return;
+  const startTime = time >= 0 ? time : now();
+  instrument.sampleVolume.mute = false;
+  player.fadeIn = instrument.fadeIn ?? 0;
+  player.fadeOut = instrument.fadeOut ?? 0;
+  if (instrument.type === InstrumentType.pad) {
+    instrument.playHigh?.stop(startTime);
+    instrument.playLow?.stop(startTime);
+  } else {
+    player.stop(startTime);
+  }
+  player.start(startTime, instrument.offset, instrument.duration);
+  if (
+    notify && instrument.type === InstrumentType.pad && player.buffer.duration
+  ) {
+    const offset = instrument.offset || 0;
+    const duration = instrument.duration || player.buffer.duration - offset;
+    const playback = {
+      id,
+      startTime,
+      offset,
+      duration,
+      bufferDuration: player.buffer.duration,
+    };
+    padPlaybackListeners.forEach((listener) => listener(playback));
+  }
+}
+
 function getPlayInstrumentTrigger(
   id: number,
   emphasis: boolean,
 ): (arg0: number) => void {
-  return (time) => {
-    const instrument = instruments[id];
-    const player = emphasis ? instrument.playHigh : instrument.playLow;
-    // note: by clearing the source we can prevent an instrument from triggering
-    if (!instrument.source || !player?.loaded) return;
-    const startTime = time > 0 ? time : now();
-    instrument.sampleVolume.mute = false;
-    player.fadeIn = instrument.fadeIn ?? 0;
-    player.fadeOut = instrument.fadeOut ?? 0;
-    if (instrument.type === InstrumentType.pad) {
-      instrument.playHigh?.stop(startTime);
-      instrument.playLow?.stop(startTime);
-    } else {
-      player.stop(startTime);
-    }
-    player.start(startTime, instrument.offset, instrument.duration);
-    if (instrument.type === InstrumentType.pad && player.buffer.duration) {
-      const offset = instrument.offset || 0;
-      const duration = instrument.duration || player.buffer.duration - offset;
-      const playback = {
-        id,
-        startTime,
-        offset,
-        duration,
-        bufferDuration: player.buffer.duration,
-      };
-      padPlaybackListeners.forEach((listener) => listener(playback));
-    }
-  };
+  return (time) => triggerInstrument(instruments, id, emphasis, time, true);
 }
 
 // SIGNAL CHAIN
 
-function wireSignalChain(instrument: Instrument) {
-  instrument.channelVolume.fan(controlRoomRecorder, masterVolume);
+function wireSignalChain(
+  instrument: Instrument,
+  destinations: Array<ToneAudioNode>,
+  source?: string | AudioBuffer | ToneAudioBuffer,
+) {
+  instrument.channelVolume.fan(...destinations);
   const fxAndVol = instrument.pitchShift.chain(
     instrument.sampleVolume,
     instrument.channelVolume,
@@ -157,20 +180,24 @@ function wireSignalChain(instrument: Instrument) {
       },
     }).chain(new Volume(-8), fxAndVol);
   } else {
-    instrument.playHigh = new Player(instrument.source).chain(
+    instrument.playHigh = new Player(source ?? instrument.source).chain(
       new Volume(0),
       fxAndVol,
     );
-    instrument.playLow = new Player(instrument.source).chain(
+    instrument.playLow = new Player(source ?? instrument.source).chain(
       new Volume(-8),
       fxAndVol,
     );
   }
 }
 
-function syncInstrumentParam(id: number) {
-  const param = useToneStore.getState().instrumentParams[id];
-  const i = InstrumentsService.instruments[id];
+function syncInstrumentParam(
+  targetInstruments: Array<Instrument>,
+  params: InstrumentParams,
+  id: number,
+) {
+  const param = params[id];
+  const i = targetInstruments[id];
 
   // allowing changes on all types requires async loading
   if (i.type !== InstrumentType.pad) {
@@ -190,19 +217,69 @@ function syncInstrumentParam(id: number) {
   }
 }
 
-function syncParams() {
-  instruments.forEach((i) => syncInstrumentParam(i.id));
+function syncParams(
+  params: InstrumentParams,
+  targetInstruments = instruments,
+) {
+  targetInstruments.forEach((i) =>
+    syncInstrumentParam(targetInstruments, params, i.id)
+  );
+}
+
+function syncTrackSettings(
+  trackSettings: TrackParams,
+  activeTracks: number,
+  targetInstruments = instruments,
+) {
+  const soloed = Object.entries(trackSettings).filter(([, setting]) =>
+    setting.solo
+  ).map(([id]) => id);
+  targetInstruments.forEach((instrument, index) => {
+    const track = trackSettings[instrument.id];
+    instrument.channelVolume.volume.value = -12 * (100 - track.volume) / 100;
+    instrument.channelVolume.mute = index >= activeTracks || track.mute ||
+      (soloed.length > 0 && !soloed.includes(instrument.id.toString()));
+  });
 }
 
 let instrumentsConnected = false;
 
 function connectInstruments() {
   if (!instrumentsConnected) {
-    instruments.forEach((instrument) => wireSignalChain(instrument));
+    instruments.forEach((instrument) =>
+      wireSignalChain(instrument, [controlRoomRecorder, masterVolume])
+    );
     instrumentsConnected = true;
   }
-  syncParams();
-  return useToneStore.subscribe((state) => state.instrumentParams, syncParams);
+}
+
+function createInstrumentGraph(destination: ToneAudioNode) {
+  return instruments.map((template) => {
+    const instrument: Instrument = {
+      id: template.id,
+      type: template.type,
+      name: template.name,
+      source: template.source,
+      offset: template.offset,
+      duration: template.duration,
+      fadeIn: template.fadeIn,
+      fadeOut: template.fadeOut,
+      channelVolume: new Volume(0),
+      pitchShift: new PitchShift(),
+      sampleVolume: new Volume(0),
+    };
+    const source = template.playHigh?.loaded
+      ? template.playHigh.buffer
+      : undefined;
+    wireSignalChain(instrument, [destination], source);
+    return instrument;
+  });
+}
+
+function createPlaybackPlayer(index: number, destination: ToneAudioNode) {
+  const playback = playbacks[index];
+  if (!playback?.player.loaded) return;
+  return new Player(playback.player.buffer).connect(destination);
 }
 
 const InstrumentsService = {
@@ -213,7 +290,12 @@ const InstrumentsService = {
   instruments,
   playbacks,
   connectInstruments,
+  createInstrumentGraph,
+  createPlaybackPlayer,
   getPlayInstrumentTrigger,
+  triggerInstrument,
+  syncParams,
+  syncTrackSettings,
   subscribePadPlayback,
   // nodes
   masterVolume,

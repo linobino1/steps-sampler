@@ -2,6 +2,7 @@ import useToneStore, {
   GridResolutions,
   GridSignature,
 } from "../../store/store.ts";
+import { parseTimeId } from "./time.ts";
 
 // TimeIds set the ActiveSlots in the store are used
 // to generate the UI Grid displayed in the Sequencer component
@@ -47,13 +48,6 @@ function timeIdToGuideName(timeId: string): string | undefined {
   return sixteenth === "0"
     ? (quarter + 1).toString()
     : sixteenthNoteGuides[str16];
-}
-
-function parseTimeId(
-  timeId: string,
-): { bar: number; quarter: number; sixteenth: string } {
-  const [bar, quarter, sixteenth] = timeId.split("|")[0].split(":");
-  return { bar: parseInt(bar), quarter: parseInt(quarter), sixteenth };
 }
 
 function timeIdsByBar(timeIds: Array<string>) {

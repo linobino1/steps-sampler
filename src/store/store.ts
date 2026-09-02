@@ -10,7 +10,7 @@ import {
 } from "../services/core/interfaces.ts";
 import InstrumentsService from "../services/core/instruments.ts";
 import TriggersService from "../services/transport/triggers.ts";
-import GridService from "../services/transport/grid.ts";
+import { parseTimeId } from "../services/transport/time.ts";
 
 export type GridResolutions = "16n" | "8n" | "8t";
 export type GridSignature = "4" | "3";
@@ -317,9 +317,7 @@ function removeEventsFromInactiveBars(
   activeBars: number,
   scheduledEvents: Array<string>,
 ) {
-  return scheduledEvents.filter((event) =>
-    GridService.parseTimeId(event).bar < activeBars
-  );
+  return scheduledEvents.filter((event) => parseTimeId(event).bar < activeBars);
 }
 
 function getEventsWithDuplicates(
@@ -328,9 +326,7 @@ function getEventsWithDuplicates(
 ) {
   const barToDup = activeBars - 1;
   const barDup = activeBars < 5
-    ? scheduledEvents.filter((event) =>
-      GridService.parseTimeId(event).bar === barToDup
-    )
+    ? scheduledEvents.filter((event) => parseTimeId(event).bar === barToDup)
     : [];
   const newEvents = barDup.map((ev) =>
     ev.replace(`${barToDup}:`, `${barToDup + 1}:`)

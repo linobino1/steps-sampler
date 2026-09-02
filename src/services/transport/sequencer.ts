@@ -1,18 +1,26 @@
 import { context, Emitter, loaded, Loop, start, Transport } from "tone";
 import ToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
-import TriggersService from "./triggers.ts";
+import type { Instrument } from "../core/interfaces.ts";
+import TriggersService, { type PlaybackPlan } from "./triggers.ts";
 import GridService from "./grid.ts";
 import PadService from "../sampling/sample.ts";
-import useToneStore from "../../store/store.ts";
 
 // SETTING SYNCS
 
-function syncActiveTracks() {
-  const tracks = ToneStore.getState().activeTracks;
-  InstrumentsService.instruments.forEach((inst, index) => {
-    inst.channelVolume.mute = index >= tracks;
-  });
+interface TransportSettings {
+  bpm: number;
+  signature: string;
+  swing: number;
+}
+
+export function configureTransport(
+  transport: typeof Transport,
+  settings: TransportSettings,
+) {
+  transport.bpm.value = settings.bpm;
+  transport.timeSignature = parseInt(settings.signature);
+  transport.swing = settings.swing / 100;
 }
 
 function syncBpm(val: number): void {
@@ -20,40 +28,79 @@ function syncBpm(val: number): void {
 }
 
 function syncTrackSettings() {
-  const trackSettings = ToneStore.getState().trackSettings;
-  const activeTracks = ToneStore.getState().activeTracks;
-  const activeSoloIds = Object.entries(trackSettings).filter(([_id, setting]) =>
-    setting.solo
-  ).map((s) => s[0]);
-  InstrumentsService.instruments.forEach((i, index) => {
-    i.channelVolume.volume.value = -12 * (100 - trackSettings[i.id].volume) /
-      100;
-    i.channelVolume.mute = index >= activeTracks ||
-      (activeSoloIds.length > 0 &&
-        activeSoloIds.indexOf(i.id.toString()) == -1) ||
-      trackSettings[i.id].mute;
-  });
+  const state = ToneStore.getState();
+  InstrumentsService.syncTrackSettings(
+    state.trackSettings,
+    state.activeTracks,
+  );
+}
+
+function syncInstrumentParams() {
+  InstrumentsService.syncParams(ToneStore.getState().instrumentParams);
 }
 
 // START-STOP CONTROLS
 
 function clearTransport() {
   Transport.cancel();
+  scheduledEventIds.clear();
   syncSwing();
 }
 
 function syncSwing() {
-  Transport.swing = useToneStore.getState().swing / 100;
+  Transport.swing = ToneStore.getState().swing / 100;
 }
 
 function syncSignature() {
-  Transport.timeSignature = parseInt(useToneStore.getState().signature);
+  Transport.timeSignature = parseInt(ToneStore.getState().signature);
+}
+
+const scheduledEventIds = new Set<number>();
+
+export function schedulePlaybackPlan(
+  transport: typeof Transport,
+  instruments: Array<Instrument>,
+  plan: PlaybackPlan,
+  notify = false,
+) {
+  const eventIds: Array<number> = [];
+  plan.instrumentEvents.forEach((event) => {
+    eventIds.push(transport.schedule((time) => {
+      InstrumentsService.triggerInstrument(
+        instruments,
+        event.instrumentId,
+        event.emphasis,
+        time,
+        notify,
+      );
+    }, event.time));
+  });
+  plan.chordEvents.forEach((event) => {
+    eventIds.push(transport.schedule((time) => {
+      instruments[InstrumentsService.chords.id].playSampler
+        ?.triggerAttackRelease(event.notes, 0.6, time);
+    }, event.time));
+  });
+  return eventIds;
+}
+
+function syncPlaybackPlan() {
+  scheduledEventIds.forEach((id) => Transport.clear(id));
+  scheduledEventIds.clear();
+  const plan = TriggersService.createPlaybackPlan(ToneStore.getState());
+  Transport.setLoopPoints(0, `${plan.measures}m`);
+  schedulePlaybackPlan(
+    Transport,
+    InstrumentsService.instruments,
+    plan,
+    true,
+  ).forEach((id) => scheduledEventIds.add(id));
 }
 
 let playbackEventId: number | undefined;
 
 function syncPlaybackSample() {
-  const playback = useToneStore.getState().playbackSample;
+  const playback = ToneStore.getState().playbackSample;
   InstrumentsService.playbacks.forEach((pb) => pb.player.stop());
   if (playbackEventId !== undefined) {
     Transport.clear(playbackEventId);
@@ -153,19 +200,21 @@ function initSequencer() {
   clearTransport();
   linkStepEmitter();
   addKeyboardListener();
-  const unsubInstrumentParams = InstrumentsService.connectInstruments();
+  InstrumentsService.connectInstruments();
   PadService.loadSavedSamples();
   GridService.setGridTimeIds();
-  TriggersService.scheduleActiveTriggers();
 
-  syncActiveTracks();
+  syncInstrumentParams();
   syncTrackSettings();
-  syncSignature();
-  syncBpm(ToneStore.getState().bpm);
+  configureTransport(Transport, ToneStore.getState());
+  syncPlaybackPlan();
 
   unSubs = [
-    unsubInstrumentParams,
-    ToneStore.subscribe((state) => state.activeTracks, syncActiveTracks),
+    ToneStore.subscribe(
+      (state) => state.instrumentParams,
+      syncInstrumentParams,
+    ),
+    ToneStore.subscribe((state) => state.activeTracks, syncTrackSettings),
     ToneStore.subscribe((state) => state.bpm, syncBpm),
     ToneStore.subscribe((state) => state.trackSettings, syncTrackSettings),
     ToneStore.subscribe((state) => state.resolution, syncStepEmitter),
@@ -185,24 +234,24 @@ function initSequencer() {
     // scheduled triggers
     ToneStore.subscribe(
       (state) => state.activeBars,
-      TriggersService.scheduleActiveTriggers,
+      syncPlaybackPlan,
     ),
     ToneStore.subscribe(
       (state) => state.resolution,
-      TriggersService.scheduleActiveTriggers,
+      syncPlaybackPlan,
     ),
     ToneStore.subscribe(
       (state) => state.signature,
-      TriggersService.scheduleActiveTriggers,
+      syncPlaybackPlan,
     ),
     ToneStore.subscribe(
       (state) => state.scheduledEvents,
-      TriggersService.scheduleActiveTriggers,
+      syncPlaybackPlan,
     ),
 
     ToneStore.subscribe(
       (state) => state.songArrangement,
-      TriggersService.scheduleActiveTriggers,
+      syncPlaybackPlan,
     ),
   ];
 }
