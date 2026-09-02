@@ -9,7 +9,7 @@ import {
 const TrackHeadBox = styled.div<{ trackName: string }>`
   height: 100%;
   overflow: hidden;
-  border: 1px solid var(--black);
+  border: 0.5px solid var(--black);
   color: var(--black);
   cursor: default;
   box-sizing: border-box;

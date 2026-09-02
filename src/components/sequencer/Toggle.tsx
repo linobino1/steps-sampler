@@ -8,7 +8,6 @@ import SequencerService from "../../services/transport/sequencer.ts";
 const colors = {
   odd: "var(--main-faded)",
   free: "rgba(0,0,0,0)",
-  toggled: "black",
 };
 
 const StepMargin = styled.div`
@@ -26,14 +25,24 @@ const StepMargin = styled.div`
 
 const Step = styled.div`
   height: 100%;
+  position: relative;
   cursor: pointer;
 `;
 
-const Head = styled.div<{ emph: boolean }>`
-  position: relative;
-  top: ${(props) => (props.emph ? "20%" : "80%")};
-  height: 5%;
-  background: var(--main);
+const Note = styled.div<{
+  $emphasized: boolean;
+  $isActive: boolean;
+  $muted: boolean;
+  $trackName: string;
+}>`
+  position: absolute;
+  inset: auto 2px 2px;
+  height: ${(props) => (props.$emphasized ? "93%" : "55%")};
+  background: ${(props) => `var(--${props.$trackName})`};
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  box-sizing: border-box;
+  opacity: ${(props) => props.$muted ? 0.45 : props.$isActive ? 0.8 : 1};
 `;
 
 const Guide = styled.div`
@@ -54,6 +63,7 @@ const WeakGuide = styled.div`
 interface ToggleProps {
   timeId: string;
   instrumentId: number;
+  trackName: string;
   muted: boolean;
 }
 
@@ -76,9 +86,9 @@ export default function Toggle(props: ToggleProps) {
       const cycleBar = parseInt(step[0]) % activeBars;
       const stepNormal = `${cycleBar}${step.substring(1)}`;
       // split drops triplet sixteenth decimal
-      setIsActive(!props.muted && stepNormal === props.timeId.split(".")[0]);
+      setIsActive(stepNormal === props.timeId.split(".")[0]);
     },
-    [props.muted, activeBars, props.timeId],
+    [activeBars, props.timeId],
   );
 
   useLayoutEffect(() => {
@@ -90,7 +100,7 @@ export default function Toggle(props: ToggleProps) {
 
   function getBackgroundColor() {
     const odd = bar % 2 === 1;
-    return scheduled ? colors.toggled : odd ? colors.odd : colors.free;
+    return odd ? colors.odd : colors.free;
   }
 
   function toggleStep(emphasized: boolean) {
@@ -132,12 +142,18 @@ export default function Toggle(props: ToggleProps) {
         )}
       <Step
         style={{
-          backgroundColor: getBackgroundColor(),
-          opacity: isActive ? "0.2" : "1",
+          backgroundColor: isActive
+            ? "var(--main-light)"
+            : getBackgroundColor(),
         }}
       >
         {scheduled && (
-          <Head emph={TriggersService.parseTrigger(scheduled)?.emphasized} />
+          <Note
+            $emphasized={TriggersService.parseTrigger(scheduled).emphasized}
+            $isActive={isActive}
+            $muted={props.muted}
+            $trackName={props.trackName}
+          />
         )}
       </Step>
     </StepMargin>

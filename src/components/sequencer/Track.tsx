@@ -245,6 +245,7 @@ export function Track({
                   key={`${timeId}|${instrument.id}`}
                   timeId={timeId}
                   instrumentId={instrument.id}
+                  trackName={instrument.name}
                   muted={instrument.channelVolume.mute ||
                     (instrument.id > 2 && !instrumentParam.audioUrl)}
                 />
