@@ -42,6 +42,65 @@ const ControlSection = styled.div<{ disabled?: boolean }>`
   }
 `;
 
+const BarLengthControl = styled(ControlSection)`
+  align-items: center;
+  justify-content: center;
+`;
+
+const BarLengthStepper = styled.div`
+  align-items: stretch;
+  border: 2px solid black;
+  border-radius: 6px;
+  display: flex;
+  height: 27px;
+  overflow: hidden;
+
+  && > button {
+    appearance: none;
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-sizing: border-box;
+    color: var(--black);
+    display: inline-flex;
+    flex: 0 0 30px;
+    height: 100%;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 30px;
+
+    &:first-child {
+      border-right: 2px solid black;
+    }
+
+    &:last-child {
+      border-left: 2px solid black;
+    }
+
+    &:disabled {
+      background: transparent;
+      color: var(--inactive-color);
+    }
+
+    &:not(:disabled):hover {
+      background: var(--main-light);
+    }
+  }
+
+  > span {
+    align-items: center;
+    display: flex;
+    font-size: 12px;
+    font-weight: bold;
+    justify-content: center;
+    line-height: 1;
+    min-width: 58px;
+    text-align: center;
+  }
+`;
+
 const MultiSelectBtn = styled.button`
   margin-left: 5px;
   position: relative;
@@ -104,6 +163,7 @@ const _DisableMask = styled.div`
 
 export default function Controls() {
   const [isPlaying, setIsPlaying] = useState(Transport.state === "started");
+  const activeBars = useToneStore((state) => state.activeBars);
   const changeBars = useToneStore((state) => state.changeBars);
   const [res, toggleRes] = useToneStore(
     (state) => [state.resolution, state.toggleResolution],
@@ -165,16 +225,27 @@ export default function Controls() {
         </TransportButton>
         <button type="button" onClick={clearSchedule}>Clear Steps</button>
       </ControlSection>
-      <ControlSection>
-        <button type="button" onClick={dupeBar}>
-          <FontAwesomeIcon icon={faAdd} />
-          <span style={{ paddingLeft: 5 }}>Add</span>
-        </button>
-        <button type="button" onClick={() => changeBars(-1)}>
-          <FontAwesomeIcon icon={faMinus} />
-          <span style={{ paddingLeft: 5 }}>Remove</span>
-        </button>
-      </ControlSection>
+      <BarLengthControl>
+        <BarLengthStepper>
+          <button
+            type="button"
+            aria-label="Remove bar"
+            disabled={activeBars <= 1}
+            onClick={() => changeBars(-1)}
+          >
+            <FontAwesomeIcon icon={faMinus} />
+          </button>
+          <span>{activeBars} {activeBars === 1 ? "BAR" : "BARS"}</span>
+          <button
+            type="button"
+            aria-label="Add bar"
+            disabled={activeBars >= 4}
+            onClick={dupeBar}
+          >
+            <FontAwesomeIcon icon={faAdd} />
+          </button>
+        </BarLengthStepper>
+      </BarLengthControl>
 
       {/* <Stretch /> */}
 
