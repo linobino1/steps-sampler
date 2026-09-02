@@ -23,30 +23,12 @@ const ValDisplay = styled.div`
 `;
 
 export default function Tempo() {
-  const [bpm, setBpm] = useToneStore(
-    (state) => [state.bpm, state.setBpm],
-    shallow,
-  );
   const [swing, setSwing] = useToneStore(
     (state) => [state.swing, state.setSwing],
     shallow,
   );
-  const playback = useToneStore((state) => state.playbackSample);
-
   return (
     <TempoBox>
-      <ValDisplay>Bpm {bpm}</ValDisplay>
-      <div>
-        <input
-          type="range"
-          min="24"
-          max="241"
-          step="1"
-          value={bpm}
-          disabled={playback > -1}
-          onChange={(e) => setBpm(e.target.value)}
-        />
-      </div>
       <ValDisplay className="swing">
         Swing {swing > 0 ? swing / 100 : "-"}
       </ValDisplay>

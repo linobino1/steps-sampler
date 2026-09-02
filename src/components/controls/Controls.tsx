@@ -15,6 +15,7 @@ import SampleService from "../../services/sampling/sample.ts";
 
 import { shallow } from "zustand/shallow";
 import NoteIcon from "./NoteIcon.tsx";
+import BpmControl from "./BpmControl.tsx";
 
 const ControlBox = styled.div`
   border: solid black 2px;
@@ -223,6 +224,7 @@ export default function Controls() {
           <FontAwesomeIcon icon={faPlay} /> <span></span>
           <FontAwesomeIcon icon={faStop} />
         </TransportButton>
+        <BpmControl />
         <button type="button" onClick={clearSchedule}>Clear Steps</button>
       </ControlSection>
       <BarLengthControl>
