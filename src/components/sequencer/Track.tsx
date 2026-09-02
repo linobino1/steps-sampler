@@ -31,12 +31,13 @@ type GestureMode = "idle" | "paint" | "erase" | "velocity";
 
 const Grid = styled.div<{
   signature: GridSignature;
+  activeBars: number;
   $gestureMode: GestureMode;
 }>`
   flex: 1;
   display: grid;
   grid-template-columns: repeat(${(props) =>
-    barsForSignature[props.signature]}, 1fr);
+    props.activeBars <= 3 ? 3 : barsForSignature[props.signature]}, 1fr);
   cursor: ${(props) =>
     props.$gestureMode === "velocity"
       ? "ns-resize"
@@ -97,7 +98,7 @@ export function Track({
   const trackParam = useToneStore(
     useCallback((state) => state.trackSettings[instrument.id], [instrument.id]),
   );
-  const _activeBars = useToneStore((state) => state.activeBars);
+  const activeBars = useToneStore((state) => state.activeBars);
   const gesture = useRef<Gesture | null>(null);
   const [gestureMode, setGestureMode] = useState<GestureMode>("idle");
   const hasSound = instrumentParam.audioUrl ||
@@ -236,6 +237,7 @@ export function Track({
       {instrument.type === InstrumentType.chords ? <Chords /> : (
         <Grid
           signature={gridSignature}
+          activeBars={activeBars}
           $gestureMode={gestureMode}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

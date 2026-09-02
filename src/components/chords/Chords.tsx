@@ -21,10 +21,10 @@ const ChordChip = styled.div`
   cursor: pointer;
 `;
 
-const Arrangment = styled.div`
+const Arrangment = styled.div<{ activeBars: number }>`
   margin-bottom: 5px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(${(props) => props.activeBars <= 3 ? 3 : 4}, 1fr);
   height: 21px;
 `;
 const Bar = styled.div`
@@ -86,7 +86,7 @@ export default function Chords() {
   return (
     <ChordPlay>
       {songArrangement.map((cycle, index) => (
-        <Arrangment>
+        <Arrangment activeBars={activeBars}>
           {Array.from(Array(activeBars).keys()).map((bar) => (
             <Bar onDrop={(e) => ondrop(e, bar, index)} onDragOver={onover}>
               {(cycle[bar] || []).map((chord) => (
