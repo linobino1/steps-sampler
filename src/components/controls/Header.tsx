@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import AudioExportDialog from "./AudioExportDialog.tsx";
+import ProjectFileControls from "./ProjectFileControls.tsx";
 
 const HeaderDiv = styled.div`
   box-sizing: border-box;
@@ -21,6 +22,10 @@ const Stretch = styled.div`
   flex: 1;
 `;
 
+const HeaderActions = styled.div`
+  display: flex;
+`;
+
 export default function Header(
   { showControls = true }: { showControls?: boolean },
 ) {
@@ -30,7 +35,10 @@ export default function Header(
       {showControls && (
         <>
           <Stretch />
-          <AudioExportDialog />
+          <HeaderActions>
+            <ProjectFileControls />
+            <AudioExportDialog />
+          </HeaderActions>
         </>
       )}
     </HeaderDiv>

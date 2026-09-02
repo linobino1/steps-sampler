@@ -26,10 +26,37 @@ function deleteBlob(id: number) {
   localStorage.removeItem(`audioBlob_${id}`);
 }
 
+function loadDataUrl(id: number) {
+  return localStorage.getItem(`audioBlob_${id}`) ?? undefined;
+}
+
+function replaceDataUrls(dataUrls: Map<number, string>, ids: Array<number>) {
+  const existing = new Map(ids.map((id) => [id, loadDataUrl(id)]));
+
+  try {
+    ids.forEach((id) => {
+      const dataUrl = dataUrls.get(id);
+      if (dataUrl) {
+        localStorage.setItem(`audioBlob_${id}`, dataUrl);
+      } else {
+        deleteBlob(id);
+      }
+    });
+  } catch (error) {
+    existing.forEach((dataUrl, id) => {
+      if (dataUrl) localStorage.setItem(`audioBlob_${id}`, dataUrl);
+      else deleteBlob(id);
+    });
+    throw error;
+  }
+}
+
 const BlobService = {
   storeBlob,
   loadBlob,
   deleteBlob,
+  loadDataUrl,
+  replaceDataUrls,
 };
 
 export default BlobService;

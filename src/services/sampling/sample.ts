@@ -36,10 +36,34 @@ function removeSample(id: number) {
   useToneStore.getState().setInstrumentParams(inst.id);
 }
 
+async function replaceSavedSamples(
+  dataUrls: Map<number, string>,
+  persist = true,
+) {
+  const padIds = InstrumentsService.pads.map((pad) => pad.id);
+  if (persist) BlobService.replaceDataUrls(dataUrls, padIds);
+
+  for (const instrument of InstrumentsService.pads) {
+    const oldUrl = instrument.source;
+    if (oldUrl?.startsWith("blob:")) URL.revokeObjectURL(oldUrl);
+
+    instrument.playHigh?.stop();
+    instrument.playLow?.stop();
+    instrument.source = undefined;
+
+    const dataUrl = dataUrls.get(instrument.id);
+    if (dataUrl) {
+      const blob = await (await fetch(dataUrl)).blob();
+      addSample(URL.createObjectURL(blob), instrument);
+    }
+  }
+}
+
 const SampleService = {
   loadSavedSamples,
   addSample,
   removeSample,
+  replaceSavedSamples,
 };
 
 export default SampleService;

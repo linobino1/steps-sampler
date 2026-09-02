@@ -272,6 +272,7 @@ const SequencerService = {
   unsubSequencerSubscriptions,
   stepEmitter,
   clearTransport,
+  stopTransport,
   toggleTransport,
 };
 
