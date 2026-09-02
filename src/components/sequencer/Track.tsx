@@ -150,6 +150,10 @@ export function Track({
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
     const currentGesture = gesture.current;
     if (!currentGesture || currentGesture.pointerId !== event.pointerId) return;
+    if (event.pointerType === "mouse" && event.buttons === 0) {
+      finishGesture(event);
+      return;
+    }
 
     const deltaX = event.clientX - currentGesture.startX;
     const deltaY = event.clientY - currentGesture.startY;
@@ -237,6 +241,7 @@ export function Track({
           onPointerMove={handlePointerMove}
           onPointerUp={finishGesture}
           onPointerCancel={cancelGesture}
+          onLostPointerCapture={cancelGesture}
         >
           {GridService.timeIdsByBar(timeIds).map((barInfo, _index, _arr) => (
             <Bar key={barInfo.bar} togglesPerBeat={togglesPerBeat}>
