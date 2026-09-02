@@ -12,17 +12,31 @@ function clearSample(parentEl: Element, className: "wave" | "edit") {
   canvas.width = 0;
 }
 
+function prepareCanvas(canvas: HTMLCanvasElement, parentEl: Element) {
+  const width = parentEl.clientWidth;
+  const height = parentEl.clientHeight;
+  const pixelRatio = globalThis.devicePixelRatio || 1;
+
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  canvas.width = Math.round(width * pixelRatio);
+  canvas.height = Math.round(height * pixelRatio);
+
+  const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+  return { context, width, height };
+}
+
 function updateEditLayer(params: InstrumentParam, parentEl: Element) {
   if (!params || !params.custom) return;
 
   const canvas = parentEl.querySelector(".edit") as HTMLCanvasElement;
   if (!canvas) return;
-  canvas.height = parentEl.clientHeight;
-  canvas.width = parentEl.clientWidth;
-
-  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-  const WIDTH = canvas.width;
-  const HEIGHT = canvas.height;
+  const { context: ctx, width: WIDTH, height: HEIGHT } = prepareCanvas(
+    canvas,
+    parentEl,
+  );
 
   ctx.fillStyle = "rgba(0,0,0,0)";
   ctx.lineWidth = 1;
@@ -75,12 +89,10 @@ function drawSample(
   volume: number,
 ) {
   const waveCanvas = parentEl.querySelector(".wave") as HTMLCanvasElement;
-  waveCanvas.width = parentEl.clientWidth;
-  waveCanvas.height = parentEl.clientHeight;
-
-  const waveCtx = waveCanvas.getContext("2d") as CanvasRenderingContext2D;
-  const WIDTH = waveCanvas.width;
-  const HEIGHT = waveCanvas.height;
+  const { context: waveCtx, width: WIDTH, height: HEIGHT } = prepareCanvas(
+    waveCanvas,
+    parentEl,
+  );
 
   waveCtx.fillStyle = "rgba(0,0,0,0)"; // '#36454f' //off-color-2
   waveCtx.fillRect(0, 0, WIDTH, HEIGHT);
