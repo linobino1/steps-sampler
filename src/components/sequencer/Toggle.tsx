@@ -14,9 +14,14 @@ const colors = {
 const StepMargin = styled.div`
   height: 100%;
   position: relative;
-  cursor: default;
+  cursor: inherit;
   border: 0.5px solid var(--main);
   box-sizing: border-box;
+
+  &:focus-visible {
+    outline: 2px solid var(--black);
+    outline-offset: -2px;
+  }
 `;
 
 const Step = styled.div`
@@ -44,11 +49,6 @@ const StrongGuide = styled.div`
 `;
 const WeakGuide = styled.div`
   color: grey;
-`;
-
-const ToggleBtn = styled.div`
-  height: 50%;
-  width: 100%;
 `;
 
 interface ToggleProps {
@@ -100,7 +100,25 @@ export default function Toggle(props: ToggleProps) {
   }
 
   return (
-    <StepMargin>
+    <StepMargin
+      data-time-id={props.timeId}
+      role="button"
+      tabIndex={0}
+      aria-label={`${scheduled ? "Remove" : "Add"} note at ${props.timeId}`}
+      aria-pressed={Boolean(scheduled)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          toggleStep(false);
+        } else if (scheduled && event.key === "ArrowUp") {
+          event.preventDefault();
+          addTriggerEvent(props.timeId, props.instrumentId, true);
+        } else if (scheduled && event.key === "ArrowDown") {
+          event.preventDefault();
+          addTriggerEvent(props.timeId, props.instrumentId, false);
+        }
+      }}
+    >
       {guideName
         ? (
           <Guide>
@@ -121,8 +139,6 @@ export default function Toggle(props: ToggleProps) {
         {scheduled && (
           <Head emph={TriggersService.parseTrigger(scheduled)?.emphasized} />
         )}
-        <ToggleBtn onClick={() => toggleStep(true)}></ToggleBtn>
-        <ToggleBtn onClick={() => toggleStep(false)}></ToggleBtn>
       </Step>
     </StepMargin>
   );
