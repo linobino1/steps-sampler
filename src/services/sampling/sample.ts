@@ -3,7 +3,12 @@ import useToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import BlobService from "./blobStore.ts";
 
+let savedSamplesLoaded = false;
+
 function loadSavedSamples() {
+  if (savedSamplesLoaded) return;
+  savedSamplesLoaded = true;
+
   InstrumentsService.instruments.forEach(async (instrument) => {
     const audioURL = await BlobService.loadBlob(instrument.id);
     if (audioURL) {

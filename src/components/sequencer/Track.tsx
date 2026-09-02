@@ -20,24 +20,24 @@ const Head = styled.div`
   width: 65px;
 `;
 
-const Bar = styled.div<{ togglesPerBeat: number }>`
+const Bar = styled.div<{ $togglesPerBeat: number }>`
   position: relative;
   display: grid;
-  grid-template-columns: repeat(${(props) => props.togglesPerBeat}, 1fr);
+  grid-template-columns: repeat(${(props) => props.$togglesPerBeat}, 1fr);
   border-radius: 2px;
 `;
 
 type GestureMode = "idle" | "paint" | "erase" | "velocity";
 
 const Grid = styled.div<{
-  signature: GridSignature;
-  activeBars: number;
+  $signature: GridSignature;
+  $activeBars: number;
   $gestureMode: GestureMode;
 }>`
   flex: 1;
   display: grid;
   grid-template-columns: repeat(${(props) =>
-    props.activeBars <= 3 ? 3 : barsForSignature[props.signature]}, 1fr);
+    props.$activeBars <= 3 ? 3 : barsForSignature[props.$signature]}, 1fr);
   cursor: ${(props) =>
     props.$gestureMode === "velocity"
       ? "ns-resize"
@@ -236,8 +236,8 @@ export function Track({
       </Head>
       {instrument.type === InstrumentType.chords ? <Chords /> : (
         <Grid
-          signature={gridSignature}
-          activeBars={activeBars}
+          $signature={gridSignature}
+          $activeBars={activeBars}
           $gestureMode={gestureMode}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -246,7 +246,7 @@ export function Track({
           onLostPointerCapture={cancelGesture}
         >
           {GridService.timeIdsByBar(timeIds).map((barInfo, _index, _arr) => (
-            <Bar key={barInfo.bar} togglesPerBeat={togglesPerBeat}>
+            <Bar key={barInfo.bar} $togglesPerBeat={togglesPerBeat}>
               {barInfo.timeIds.map((timeId) => (
                 <Toggle
                   key={`${timeId}|${instrument.id}`}

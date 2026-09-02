@@ -2,7 +2,7 @@ import { useRef } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/shallow";
 import useToneStore from "../../store/store.ts";
 
 const MIN_SWING_PERCENT = 50;
@@ -49,8 +49,7 @@ const DragIndicator = styled.span`
 
 export default function SwingControl() {
   const [swing, setSwing] = useToneStore(
-    (state) => [state.swing, state.setSwing],
-    shallow,
+    useShallow((state) => [state.swing, state.setSwing]),
   );
   const resolution = useToneStore((state) => state.resolution);
   const swingPercent = Math.round(MIN_SWING_PERCENT + swing / 3);

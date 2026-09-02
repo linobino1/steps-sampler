@@ -51,7 +51,7 @@ function Sampler() {
     SequencerService.initSequencer();
     setSequencerOn(true);
     return SequencerService.unsubSequencerSubscriptions;
-  }, [setSequencerOn]);
+  }, []);
 
   return (
     <MainFrame>

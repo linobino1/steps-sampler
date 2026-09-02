@@ -119,18 +119,23 @@ function linkStepEmitter() {
   }, ToneStore.getState().resolution);
   stepper.start(0);
 
-  Transport.on("stop", () => stepEmitter.emit("step", "stop"));
+  Transport.on("stop", emitStopStep);
+}
+
+function emitStopStep() {
+  stepEmitter.emit("step", "stop");
 }
 
 // INIT
 
-let unSubs: Array<() => void>;
+let unSubs: Array<() => void> = [];
 
 function initSequencer() {
+  unsubSequencerSubscriptions();
   clearTransport();
   linkStepEmitter();
   addKeyboardListener();
-  InstrumentsService.connectInstruments();
+  const unsubInstrumentParams = InstrumentsService.connectInstruments();
   PadService.loadSavedSamples();
   GridService.setGridTimeIds();
   TriggersService.scheduleActiveTriggers();
@@ -141,6 +146,7 @@ function initSequencer() {
   syncBpm(ToneStore.getState().bpm);
 
   unSubs = [
+    unsubInstrumentParams,
     ToneStore.subscribe((state) => state.activeTracks, syncActiveTracks),
     ToneStore.subscribe((state) => state.bpm, syncBpm),
     ToneStore.subscribe((state) => state.trackSettings, syncTrackSettings),
@@ -185,6 +191,10 @@ function initSequencer() {
 
 function unsubSequencerSubscriptions() {
   unSubs.forEach((unsub) => unsub());
+  unSubs = [];
+  stepper?.dispose();
+  stepper = null;
+  Transport.off("stop", emitStopStep);
   document.removeEventListener("keydown", handleTransportKeydown);
 }
 

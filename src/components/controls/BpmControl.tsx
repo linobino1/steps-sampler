@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import useToneStore from "../../store/store.ts";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/shallow";
 
 const MIN_BPM = 24;
 const MAX_BPM = 241;
@@ -49,8 +49,7 @@ const DragIndicator = styled.span`
 
 export default function BpmControl() {
   const [bpm, setBpm] = useToneStore(
-    (state) => [state.bpm, state.setBpm],
-    shallow,
+    useShallow((state) => [state.bpm, state.setBpm]),
   );
   const playback = useToneStore((state) => state.playbackSample);
   const dragStart = useRef({ y: 0, bpm });

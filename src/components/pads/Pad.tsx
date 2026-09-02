@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import { useShallow } from "zustand/shallow";
 import RecorderService from "../../services/sampling/recorder.ts";
 import SampleService from "../../services/sampling/sample.ts";
 import { EnvelopeParam, Instrument } from "../../services/core/interfaces.ts";
@@ -199,10 +200,12 @@ export default function Pad(props: { pad: Instrument }) {
       props.pad.id,
     ]),
   );
-  const [padParams, setPadParams] = useToneStore((state) => [
-    state.instrumentParams[props.pad.id],
-    state.setInstrumentParams,
-  ]);
+  const [padParams, setPadParams] = useToneStore(
+    useShallow((state) => [
+      state.instrumentParams[props.pad.id],
+      state.setInstrumentParams,
+    ]),
+  );
   const [recording, setRecording] = useState(false);
   const [showPadCtrl, setShowPadCtrl] = useState(false);
   const windowSize = useWindowResize();

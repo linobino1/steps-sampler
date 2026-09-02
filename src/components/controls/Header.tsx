@@ -33,10 +33,10 @@ export default function Header(
   return (
     <HeaderDiv>
       <Title href="/">STEPS</Title>
-       {showControls && (
-         <>
-           <Stretch />
-           <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
+      {showControls && (
+        <>
+          <Stretch />
+          <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
           <HeaderButton onClick={() => recordAudio()}>Save Audio</HeaderButton>
         </>
       )}

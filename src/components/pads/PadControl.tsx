@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useShallow } from "zustand/shallow";
 import { EnvelopeParam } from "../../services/core/interfaces.ts";
 import useToneStore from "../../store/store.ts";
 
@@ -90,10 +91,12 @@ interface CmpProps {
 }
 
 export default function PadControl({ padId }: CmpProps) {
-  const [padParams, setPadParams] = useToneStore((state) => [
-    state.instrumentParams[padId],
-    state.setInstrumentParams,
-  ]);
+  const [padParams, setPadParams] = useToneStore(
+    useShallow((state) => [
+      state.instrumentParams[padId],
+      state.setInstrumentParams,
+    ]),
+  );
 
   function updateParams(value: string, paramName: EnvelopeParam) {
     setPadParams(padId, {

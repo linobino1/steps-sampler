@@ -194,10 +194,15 @@ function syncParams() {
   instruments.forEach((i) => syncInstrumentParam(i.id));
 }
 
+let instrumentsConnected = false;
+
 function connectInstruments() {
-  instruments.forEach((instrument) => wireSignalChain(instrument));
+  if (!instrumentsConnected) {
+    instruments.forEach((instrument) => wireSignalChain(instrument));
+    instrumentsConnected = true;
+  }
   syncParams();
-  useToneStore.subscribe((state) => state.instrumentParams, syncParams);
+  return useToneStore.subscribe((state) => state.instrumentParams, syncParams);
 }
 
 const InstrumentsService = {

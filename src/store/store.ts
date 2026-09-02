@@ -120,7 +120,7 @@ const useToneStore = create<TonesState>()(
       subscribeWithSelector(
         (set, get) => ({
           ...initialState,
-          resetStore: () => set((_state) => initialState, true, "resetStore"),
+          resetStore: () => set(initialState, false, "resetStore"),
           resetSequencer: () =>
             set((_state) => ({ ...cleanSequencer }), false, "resetSequencer"),
           setInstrumentParams: (id, params) => {

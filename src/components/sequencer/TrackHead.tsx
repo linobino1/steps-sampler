@@ -6,7 +6,7 @@ import {
   TrackParam,
 } from "../../services/core/interfaces.ts";
 
-const TrackHeadBox = styled.div<{ trackName: string }>`
+const TrackHeadBox = styled.div<{ $trackName: string }>`
   height: 100%;
   overflow: hidden;
   border: 0.5px solid var(--black);
@@ -16,7 +16,7 @@ const TrackHeadBox = styled.div<{ trackName: string }>`
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  background: ${(props) => `var(--${props.trackName});`};
+  background: ${(props) => `var(--${props.$trackName});`};
 
   & svg {
     width: 50%;
@@ -42,15 +42,15 @@ const ButtonSection = styled.div`
   }
 `;
 
-const TrackIcon = styled.button<{ active: string | null; clickable: boolean }>`
+const TrackIcon = styled.button<{ $active: boolean }>`
   border-radius: 3px;
   border: 1px solid var(--black);
   margin: 0px 1px;
   padding: 0px 4px;
   overflow: hidden;
   text-align: center;
-  background: ${(props) => (props.active ? "var(--main)" : "null")};
-  color: var(${(props) => (props.active ? "--white" : "--black")});
+  background: ${(props) => (props.$active ? "var(--main)" : "transparent")};
+  color: var(${(props) => (props.$active ? "--white" : "--black")});
   font-size: 12.6px;
 `;
 
@@ -64,19 +64,17 @@ export default function TrackHead({ instrument, trackParam }: TrackHeadProps) {
   const toggleTrackMute = useToneStore((state) => state.toggleTrackMute);
   const toggleTrackSolo = useToneStore((state) => state.toggleTrackSolo);
   return (
-    <TrackHeadBox trackName={instrument.name}>
-      <LabelName color={instrument.name}>{instrument.name}</LabelName>
+    <TrackHeadBox $trackName={instrument.name}>
+      <LabelName>{instrument.name}</LabelName>
       <ButtonSection>
         <TrackIcon
-          active={trackParam?.mute ? "--black" : null}
-          clickable
+          $active={Boolean(trackParam?.mute)}
           onClick={() => toggleTrackMute(instrument.id)}
         >
           M
         </TrackIcon>
         <TrackIcon
-          active={trackParam?.solo ? "--black" : null}
-          clickable
+          $active={Boolean(trackParam?.solo)}
           onClick={() => toggleTrackSolo(instrument.id)}
         >
           S

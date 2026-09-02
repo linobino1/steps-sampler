@@ -6,7 +6,7 @@ import DrawerService from "../../services/sampling/waveRender.ts";
 import { Transport } from "tone";
 import useWindowResize from "../useWindowResize.ts";
 
-const WaveTrack = styled.div<{ activeBars: number }>`
+const WaveTrack = styled.div<{ $activeBars: number }>`
   position: relative;
   background: var(--off-color-2);
   height: 100%;
@@ -16,7 +16,7 @@ const WaveTrack = styled.div<{ activeBars: number }>`
   padding: 2px 0px;
   overflow: hidden;
   grid-column-start: 1;
-  grid-column-end: ${(props) => props.activeBars + 1};
+  grid-column-end: ${(props) => props.$activeBars + 1};
 `;
 
 const Wave = styled.div`
@@ -24,13 +24,13 @@ const Wave = styled.div`
   width: 100%;
 `;
 
-const TransportPosition = styled.div<{ duration: number }>`
+const TransportPosition = styled.div<{ $duration: number }>`
   height: 100%;
   position: absolute;
   bottom: 0;
   border-left: 1px solid var(--control-bar);
   animation-direction: normal;
-  animation-duration: ${(props) => `${props.duration}ms`};
+  animation-duration: ${(props) => `${props.$duration}ms`};
   animation-name: tracker;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -67,7 +67,7 @@ function PlayCursor({ showCursor, activeBars }: CursorProps) {
   }, []);
 
   return (playing && showCursor)
-    ? <TransportPosition duration={getAnimationDuration(activeBars, bpm)} />
+    ? <TransportPosition $duration={getAnimationDuration(activeBars, bpm)} />
     : null;
 }
 
@@ -85,7 +85,7 @@ export default function DubTrack() {
   }, [elementRef, overdubParam, windowSize]);
 
   return (
-    <WaveTrack activeBars={activeBars}>
+    <WaveTrack $activeBars={activeBars}>
       <Wave ref={elementRef}>
         <canvas className="wave" height="0px" width="0px"></canvas>
         <canvas className="edit" height="0px" width="0px"></canvas>

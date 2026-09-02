@@ -14,7 +14,7 @@ import {
 import InstrumentsService from "../../services/core/instruments.ts";
 import SampleService from "../../services/sampling/sample.ts";
 
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/shallow";
 import NoteIcon from "./NoteIcon.tsx";
 import BpmControl from "./BpmControl.tsx";
 import SwingControl from "./SwingControl.tsx";
@@ -32,7 +32,7 @@ const ControlBox = styled.div`
   }
 `;
 
-const ControlSection = styled.div<{ disabled?: boolean }>`
+const ControlSection = styled.div`
   border-right: solid black 2px;
   padding: 10px;
   display: flex;
@@ -182,20 +182,17 @@ export default function Controls() {
   const activeBars = useToneStore((state) => state.activeBars);
   const changeBars = useToneStore((state) => state.changeBars);
   const [res, toggleRes] = useToneStore(
-    (state) => [state.resolution, state.toggleResolution],
-    shallow,
+    useShallow((state) => [state.resolution, state.toggleResolution]),
   );
   const straightSwing = useRef(useToneStore.getState().swing);
   const [sig, toggleSig] = useToneStore(
-    (state) => [state.signature, state.setGridSignature],
-    shallow,
+    useShallow((state) => [state.signature, state.setGridSignature]),
   );
   const dupeBar = useToneStore((state) => state.duplicateBarEvents);
   const resetSequencer = useToneStore((state) => state.resetSequencer);
   const clearSchedule = useToneStore((state) => state.clearSchedule);
   const [playback, setPlayback] = useToneStore(
-    (state) => [state.playbackSample, state.setPlaybackSample],
-    shallow,
+    useShallow((state) => [state.playbackSample, state.setPlaybackSample]),
   );
 
   useEffect(() => {
@@ -312,7 +309,7 @@ export default function Controls() {
         </PlaybackSelect>
       </ControlSection>
 
-      <ControlSection disabled={playback !== -1}>
+      <ControlSection>
         {/* {playback !== -1 && <DisableMask />} */}
         <MultiSelectBtn
           className={sig === "3" ? "active" : ""}
