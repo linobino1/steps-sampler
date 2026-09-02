@@ -37,7 +37,8 @@ export default function Header(
         <>
           <Stretch />
           <HeaderButton onClick={saveFile}>Save Midi</HeaderButton>
-          <HeaderButton onClick={() => recordAudio()}>Save Audio</HeaderButton>
+          <HeaderButton onClick={() => recordAudio("wav")}>Save WAV</HeaderButton>
+          <HeaderButton onClick={() => recordAudio("mp3")}>Save MP3</HeaderButton>
         </>
       )}
     </HeaderDiv>

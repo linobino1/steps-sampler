@@ -7,7 +7,11 @@ import {
 } from "../transport/sequencer.ts";
 import TriggersService from "../transport/triggers.ts";
 
-export async function recordAudio() {
+type AudioFormat = "mp3" | "wav";
+
+let mp3EncoderRegistered = false;
+
+export async function recordAudio(format: AudioFormat = "wav") {
   await loaded();
 
   const state = useToneStore.getState();
@@ -47,7 +51,43 @@ export async function recordAudio() {
 
   const audioBuffer = rendered.get();
   if (!audioBuffer) throw new Error("Offline audio render produced no buffer");
-  downloadWav(audioBuffer, state.bpm);
+
+  if (format === "mp3") {
+    const mp3 = await encodeMp3(audioBuffer);
+    download(mp3, "audio/mpeg", `steps-${state.bpm}bpm.mp3`);
+  } else {
+    downloadWav(audioBuffer, state.bpm);
+  }
+}
+
+async function encodeMp3(audioBuffer: AudioBuffer) {
+  const [mediabunny, mp3Encoder] = await Promise.all([
+    import("mediabunny"),
+    import("@mediabunny/mp3-encoder"),
+  ]);
+
+  if (!mp3EncoderRegistered) {
+    mp3Encoder.registerMp3Encoder();
+    mp3EncoderRegistered = true;
+  }
+
+  const target = new mediabunny.BufferTarget();
+  const output = new mediabunny.Output({
+    format: new mediabunny.Mp3OutputFormat(),
+    target,
+  });
+  const source = new mediabunny.AudioBufferSource({
+    codec: "mp3",
+    bitrate: 192_000,
+  });
+
+  output.addAudioTrack(source);
+  await output.start();
+  await source.add(audioBuffer);
+  await output.finalize();
+
+  if (!target.buffer) throw new Error("MP3 encoding produced no output");
+  return target.buffer;
 }
 
 function downloadWav(audioBuffer: AudioBuffer, bpm: number) {
@@ -86,9 +126,13 @@ function downloadWav(audioBuffer: AudioBuffer, bpm: number) {
     }
   }
 
-  const url = URL.createObjectURL(new Blob([wav], { type: "audio/wav" }));
+  download(wav, "audio/wav", `steps-${bpm}bpm.wav`);
+}
+
+function download(data: BlobPart, type: string, filename: string) {
+  const url = URL.createObjectURL(new Blob([data], { type }));
   const anchor = document.createElement("a");
-  anchor.download = `steps-${bpm}bpm.wav`;
+  anchor.download = filename;
   anchor.href = url;
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);

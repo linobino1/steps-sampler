@@ -4,21 +4,23 @@
     "npm:@fortawesome/fontawesome-svg-core@^7.3.1": "7.3.1",
     "npm:@fortawesome/free-solid-svg-icons@^7.3.1": "7.3.1",
     "npm:@fortawesome/react-fontawesome@^3.5.0": "3.5.0_@fortawesome+fontawesome-svg-core@7.3.1_react@19.2.8",
+    "npm:@mediabunny/mp3-encoder@^1.55.5": "1.55.5_mediabunny@1.55.5",
     "npm:@tonejs/midi@^2.0.28": "2.0.28",
     "npm:@types/node@^17.0.23": "17.0.23",
     "npm:@types/react-dom@^19.2.5": "19.2.5_@types+react@19.2.18",
     "npm:@types/react@^19.2.18": "19.2.18",
     "npm:@types/styled-components@^5.1.36": "5.1.36",
-    "npm:@vitejs/plugin-legacy@^8.2.3": "8.2.3_terser@5.51.2_vite@8.2.2",
-    "npm:@vitejs/plugin-react@^6.1.1": "6.1.1_vite@8.2.2_terser@5.51.2",
+    "npm:@vitejs/plugin-legacy@^8.2.3": "8.2.3_terser@5.51.2_vite@8.2.2__@types+node@17.0.23__terser@5.51.2",
+    "npm:@vitejs/plugin-react@^6.1.1": "6.1.1_vite@8.2.2__@types+node@17.0.23__terser@5.51.2_terser@5.51.2",
+    "npm:mediabunny@^1.55.5": "1.55.5",
     "npm:prettier@^3.9.6": "3.9.6",
     "npm:react-dom@^19.2.8": "19.2.8_react@19.2.8",
     "npm:react@^19.2.8": "19.2.8",
-    "npm:styled-components@^6.5.3": "6.5.3_react@19.2.8_react-dom@19.2.8",
+    "npm:styled-components@^6.5.3": "6.5.3_react@19.2.8_react-dom@19.2.8__react@19.2.8",
     "npm:tonal@^6.4.3": "6.4.3",
     "npm:tone@^14.9.17": "14.9.17",
     "npm:typescript@^7.0.2": "7.0.2",
-    "npm:vite-plugin-pwa@^1.3.0": "1.3.0_vite@8.2.2_workbox-build@7.4.1_workbox-window@7.4.1",
+    "npm:vite-plugin-pwa@^1.3.0": "1.3.0_vite@8.2.2__@types+node@17.0.23__terser@5.51.2_workbox-build@7.4.1_workbox-window@7.4.1",
     "npm:vite@^8.2.2": "8.2.2_@types+node@17.0.23_terser@5.51.2",
     "npm:zustand@^5.0.15": "5.0.15_@types+react@19.2.18_react@19.2.8"
   },
@@ -868,6 +870,12 @@
         "@jridgewell/sourcemap-codec"
       ]
     },
+    "@mediabunny/mp3-encoder@1.55.5_mediabunny@1.55.5": {
+      "integrity": "sha512-WNdWY40KXy6P23iXboIJ8IuLaUsukEF3m+kQ4jCXnDwHTOlyRd+hyq4trTDq7g9kVwB+rpj5ZSzsBq8LKsRYwQ==",
+      "dependencies": [
+        "mediabunny"
+      ]
+    },
     "@napi-rs/lzma-linux-x64-gnu@1.5.1": {
       "integrity": "sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==",
       "os": ["linux"],
@@ -1361,6 +1369,15 @@
         "string.prototype.matchall"
       ]
     },
+    "@types/dom-mediacapture-transform@0.1.12": {
+      "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw==",
+      "dependencies": [
+        "@types/dom-webcodecs"
+      ]
+    },
+    "@types/dom-webcodecs@0.1.13": {
+      "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+    },
     "@types/estree@1.0.9": {
       "integrity": "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg=="
     },
@@ -1500,7 +1517,7 @@
       "os": ["win32"],
       "cpu": ["x64"]
     },
-    "@vitejs/plugin-legacy@8.2.3_terser@5.51.2_vite@8.2.2": {
+    "@vitejs/plugin-legacy@8.2.3_terser@5.51.2_vite@8.2.2__@types+node@17.0.23__terser@5.51.2": {
       "integrity": "sha512-MMHLsn/0FrBkCQyb1x44cPYGwkfqcGr2FblcEP2ne79aXe7d5tFKoZ09xs5C4wuh8fOu2JRaNhgAS3K3uvUeJA==",
       "dependencies": [
         "@babel/core",
@@ -1519,7 +1536,7 @@
         "vite"
       ]
     },
-    "@vitejs/plugin-react@6.1.1_vite@8.2.2_terser@5.51.2": {
+    "@vitejs/plugin-react@6.1.1_vite@8.2.2__@types+node@17.0.23__terser@5.51.2_terser@5.51.2": {
       "integrity": "sha512-yxLaQV9gkhS8ezJqCM6+ndU7mDY6gqAg75NQ+0IjwEI8IYOmQCgkRwHKVSfWXW076DsqMo0Dk+0FK1U+M5RgFw==",
       "dependencies": [
         "@rolldown/pluginutils",
@@ -2383,6 +2400,13 @@
     "math-intrinsics@1.1.0": {
       "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g=="
     },
+    "mediabunny@1.55.5": {
+      "integrity": "sha512-m0v6y8FGXiK+HKOc3AZqU+kJPLYsSKaLitmQNQIIHZKIGlTwQ34OF+X6Ul0K8iV4b03oPse10apwuoqbvmKeAA==",
+      "dependencies": [
+        "@types/dom-mediacapture-transform",
+        "@types/dom-webcodecs"
+      ]
+    },
     "meow@13.2.0": {
       "integrity": "sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA=="
     },
@@ -2831,7 +2855,7 @@
     "strip-comments@2.0.1": {
       "integrity": "sha512-ZprKx+bBLXv067WTCALv8SSz5l2+XhpYCsVtSqlMnkAXMWDq+/ekVbl1ghqP9rUHTzv6sm/DwCOiYutU/yp1fw=="
     },
-    "styled-components@6.5.3_react@19.2.8_react-dom@19.2.8": {
+    "styled-components@6.5.3_react@19.2.8_react-dom@19.2.8__react@19.2.8": {
       "integrity": "sha512-vAX79sfpmUerP9fsTTxoTrBDE0RuO4ahjInyWYoohNgqrdg63Ms4q6FJ/o2Fyity82NU3cujOT8Ewl9TThBdwg==",
       "dependencies": [
         "@emotion/is-prop-valid",
@@ -3036,7 +3060,7 @@
       ],
       "bin": true
     },
-    "vite-plugin-pwa@1.3.0_vite@8.2.2_workbox-build@7.4.1_workbox-window@7.4.1": {
+    "vite-plugin-pwa@1.3.0_vite@8.2.2__@types+node@17.0.23__terser@5.51.2_workbox-build@7.4.1_workbox-window@7.4.1": {
       "integrity": "sha512-c5kMgN+ITrOtHXp8PAtk2uOIEea6XjP/unCGxOWWBzQ6qa65qj/awHg0wf+QF9E/2u9vh86LqxPwzEPNbM2r5A==",
       "dependencies": [
         "debug",
@@ -3283,6 +3307,7 @@
         "npm:@fortawesome/fontawesome-svg-core@^7.3.1",
         "npm:@fortawesome/free-solid-svg-icons@^7.3.1",
         "npm:@fortawesome/react-fontawesome@^3.5.0",
+        "npm:@mediabunny/mp3-encoder@^1.55.5",
         "npm:@tonejs/midi@^2.0.28",
         "npm:@types/node@^17.0.23",
         "npm:@types/react-dom@^19.2.5",
@@ -3290,6 +3315,7 @@
         "npm:@types/styled-components@^5.1.36",
         "npm:@vitejs/plugin-legacy@^8.2.3",
         "npm:@vitejs/plugin-react@^6.1.1",
+        "npm:mediabunny@^1.55.5",
         "npm:prettier@^3.9.6",
         "npm:react-dom@^19.2.8",
         "npm:react@^19.2.8",
