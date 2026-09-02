@@ -237,7 +237,8 @@ function syncTrackSettings(
   targetInstruments.forEach((instrument, index) => {
     const track = trackSettings[instrument.id];
     instrument.channelVolume.volume.value = -12 * (100 - track.volume) / 100;
-    instrument.channelVolume.mute = index >= activeTracks || track.mute ||
+    const trackMuted = track.mute && instrument.type !== InstrumentType.pad;
+    instrument.channelVolume.mute = index >= activeTracks || trackMuted ||
       (soloed.length > 0 && !soloed.includes(instrument.id.toString()));
   });
 }

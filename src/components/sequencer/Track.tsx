@@ -253,7 +253,7 @@ export function Track({
                   timeId={timeId}
                   instrumentId={instrument.id}
                   trackName={instrument.name}
-                  muted={instrument.channelVolume.mute ||
+                  muted={trackParam.mute || instrument.channelVolume.mute ||
                     (instrument.id > 2 && !instrumentParam.audioUrl)}
                 />
               ))}

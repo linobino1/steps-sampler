@@ -217,6 +217,7 @@ function initSequencer() {
     ToneStore.subscribe((state) => state.activeTracks, syncTrackSettings),
     ToneStore.subscribe((state) => state.bpm, syncBpm),
     ToneStore.subscribe((state) => state.trackSettings, syncTrackSettings),
+    ToneStore.subscribe((state) => state.trackSettings, syncPlaybackPlan),
     ToneStore.subscribe((state) => state.resolution, syncStepEmitter),
     ToneStore.subscribe((state) => state.signature, syncSignature),
     ToneStore.subscribe((state) => state.swing, syncSwing),

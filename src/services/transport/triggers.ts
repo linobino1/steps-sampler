@@ -1,5 +1,5 @@
 import { Voicing, VoicingDictionary } from "tonal";
-import { SongArrangement } from "../core/interfaces.ts";
+import type { SongArrangement, TrackParams } from "../core/interfaces.ts";
 import { parseTimeId } from "./time.ts";
 
 interface PlaybackPlanState {
@@ -8,6 +8,7 @@ interface PlaybackPlanState {
   resolution: string;
   scheduledEvents: Array<string>;
   songArrangement: SongArrangement;
+  trackSettings: TrackParams;
 }
 
 export interface InstrumentEvent {
@@ -31,6 +32,8 @@ function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
   const cycles = state.songArrangement.length || 1;
   const activeEvents = new Map<string, string>();
   state.scheduledEvents.filter((event) => {
+    const { instrumentId } = parseTrigger(event);
+    if (state.trackSettings[parseInt(instrumentId)]?.mute) return false;
     const { bar, quarter, sixteenth } = parseTimeId(event);
     if (bar >= state.activeBars || quarter >= parseInt(state.signature)) {
       return false;
