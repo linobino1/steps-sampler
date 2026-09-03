@@ -18,8 +18,8 @@ import NoteIcon from "./NoteIcon.tsx";
 import BpmControl from "./BpmControl.tsx";
 import SwingControl from "./SwingControl.tsx";
 import {
-  type GridSignature,
   GRID_SIGNATURES,
+  type GridSignature,
 } from "../../services/transport/time.ts";
 
 const ControlBox = styled.div`
@@ -141,20 +141,79 @@ const BarLengthStepper = styled.div`
   }
 `;
 
-const MultiSelectBtn = styled.button`
+const ResolutionRadioGroup = styled.fieldset`
+  border: 0;
+  display: flex;
+  gap: 8px;
   margin: 0;
-  position: relative;
-  height: 26px;
+  padding: 0;
 
-  & div {
-    flex: 1;
-    border-right: 1px solid black;
-    background: var(--white);
-    text-align: center;
+  legend {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
   }
-  &.active {
+
+  input {
+    opacity: 0;
+    position: absolute;
+  }
+
+  label {
+    align-items: center;
+    border: 2px solid var(--black);
+    border-radius: 6px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    font-size: 0.8rem;
+    height: 26px;
+    padding: 0 5px;
+  }
+
+  input:checked + label {
     background: var(--main);
     color: var(--white);
+  }
+
+  input:focus-visible + label {
+    outline: 2px solid var(--black);
+    outline-offset: 2px;
+  }
+
+  label:hover {
+    background: var(--main-light);
+  }
+
+  @media (max-width: 990px) {
+    display: none;
+  }
+`;
+
+const ResolutionSelect = styled.select`
+  background: none;
+  border: 2px solid var(--black);
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--black);
+  cursor: pointer;
+  display: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: bold;
+  height: 26px;
+  padding-left: 5px;
+
+  &:hover {
+    background: var(--main-light);
+  }
+
+  @media (max-width: 990px) {
+    display: block;
   }
 `;
 
@@ -265,6 +324,15 @@ const _DisableMask = styled.div`
   background: var(--off-color-1);
 `;
 
+const GRID_RESOLUTIONS: ReadonlyArray<{
+  value: GridResolutions;
+  label: string;
+}> = [
+  { value: "8n", label: "8THS" },
+  { value: "8t", label: "TRIPLETS" },
+  { value: "16n", label: "16THS" },
+];
+
 export default function Controls() {
   const [isPlaying, setIsPlaying] = useState(Transport.state === "started");
   const activeBars = useToneStore((state) => state.activeBars);
@@ -278,7 +346,9 @@ export default function Controls() {
   );
   const dupeBar = useToneStore((state) => state.duplicateBarEvents);
   const clearSchedule = useToneStore((state) => state.clearSchedule);
-  const isGridEmpty = useToneStore((state) => state.scheduledEvents.length === 0);
+  const isGridEmpty = useToneStore((state) =>
+    state.scheduledEvents.length === 0
+  );
   const [playback, setPlayback] = useToneStore(
     useShallow((state) => [state.playbackSample, state.setPlaybackSample]),
   );
@@ -417,24 +487,32 @@ export default function Controls() {
         </BarControls>
 
         <ControlSection>
-          <MultiSelectBtn
-            className={res === "8n" ? "active" : ""}
-            onClick={() => setGridResolution("8n")}
+          <ResolutionRadioGroup>
+            <legend>Grid granularity</legend>
+            {GRID_RESOLUTIONS.map(({ value, label }) => (
+              <div key={value}>
+                <input
+                  id={`grid-resolution-${value}`}
+                  name="grid-resolution"
+                  type="radio"
+                  value={value}
+                  checked={res === value}
+                  onChange={() => setGridResolution(value)}
+                />
+                <label htmlFor={`grid-resolution-${value}`}>{label}</label>
+              </div>
+            ))}
+          </ResolutionRadioGroup>
+          <ResolutionSelect
+            aria-label="Grid granularity"
+            value={res}
+            onChange={(event) =>
+              setGridResolution(event.target.value as GridResolutions)}
           >
-            8THS
-          </MultiSelectBtn>
-          <MultiSelectBtn
-            className={res === "8t" ? "active" : ""}
-            onClick={() => setGridResolution("8t")}
-          >
-            TRIPLETS
-          </MultiSelectBtn>
-          <MultiSelectBtn
-            className={res === "16n" ? "active" : ""}
-            onClick={() => setGridResolution("16n")}
-          >
-            16THS
-          </MultiSelectBtn>
+            {GRID_RESOLUTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </ResolutionSelect>
         </ControlSection>
       </ControlGroup>
     </ControlBox>
