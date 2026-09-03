@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
-import { Transport } from "tone";
+import { getTransport } from "tone";
 import SequencerService from "../../services/transport/sequencer.ts";
 
 const TransportButton = styled.button<{ $playing: boolean }>`
@@ -16,20 +16,23 @@ const TransportButton = styled.button<{ $playing: boolean }>`
 `;
 
 export default function TransportControl() {
-  const [isPlaying, setIsPlaying] = useState(Transport.state === "started");
+  const [isPlaying, setIsPlaying] = useState(
+    getTransport().state === "started",
+  );
 
   useEffect(() => {
+    const transport = getTransport();
     const showPlaying = () => setIsPlaying(true);
     const showStopped = () => setIsPlaying(false);
 
-    Transport.on("start", showPlaying);
-    Transport.on("stop", showStopped);
-    Transport.on("pause", showStopped);
+    transport.on("start", showPlaying);
+    transport.on("stop", showStopped);
+    transport.on("pause", showStopped);
 
     return () => {
-      Transport.off("start", showPlaying);
-      Transport.off("stop", showStopped);
-      Transport.off("pause", showStopped);
+      transport.off("start", showPlaying);
+      transport.off("stop", showStopped);
+      transport.off("pause", showStopped);
     };
   }, []);
 

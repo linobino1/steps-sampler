@@ -1,11 +1,11 @@
-import { context, start, Transport } from "tone";
+import { context, getTransport, start } from "tone";
 import useToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import BlobService from "./blobStore.ts";
 import PadService from "./sample.ts";
 
 async function saveRecording() {
-  Transport.off("stop", saveRecording);
+  getTransport().off("stop", saveRecording);
   const blob = await InstrumentsService.keyboardRecorder.stop();
   const url = BlobService.storeBlob(blob, InstrumentsService.overdub.id);
   PadService.addSample(url, InstrumentsService.overdub);
@@ -20,8 +20,9 @@ async function recordOverdub() {
   if (context.state !== "running") await start();
 
   await InstrumentsService.keyboardRecorder.start();
-  Transport.on("stop", saveRecording);
-  Transport.start().stop(`+${useToneStore.getState().activeBars}:0:0`);
+  const transport = getTransport();
+  transport.on("stop", saveRecording);
+  transport.start().stop(`+${useToneStore.getState().activeBars}:0:0`);
 }
 
 function deleteOverdub() {

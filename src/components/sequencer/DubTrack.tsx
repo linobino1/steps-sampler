@@ -3,7 +3,7 @@ import InstrumentsService from "../../services/core/instruments.ts";
 import useToneStore from "../../store/store.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import DrawerService from "../../services/sampling/waveRender.ts";
-import { Transport } from "tone";
+import { getTransport } from "tone";
 import useWindowResize from "../useWindowResize.ts";
 
 const WaveTrack = styled.div<{ $activeBars: number }>`
@@ -58,11 +58,12 @@ function PlayCursor({ showCursor, activeBars }: CursorProps) {
   }, [activeBars]);
 
   useEffect(() => {
-    const start = Transport.schedule(startCursor, "0:0:0");
-    Transport.on("stop", stopCursor);
+    const transport = getTransport();
+    const start = transport.schedule(startCursor, "0:0:0");
+    transport.on("stop", stopCursor);
     return () => {
-      Transport.clear(start);
-      Transport.off("stop", stopCursor);
+      transport.clear(start);
+      transport.off("stop", stopCursor);
     };
   }, []);
 

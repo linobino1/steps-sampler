@@ -1,11 +1,14 @@
-import { context, Emitter, loaded, Loop, start, Transport } from "tone";
+import { context, Emitter, getTransport, loaded, Loop, start } from "tone";
 import ToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import type { Instrument } from "../core/interfaces.ts";
 import TriggersService, { type PlaybackPlan } from "./triggers.ts";
 import GridService from "./grid.ts";
 import PadService from "../sampling/sample.ts";
-import { type GridSignature, signatureToToneTime } from "./time.ts";
+import {
+  type GridSignature,
+  signatureToToneTime,
+} from "./time.ts";
 
 // SETTING SYNCS
 
@@ -16,7 +19,7 @@ interface TransportSettings {
 }
 
 export function configureTransport(
-  transport: typeof Transport,
+  transport: ReturnType<typeof getTransport>,
   settings: TransportSettings,
 ) {
   transport.bpm.value = settings.bpm;
@@ -25,7 +28,7 @@ export function configureTransport(
 }
 
 function syncBpm(val: number): void {
-  Transport.bpm.value = val;
+  getTransport().bpm.value = val;
 }
 
 function syncTrackSettings() {
@@ -43,17 +46,17 @@ function syncInstrumentParams() {
 // START-STOP CONTROLS
 
 function clearTransport() {
-  Transport.cancel();
+  getTransport().cancel();
   scheduledEventIds.clear();
   syncSwing();
 }
 
 function syncSwing() {
-  Transport.swing = ToneStore.getState().swing / 100;
+  getTransport().swing = ToneStore.getState().swing / 100;
 }
 
 function syncSignature() {
-  Transport.timeSignature = signatureToToneTime(
+  getTransport().timeSignature = signatureToToneTime(
     ToneStore.getState().signature,
   );
 }
@@ -61,7 +64,7 @@ function syncSignature() {
 const scheduledEventIds = new Set<number>();
 
 export function schedulePlaybackPlan(
-  transport: typeof Transport,
+  transport: ReturnType<typeof getTransport>,
   instruments: Array<Instrument>,
   plan: PlaybackPlan,
   notify = false,
@@ -88,12 +91,13 @@ export function schedulePlaybackPlan(
 }
 
 function syncPlaybackPlan() {
-  scheduledEventIds.forEach((id) => Transport.clear(id));
+  const transport = getTransport();
+  scheduledEventIds.forEach((id) => transport.clear(id));
   scheduledEventIds.clear();
   const plan = TriggersService.createPlaybackPlan(ToneStore.getState());
-  Transport.setLoopPoints(0, `${plan.measures}m`);
+  transport.setLoopPoints(0, `${plan.measures}m`);
   schedulePlaybackPlan(
-    Transport,
+    transport,
     InstrumentsService.instruments,
     plan,
     true,
@@ -103,15 +107,16 @@ function syncPlaybackPlan() {
 let playbackEventId: number | undefined;
 
 function syncPlaybackSample() {
+  const transport = getTransport();
   const playback = ToneStore.getState().playbackSample;
   InstrumentsService.playbacks.forEach((pb) => pb.player.stop());
   if (playbackEventId !== undefined) {
-    Transport.clear(playbackEventId);
+    transport.clear(playbackEventId);
     playbackEventId = undefined;
   }
   if (playback !== -1) {
     const i = InstrumentsService.playbacks[playback];
-    playbackEventId = Transport.scheduleOnce(
+    playbackEventId = transport.scheduleOnce(
       (time) => {
         if (i.player.loaded) i.player.start(time);
       },
@@ -124,7 +129,7 @@ let transportStartPending = false;
 let transportStartRequest = 0;
 
 function toggleTransport(): void {
-  Transport.state === "stopped" && !transportStartPending
+  getTransport().state === "stopped" && !transportStartPending
     ? startTransport()
     : stopTransport();
 }
@@ -138,7 +143,7 @@ function stopTransport() {
     pad.playHigh?.stop();
     pad.playLow?.stop();
   });
-  Transport.stop();
+  getTransport().stop();
 }
 
 async function startTransport() {
@@ -152,8 +157,9 @@ async function startTransport() {
     if (request !== transportStartRequest) return;
 
     syncPlaybackSample();
-    Transport.loop = true;
-    Transport.start();
+    const transport = getTransport();
+    transport.loop = true;
+    transport.start();
   } finally {
     if (request === transportStartRequest) transportStartPending = false;
   }
@@ -183,11 +189,14 @@ function syncStepEmitter() {
 
 function linkStepEmitter() {
   stepper = new Loop((_time) => {
-    stepEmitter.emit("step", (Transport.position as string).split(".")[0]);
+    stepEmitter.emit(
+      "step",
+      (getTransport().position as string).split(".")[0],
+    );
   }, ToneStore.getState().resolution);
   stepper.start(0);
 
-  Transport.on("stop", emitStopStep);
+  getTransport().on("stop", emitStopStep);
 }
 
 function emitStopStep() {
@@ -209,7 +218,7 @@ function initSequencer() {
 
   syncInstrumentParams();
   syncTrackSettings();
-  configureTransport(Transport, ToneStore.getState());
+  configureTransport(getTransport(), ToneStore.getState());
   syncPlaybackPlan();
 
   unSubs = [
@@ -267,7 +276,7 @@ function unsubSequencerSubscriptions() {
   unSubs = [];
   stepper?.dispose();
   stepper = null;
-  Transport.off("stop", emitStopStep);
+  getTransport().off("stop", emitStopStep);
   document.removeEventListener("keydown", handleTransportKeydown);
 }
 

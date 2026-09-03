@@ -13,7 +13,7 @@ import WavesIcon from "./wavesIcon.tsx";
 import PadControl from "./PadControl.tsx";
 import SliderIcon from "./sliderlcon.tsx";
 import { SAMPLER_PAD_HEIGHT } from "../../constants.ts";
-import { now, Transport } from "tone";
+import { getTransport, now } from "tone";
 import SampleSlice, { normalizeSlice } from "./SampleSlice.tsx";
 
 const padPulse = keyframes`
@@ -264,6 +264,7 @@ export default function Pad(props: { pad: Instrument }) {
   ]);
 
   useEffect(() => {
+    const transport = getTransport();
     let animationFrame = 0;
     const stopPlayback = () => {
       cancelAnimationFrame(animationFrame);
@@ -299,11 +300,11 @@ export default function Pad(props: { pad: Instrument }) {
 
       drawPlayhead();
     });
-    Transport.on("stop", stopPlayback);
+    transport.on("stop", stopPlayback);
 
     return () => {
       stopPlayback();
-      Transport.off("stop", stopPlayback);
+      transport.off("stop", stopPlayback);
       unsubscribe();
     };
   }, [props.pad.id]);
