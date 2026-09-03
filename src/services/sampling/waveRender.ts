@@ -1,5 +1,6 @@
-import { ToneAudioBuffer } from "tone";
-import { EnvelopeParam, InstrumentParam } from "../core/interfaces.ts";
+import type { ToneAudioBuffer } from "tone";
+import { EnvelopeParam } from "../core/interfaces.ts";
+import type { InstrumentParam } from "../core/interfaces.ts";
 
 function clearAllCanvas(parentEl: Element) {
   clearSample(parentEl, "wave");
@@ -74,13 +75,16 @@ function updateEditLayer(params: InstrumentParam, parentEl: Element) {
   ctx.stroke();
 }
 
-function drawAudioUrl(parentEl: Element, audioURL?: string, volume = 0) {
-  if (!audioURL) {
+function drawAudioBuffer(
+  parentEl: Element,
+  buffer?: ToneAudioBuffer,
+  volume = 0,
+) {
+  if (!buffer?.loaded) {
     clearAllCanvas(parentEl);
+    return;
   }
-  const buffer = new ToneAudioBuffer(audioURL, () => {
-    drawSample(buffer.getChannelData(0), parentEl, volume);
-  });
+  drawSample(buffer.getChannelData(0), parentEl, volume);
 }
 
 function drawSample(
@@ -119,7 +123,7 @@ function drawSample(
 }
 
 const waveRender = {
-  drawAudioUrl,
+  drawAudioBuffer,
   clearAllCanvas,
   updateEditLayer,
 };

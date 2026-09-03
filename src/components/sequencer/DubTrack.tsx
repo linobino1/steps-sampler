@@ -82,7 +82,12 @@ export default function DubTrack() {
 
   useEffect(() => {
     if (!elementRef.current) return;
-    DrawerService.drawAudioUrl(elementRef.current, overdubParam.audioUrl);
+    DrawerService.drawAudioBuffer(
+      elementRef.current,
+      overdubParam.audioUrl
+        ? InstrumentsService.overdub.playHigh?.buffer
+        : undefined,
+    );
   }, [elementRef, overdubParam, windowSize]);
 
   return (

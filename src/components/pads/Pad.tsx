@@ -3,7 +3,8 @@ import styled, { keyframes } from "styled-components";
 import { useShallow } from "zustand/shallow";
 import RecorderService from "../../services/sampling/recorder.ts";
 import SampleService from "../../services/sampling/sample.ts";
-import { EnvelopeParam, Instrument } from "../../services/core/interfaces.ts";
+import { EnvelopeParam } from "../../services/core/interfaces.ts";
+import type { Instrument } from "../../services/core/interfaces.ts";
 import useToneStore, { selectPadAudioUrl } from "../../store/store.ts";
 import DrawerService from "../../services/sampling/waveRender.ts";
 import InstrumentsService from "../../services/core/instruments.ts";
@@ -232,12 +233,12 @@ export default function Pad(props: { pad: Instrument }) {
 
   useEffect(() => {
     if (!elementRef.current) return;
-    DrawerService.drawAudioUrl(
+    DrawerService.drawAudioBuffer(
       elementRef.current,
-      audioUrl,
+      audioUrl ? props.pad.playHigh?.buffer : undefined,
       sampleVolume,
     );
-  }, [audioUrl, sampleVolume, windowSize]);
+  }, [audioUrl, props.pad.playHigh, sampleVolume, windowSize]);
 
   useEffect(() => {
     if (!elementRef.current) return;
