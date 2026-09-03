@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExternalLink } from "@fortawesome/free-solid-svg-icons";
 
 const FooterFrame = styled.footer`
   display: flex;
@@ -14,6 +16,8 @@ const FooterLink = styled.a`
   color: rgba(0, 0, 0, 0.42);
   text-decoration: none;
   transition: color 120ms ease;
+  display: flex;
+  gap: 6px;
 
   &:hover,
   &:focus-visible {
@@ -37,6 +41,7 @@ export default function Footer() {
         rel="noreferrer"
       >
         GitHub
+        <FontAwesomeIcon icon={faExternalLink} widthAuto />
       </FooterLink>
     </FooterFrame>
   );
