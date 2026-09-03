@@ -30,7 +30,6 @@
     "fmt": "deno fmt"
   },
   "devDependencies": {
-    "@types/node": "^17.0.23",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@types/styled-components": "^5.1.36",
