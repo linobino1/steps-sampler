@@ -81,7 +81,6 @@ export function Track({
   timeIds,
 }: TrackProps) {
   // we trigger rerenders on all trackSetting due to solo settings
-  const _trackSettings = useToneStore((state) => state.trackSettings);
   const instrumentParam = useToneStore(
     useCallback((state) => state.instrumentParams[instrument.id], [instrument]),
   );
