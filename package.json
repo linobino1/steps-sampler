@@ -18,7 +18,7 @@
     "react-dom": "^19.2.8",
     "styled-components": "^6.5.3",
     "tonal": "^6.4.3",
-    "tone": "^14.9.17",
+    "tone": "^15.1.22",
     "zustand": "^5.0.15"
   },
   "scripts": {
