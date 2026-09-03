@@ -4,18 +4,17 @@ Different parts of STePs Sampler are distributed under different terms.
 
 ## Software
 
-The source code is licensed under the [GNU General Public License version
-3](LICENSE.txt).
+The source code is licensed under the
+[GNU General Public License version 3](LICENSE.txt).
 
 ## Audio
 
-All files in `public/sounds/` are licensed under the [Creative Commons
-Attribution 4.0 International License (CC BY 4.0)][cc-by].
+All files in `public/sounds/` are licensed under the
+[Creative Commons Attribution 4.0 International License (CC BY 4.0)][cc-by].
 
-You may copy, redistribute, remix, transform, and build upon these files for
-any purpose, provided that you give appropriate credit, link to the license,
-and indicate whether changes were made. See the license for the complete
-terms.
+You may copy, redistribute, remix, transform, and build upon these files for any
+purpose, provided that you give appropriate credit, link to the license, and
+indicate whether changes were made. See the license for the complete terms.
 
 Suggested attribution:
 

@@ -5,10 +5,7 @@ import type { Instrument } from "../core/interfaces.ts";
 import TriggersService, { type PlaybackPlan } from "./triggers.ts";
 import GridService from "./grid.ts";
 import PadService from "../sampling/sample.ts";
-import {
-  type GridSignature,
-  signatureToToneTime,
-} from "./time.ts";
+import { type GridSignature, signatureToToneTime } from "./time.ts";
 
 // SETTING SYNCS
 

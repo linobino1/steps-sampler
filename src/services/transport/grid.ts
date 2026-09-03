@@ -1,6 +1,4 @@
-import useToneStore, {
-  GridResolutions,
-} from "../../store/store.ts";
+import useToneStore, { GridResolutions } from "../../store/store.ts";
 import {
   type GridSignature,
   isTimeInSignature,

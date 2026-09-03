@@ -1,10 +1,6 @@
 import { Voicing, VoicingDictionary } from "tonal";
 import type { SongArrangement, TrackParams } from "../core/interfaces.ts";
-import {
-  type GridSignature,
-  isTimeInSignature,
-  parseTimeId,
-} from "./time.ts";
+import { type GridSignature, isTimeInSignature, parseTimeId } from "./time.ts";
 
 interface PlaybackPlanState {
   activeBars: number;

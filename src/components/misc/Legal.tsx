@@ -126,8 +126,8 @@ export default function Legal() {
             rel="noreferrer"
           >
             Creative Commons Attribution 4.0 International (CC BY 4.0)
-          </Link>
-          {" "}license.
+          </Link>{" "}
+          license.
         </Copy>
         <Copy>Creator, copyright &amp; composition: Simon Krickl</Copy>
         <Copy>

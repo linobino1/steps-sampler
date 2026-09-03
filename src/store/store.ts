@@ -10,10 +10,7 @@ import {
 } from "../services/core/interfaces.ts";
 import InstrumentsService from "../services/core/instruments.ts";
 import TriggersService from "../services/transport/triggers.ts";
-import {
-  type GridSignature,
-  parseTimeId,
-} from "../services/transport/time.ts";
+import { type GridSignature, parseTimeId } from "../services/transport/time.ts";
 
 export type { GridSignature } from "../services/transport/time.ts";
 
