@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import useToneStore from "../../store/store.ts";
+import useToneStore, { type GridResolutions } from "../../store/store.ts";
 import styled from "styled-components";
 import { Instrument, InstrumentType } from "../../services/core/interfaces.ts";
 import GridService from "../../services/transport/grid.ts";
@@ -20,10 +20,10 @@ const Head = styled.div`
   width: 65px;
 `;
 
-const Bar = styled.div<{ $stepCount: number }>`
+const Bar = styled.div<{ $columns: string }>`
   position: relative;
   display: grid;
-  grid-template-columns: repeat(${(props) => props.$stepCount}, 1fr);
+  grid-template-columns: ${(props) => props.$columns};
   border-radius: 2px;
 `;
 
@@ -63,6 +63,36 @@ interface TrackProps {
 }
 
 const DRAG_THRESHOLD = 6;
+const MAX_VISUAL_SWING_OFFSET = 0.22;
+
+function getSwingColumns(
+  timeIds: Array<string>,
+  resolution: GridResolutions,
+  swing: number,
+) {
+  if (swing === 0 || resolution === "8t") {
+    return `repeat(${timeIds.length}, 1fr)`;
+  }
+
+  // Ease the visual offset so low swing values remain legible. The cap keeps
+  // every sixteenth-note cell usable even at the maximum setting.
+  const offset = MAX_VISUAL_SWING_OFFSET * Math.sqrt(swing / 75);
+  const parsedTimes = timeIds.map(GridService.parseTimeId);
+
+  return parsedTimes.map(({ quarter, sixteenth }) => {
+    const fullBeat = parsedTimes.some((time) =>
+      time.quarter === quarter && time.sixteenth === "2"
+    );
+    if (!fullBeat) return "1fr";
+
+    if (resolution === "8n") {
+      return sixteenth === "0" ? `${1 + offset * 2}fr` : `${1 - offset * 2}fr`;
+    }
+    if (sixteenth === "1") return `${1 + offset * 4}fr`;
+    if (sixteenth === "2") return `${1 - offset * 4}fr`;
+    return "1fr";
+  }).join(" ");
+}
 
 interface Gesture {
   pointerId: number;
@@ -88,6 +118,8 @@ export function Track({
     useCallback((state) => state.trackSettings[instrument.id], [instrument.id]),
   );
   const activeBars = useToneStore((state) => state.activeBars);
+  const resolution = useToneStore((state) => state.resolution);
+  const swing = useToneStore((state) => state.swing);
   const gesture = useRef<Gesture | null>(null);
   const [gestureMode, setGestureMode] = useState<GestureMode>("idle");
   const hasSound = instrumentParam.audioUrl ||
@@ -234,7 +266,10 @@ export function Track({
           onLostPointerCapture={cancelGesture}
         >
           {GridService.timeIdsByBar(timeIds).map((barInfo, _index, _arr) => (
-            <Bar key={barInfo.bar} $stepCount={barInfo.timeIds.length}>
+            <Bar
+              key={barInfo.bar}
+              $columns={getSwingColumns(barInfo.timeIds, resolution, swing)}
+            >
               {barInfo.timeIds.map((timeId) => (
                 <Toggle
                   key={`${timeId}|${instrument.id}`}
