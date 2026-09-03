@@ -1,14 +1,11 @@
 import { Emitter, getTransport, loaded, Loop } from "tone";
-import ToneStore from "../../store/store.ts";
+import ToneStore, { type GridResolutions } from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import type { Instrument } from "../core/interfaces.ts";
 import TriggersService, { type PlaybackPlan } from "./triggers.ts";
 import GridService from "./grid.ts";
 import PadService from "../sampling/sample.ts";
-import {
-  type GridSignature,
-  signatureToToneTime,
-} from "./time.ts";
+import { type GridSignature, signatureToToneTime } from "./time.ts";
 
 // SETTING SYNCS
 
@@ -16,6 +13,7 @@ interface TransportSettings {
   bpm: number;
   signature: GridSignature;
   swing: number;
+  resolution: GridResolutions;
 }
 
 export function configureTransport(
@@ -25,6 +23,7 @@ export function configureTransport(
   transport.bpm.value = settings.bpm;
   transport.timeSignature = signatureToToneTime(settings.signature);
   transport.swing = settings.swing / 100;
+  transport.swingSubdivision = settings.resolution === "16n" ? "16n" : "8n";
 }
 
 function syncBpm(val: number): void {
@@ -53,6 +52,12 @@ function clearTransport() {
 
 function syncSwing() {
   getTransport().swing = ToneStore.getState().swing / 100;
+}
+
+function syncSwingSubdivision() {
+  getTransport().swingSubdivision = ToneStore.getState().resolution === "16n"
+    ? "16n"
+    : "8n";
 }
 
 function syncSignature() {
@@ -228,7 +233,10 @@ function initSequencer() {
     ToneStore.subscribe((state) => state.bpm, syncBpm),
     ToneStore.subscribe((state) => state.trackSettings, syncTrackSettings),
     ToneStore.subscribe((state) => state.trackSettings, syncPlaybackPlan),
-    ToneStore.subscribe((state) => state.resolution, syncStepEmitter),
+    ToneStore.subscribe((state) => state.resolution, () => {
+      syncSwingSubdivision();
+      syncStepEmitter();
+    }),
     ToneStore.subscribe((state) => state.signature, syncSignature),
     ToneStore.subscribe((state) => state.swing, syncSwing),
     ToneStore.subscribe((state) => state.playbackSample, syncPlaybackSample),

@@ -80,17 +80,18 @@ function getSwingColumns(
   const parsedTimes = timeIds.map(GridService.parseTimeId);
 
   return parsedTimes.map(({ quarter, sixteenth }) => {
+    if (resolution === "16n") {
+      return parseInt(sixteenth) % 2 === 0
+        ? `${1 + offset * 2}fr`
+        : `${1 - offset * 2}fr`;
+    }
+
     const fullBeat = parsedTimes.some((time) =>
       time.quarter === quarter && time.sixteenth === "2"
     );
     if (!fullBeat) return "1fr";
 
-    if (resolution === "8n") {
-      return sixteenth === "0" ? `${1 + offset * 2}fr` : `${1 - offset * 2}fr`;
-    }
-    if (sixteenth === "1") return `${1 + offset * 4}fr`;
-    if (sixteenth === "2") return `${1 - offset * 4}fr`;
-    return "1fr";
+    return sixteenth === "0" ? `${1 + offset * 2}fr` : `${1 - offset * 2}fr`;
   }).join(" ");
 }
 
