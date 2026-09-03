@@ -29,6 +29,7 @@ export interface InstrumentDefn {
 export interface Instrument extends TriggerEnvelop, InstrumentDefn {
   id: number;
   channelVolume: Volume;
+  effectInput: Volume;
   sampleVolume: Volume;
   playHigh?: Player;
   playLow?: Player;
@@ -36,7 +37,7 @@ export interface Instrument extends TriggerEnvelop, InstrumentDefn {
 }
 
 export interface TriggerEnvelop {
-  pitchShift: PitchShift;
+  pitchShift?: PitchShift;
   duration?: number;
   fadeIn?: number;
   fadeOut?: number;

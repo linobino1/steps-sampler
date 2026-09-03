@@ -1,4 +1,4 @@
-import { context, getTransport, start } from "tone";
+import { getTransport } from "tone";
 import useToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import BlobService from "./blobStore.ts";
@@ -17,7 +17,7 @@ async function saveRecording() {
 }
 
 async function recordOverdub() {
-  if (context.state !== "running") await start();
+  await InstrumentsService.startAudio();
 
   await InstrumentsService.keyboardRecorder.start();
   const transport = getTransport();

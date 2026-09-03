@@ -1,4 +1,5 @@
 import {
+  context,
   now,
   PitchShift,
   Player,
@@ -6,6 +7,7 @@ import {
   Sampler,
   ToneAudioBuffer,
   ToneAudioNode,
+  start,
   Volume,
 } from "tone";
 import {
@@ -57,7 +59,7 @@ const instruments: Array<Instrument> = instDef.map((defn, index) => {
     ...defn,
     id: index,
     channelVolume: new Volume(0),
-    pitchShift: new PitchShift(), // only used for pads atm
+    effectInput: new Volume(0),
     sampleVolume: new Volume(0), // only used for pads atm
   };
   if (inst.type === InstrumentType.stock) {
@@ -165,12 +167,12 @@ function wireSignalChain(
   instrument: Instrument,
   destinations: Array<ToneAudioNode>,
   source?: string | AudioBuffer | ToneAudioBuffer,
+  enablePitchShift = false,
 ) {
   instrument.channelVolume.fan(...destinations);
-  const fxAndVol = instrument.pitchShift.chain(
-    instrument.sampleVolume,
-    instrument.channelVolume,
-  );
+  instrument.sampleVolume.connect(instrument.channelVolume);
+  instrument.effectInput.connect(instrument.sampleVolume);
+  if (enablePitchShift) insertPitchShift(instrument);
 
   if (instrument.type == InstrumentType.chords) {
     instrument.playSampler = new Sampler({
@@ -178,17 +180,24 @@ function wireSignalChain(
         C2: "sounds/piano_C2.wav",
         D4: "sounds/piano_D4.wav",
       },
-    }).chain(new Volume(-8), fxAndVol);
+    }).chain(new Volume(-8), instrument.effectInput);
   } else {
     instrument.playHigh = new Player(source ?? instrument.source).chain(
       new Volume(0),
-      fxAndVol,
+      instrument.effectInput,
     );
     instrument.playLow = new Player(source ?? instrument.source).chain(
       new Volume(-8),
-      fxAndVol,
+      instrument.effectInput,
     );
   }
+}
+
+function insertPitchShift(instrument: Instrument) {
+  if (instrument.pitchShift) return;
+  instrument.effectInput.disconnect(instrument.sampleVolume);
+  instrument.pitchShift = new PitchShift();
+  instrument.effectInput.chain(instrument.pitchShift, instrument.sampleVolume);
 }
 
 function syncInstrumentParam(
@@ -221,6 +230,7 @@ function syncParams(
   params: InstrumentParams,
   targetInstruments = instruments,
 ) {
+  if (targetInstruments === instruments) currentParams = params;
   targetInstruments.forEach((i) =>
     syncInstrumentParam(targetInstruments, params, i.id)
   );
@@ -244,6 +254,7 @@ function syncTrackSettings(
 }
 
 let instrumentsConnected = false;
+let currentParams: InstrumentParams | undefined;
 
 function connectInstruments() {
   if (!instrumentsConnected) {
@@ -252,6 +263,13 @@ function connectInstruments() {
     );
     instrumentsConnected = true;
   }
+}
+
+async function startAudio() {
+  if (context.state !== "running") await start();
+  connectInstruments();
+  instruments.forEach(insertPitchShift);
+  if (currentParams) syncParams(currentParams);
 }
 
 function createInstrumentGraph(destination: ToneAudioNode) {
@@ -266,13 +284,13 @@ function createInstrumentGraph(destination: ToneAudioNode) {
       fadeIn: template.fadeIn,
       fadeOut: template.fadeOut,
       channelVolume: new Volume(0),
-      pitchShift: new PitchShift(),
+      effectInput: new Volume(0),
       sampleVolume: new Volume(0),
     };
     const source = template.playHigh?.loaded
       ? template.playHigh.buffer
       : undefined;
-    wireSignalChain(instrument, [destination], source);
+    wireSignalChain(instrument, [destination], source, true);
     return instrument;
   });
 }
@@ -291,6 +309,7 @@ const InstrumentsService = {
   instruments,
   playbacks,
   connectInstruments,
+  startAudio,
   createInstrumentGraph,
   createPlaybackPlayer,
   getPlayInstrumentTrigger,

@@ -1,4 +1,4 @@
-import { context, Emitter, getTransport, loaded, Loop, start } from "tone";
+import { Emitter, getTransport, loaded, Loop } from "tone";
 import ToneStore from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import type { Instrument } from "../core/interfaces.ts";
@@ -150,9 +150,7 @@ async function startTransport() {
   const request = ++transportStartRequest;
   transportStartPending = true;
   try {
-    if (context.state !== "running") {
-      await start();
-    }
+    await InstrumentsService.startAudio();
     await loaded();
     if (request !== transportStartRequest) return;
 

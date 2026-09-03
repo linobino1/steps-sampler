@@ -310,7 +310,8 @@ export default function Pad(props: { pad: Instrument }) {
     };
   }, [props.pad.id]);
 
-  function recordOrPlay() {
+  async function recordOrPlay() {
+    await InstrumentsService.startAudio();
     const trigger = InstrumentsService.getPlayInstrumentTrigger(
       props.pad.id,
       true,
@@ -359,7 +360,7 @@ export default function Pad(props: { pad: Instrument }) {
       <RecordingBox
         onPointerDown={(e) => {
           e.preventDefault();
-          recordOrPlay();
+          void recordOrPlay();
         }}
       >
         {!audioUrl && !recording && (
