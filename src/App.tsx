@@ -23,6 +23,10 @@ const AppLayout = styled.div`
 const MainFrame = styled.div`
   width: 90%;
   margin: auto;
+
+  @media (max-width: 989px) {
+    width: calc(100% - 20px);
+  }
 `;
 
 const HeaderFrame = styled.div`
