@@ -5,9 +5,9 @@ import {
   Player,
   Recorder,
   Sampler,
+  start,
   ToneAudioBuffer,
   ToneAudioNode,
-  start,
   Volume,
 } from "tone";
 import {
