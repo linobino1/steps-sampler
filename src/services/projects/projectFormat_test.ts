@@ -50,6 +50,15 @@ Deno.test("parseProjectFile accepts a valid project", () => {
   if (project.project.bpm !== 124) throw new Error("Project was not parsed");
 });
 
+Deno.test("parseProjectFile accepts every supported time signature", () => {
+  const signatures = ["2", "3", "4", "5", "5/8", "6/8", "7/8"];
+  for (const signature of signatures) {
+    const source = validProject();
+    source.project.signature = signature;
+    parseProjectFile(source, options);
+  }
+});
+
 Deno.test("parseProjectFile rejects invalid state before import", () => {
   const source = validProject();
   source.project.bpm = 999;

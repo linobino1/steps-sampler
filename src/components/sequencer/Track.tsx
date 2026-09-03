@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import useToneStore, { GridSignature } from "../../store/store.ts";
+import useToneStore from "../../store/store.ts";
 import styled from "styled-components";
 import { Instrument, InstrumentType } from "../../services/core/interfaces.ts";
 import GridService from "../../services/transport/grid.ts";
@@ -20,24 +20,23 @@ const Head = styled.div`
   width: 65px;
 `;
 
-const Bar = styled.div<{ $togglesPerBeat: number }>`
+const Bar = styled.div<{ $stepCount: number }>`
   position: relative;
   display: grid;
-  grid-template-columns: repeat(${(props) => props.$togglesPerBeat}, 1fr);
+  grid-template-columns: repeat(${(props) => props.$stepCount}, 1fr);
   border-radius: 2px;
 `;
 
 type GestureMode = "idle" | "paint" | "erase" | "velocity";
 
 const Grid = styled.div<{
-  $signature: GridSignature;
   $activeBars: number;
   $gestureMode: GestureMode;
 }>`
   flex: 1;
   display: grid;
   grid-template-columns: repeat(${(props) =>
-    props.$activeBars <= 3 ? 3 : barsForSignature[props.$signature]}, 1fr);
+    props.$activeBars <= 3 ? 3 : 4}, 1fr);
   cursor: ${(props) =>
     props.$gestureMode === "velocity"
       ? "ns-resize"
@@ -60,15 +59,8 @@ const Mask = styled.div`
 
 interface TrackProps {
   instrument: Instrument;
-  togglesPerBeat: number;
   timeIds: Array<string>;
-  gridSignature: GridSignature;
 }
-
-const barsForSignature = {
-  4: 4,
-  3: 4,
-};
 
 const DRAG_THRESHOLD = 6;
 
@@ -86,9 +78,7 @@ interface Gesture {
 
 export function Track({
   instrument,
-  togglesPerBeat,
   timeIds,
-  gridSignature,
 }: TrackProps) {
   // we trigger rerenders on all trackSetting due to solo settings
   const _trackSettings = useToneStore((state) => state.trackSettings);
@@ -236,7 +226,6 @@ export function Track({
       </Head>
       {instrument.type === InstrumentType.chords ? <Chords /> : (
         <Grid
-          $signature={gridSignature}
           $activeBars={activeBars}
           $gestureMode={gestureMode}
           onPointerDown={handlePointerDown}
@@ -246,7 +235,7 @@ export function Track({
           onLostPointerCapture={cancelGesture}
         >
           {GridService.timeIdsByBar(timeIds).map((barInfo, _index, _arr) => (
-            <Bar key={barInfo.bar} $togglesPerBeat={togglesPerBeat}>
+            <Bar key={barInfo.bar} $stepCount={barInfo.timeIds.length}>
               {barInfo.timeIds.map((timeId) => (
                 <Toggle
                   key={`${timeId}|${instrument.id}`}

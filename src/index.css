@@ -57,7 +57,8 @@ body {
   --off-color-1: #ecdda6;
   --off-color-2: #36454f;
   --off-color-3: whitesmoke;
-  --inactive-color: grey;
+  --inactive-color: #545257;
+  --inactive-background: #cdcdcf;
   --pad-kick: var(--sampler-bottom);
   --pad-snare: var(--sampler-bottom);
   --pad-hat: var(--sampler-bottom);
@@ -83,11 +84,11 @@ body::before {
   z-index: 0;
   background:
     linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.8) 18.84%,
-    rgba(255, 255, 255, 0.47) 49.45%,
-    rgba(255, 255, 255, 0) 94.2%
-  ),
+      180deg,
+      rgba(255, 255, 255, 0.8) 18.84%,
+      rgba(255, 255, 255, 0.47) 49.45%,
+      rgba(255, 255, 255, 0) 94.2%
+    ),
     linear-gradient(87deg, #ffcdcd 2.61%, #ffedd8 48.87%, #fbeec3 95.12%);
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -135,12 +136,12 @@ button:-moz-focusring {
 }
 
 button:disabled {
-  background: var(--inactive-color);
-  color: lightgrey;
+  background: var(--inactive-background);
+  color: var(--inactive-color);
   cursor: default;
 }
 
-button:hover {
+button:not(:disabled):hover {
   background-color: var(--main-light);
 }
 

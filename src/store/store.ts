@@ -10,10 +10,14 @@ import {
 } from "../services/core/interfaces.ts";
 import InstrumentsService from "../services/core/instruments.ts";
 import TriggersService from "../services/transport/triggers.ts";
-import { parseTimeId } from "../services/transport/time.ts";
+import {
+  type GridSignature,
+  parseTimeId,
+} from "../services/transport/time.ts";
+
+export type { GridSignature } from "../services/transport/time.ts";
 
 export type GridResolutions = "16n" | "8n" | "8t";
-export type GridSignature = "4" | "3";
 export const STORE_VERSION = 1.9;
 const TRACKS_IDS = InstrumentsService.instruments.map((instrument) =>
   instrument.id

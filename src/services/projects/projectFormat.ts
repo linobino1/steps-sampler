@@ -4,6 +4,7 @@ import type {
   TrackParams,
 } from "../core/interfaces.ts";
 import type { GridResolutions, GridSignature } from "../../store/store.ts";
+import { GRID_SIGNATURES } from "../transport/time.ts";
 
 export const PROJECT_FORMAT = "steps-sampler-project";
 export const PROJECT_VERSION = 1;
@@ -98,7 +99,7 @@ function parseProject(
   const activeBars = integerInRange(project.activeBars, 1, 4, "bar count");
   const bpm = integerInRange(project.bpm, 24, 241, "tempo");
   const swing = integerInRange(project.swing, 0, 75, "swing");
-  if (project.signature !== "3" && project.signature !== "4") {
+  if (!GRID_SIGNATURES.some(({ value }) => value === project.signature)) {
     throw new Error("The project has an invalid time signature.");
   }
   if (!["8n", "16n", "8t"].includes(String(project.resolution))) {
@@ -115,7 +116,7 @@ function parseProject(
   return {
     activeTracks,
     activeBars,
-    signature: project.signature,
+    signature: project.signature as GridSignature,
     bpm,
     resolution: project.resolution as GridResolutions,
     instrumentParams: parseInstrumentParams(

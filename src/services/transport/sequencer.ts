@@ -5,12 +5,16 @@ import type { Instrument } from "../core/interfaces.ts";
 import TriggersService, { type PlaybackPlan } from "./triggers.ts";
 import GridService from "./grid.ts";
 import PadService from "../sampling/sample.ts";
+import {
+  type GridSignature,
+  signatureToToneTime,
+} from "./time.ts";
 
 // SETTING SYNCS
 
 interface TransportSettings {
   bpm: number;
-  signature: string;
+  signature: GridSignature;
   swing: number;
 }
 
@@ -19,7 +23,7 @@ export function configureTransport(
   settings: TransportSettings,
 ) {
   transport.bpm.value = settings.bpm;
-  transport.timeSignature = parseInt(settings.signature);
+  transport.timeSignature = signatureToToneTime(settings.signature);
   transport.swing = settings.swing / 100;
 }
 
@@ -52,7 +56,9 @@ function syncSwing() {
 }
 
 function syncSignature() {
-  Transport.timeSignature = parseInt(ToneStore.getState().signature);
+  Transport.timeSignature = signatureToToneTime(
+    ToneStore.getState().signature,
+  );
 }
 
 const scheduledEventIds = new Set<number>();

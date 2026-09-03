@@ -12,50 +12,83 @@ import {
   faStop,
 } from "@fortawesome/free-solid-svg-icons";
 import InstrumentsService from "../../services/core/instruments.ts";
-import SampleService from "../../services/sampling/sample.ts";
 
 import { useShallow } from "zustand/shallow";
 import NoteIcon from "./NoteIcon.tsx";
 import BpmControl from "./BpmControl.tsx";
 import SwingControl from "./SwingControl.tsx";
+import {
+  type GridSignature,
+  GRID_SIGNATURES,
+} from "../../services/transport/time.ts";
 
 const ControlBox = styled.div`
   border: solid black 2px;
   border-radius: 3px;
   display: flex;
+  justify-content: space-between;
   position: relative;
-  display: flex;
   flex-direction: horizontal;
   button {
-    height: 100%;
+    box-sizing: border-box;
+    height: 26px;
     border: 2px solid black;
+  }
+
+  @media (max-width: 1200px) {
+    justify-content: flex-start;
   }
 `;
 
 const ControlSection = styled.div`
+  align-items: center;
   border-right: solid black 2px;
-  padding: 10px;
+  padding: 6px;
   display: flex;
-  justify-content: space-around;
-  &:first-child {
-    flex: 1;
+  gap: 8px;
+  justify-content: space-evenly;
+`;
+
+const ControlGroup = styled.div`
+  display: flex;
+
+  &:last-child > ${ControlSection}:first-child {
+    border-left: solid black 2px;
   }
-  &:last-child {
-    border-right: 0px;
+
+  &:last-child > ${ControlSection}:last-child {
+    border-right: 0;
+  }
+
+  @media (max-width: 1200px) {
+    &:first-child {
+      flex: 1;
+    }
+
+    &:last-child > ${ControlSection}:first-child {
+      border-left: 0;
+    }
   }
 `;
 
-const BarLengthControl = styled(ControlSection)`
+const BarControls = styled(ControlSection)`
   align-items: center;
-  justify-content: center;
+`;
+
+const PlaybackSection = styled(ControlSection)`
+  @media (max-width: 1200px) {
+    flex: 1;
+    min-width: 0;
+  }
 `;
 
 const BarLengthStepper = styled.div`
   align-items: stretch;
   border: 2px solid black;
   border-radius: 6px;
+  box-sizing: border-box;
   display: flex;
-  height: 27px;
+  height: 26px;
   overflow: hidden;
 
   && > button {
@@ -67,12 +100,16 @@ const BarLengthStepper = styled.div`
     box-sizing: border-box;
     color: var(--black);
     display: inline-flex;
-    flex: 0 0 30px;
+    flex: 0 0 26px;
     height: 100%;
     justify-content: center;
     margin: 0;
     padding: 0;
-    width: 30px;
+    width: 26px;
+
+    > svg {
+      font-size: 10px;
+    }
 
     &:first-child {
       border-right: 2px solid black;
@@ -83,7 +120,7 @@ const BarLengthStepper = styled.div`
     }
 
     &:disabled {
-      background: transparent;
+      background: var(--inactive-background);
       color: var(--inactive-color);
     }
 
@@ -105,9 +142,9 @@ const BarLengthStepper = styled.div`
 `;
 
 const MultiSelectBtn = styled.button`
-  margin-left: 5px;
+  margin: 0;
   position: relative;
-  height: 100%;
+  height: 26px;
 
   & div {
     flex: 1;
@@ -121,28 +158,70 @@ const MultiSelectBtn = styled.button`
   }
 `;
 
+const SignatureControl = styled.div`
+  align-items: center;
+  display: grid;
+  position: relative;
+
+  select {
+    appearance: none;
+    background: none;
+    border: 2px solid var(--black);
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: var(--black);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: bold;
+    height: 26px;
+    padding: 0 14px 0 5px;
+    grid-area: 1 / 1;
+
+    &:hover {
+      background: var(--main-light);
+    }
+  }
+`;
+
 const TransportButton = styled.button<{ $playing: boolean }>`
   background: ${(props) => props.$playing ? "var(--main)" : "initial"};
   color: ${(props) => props.$playing ? "var(--white)" : "initial"};
+
+  && {
+    box-sizing: content-box;
+    height: 27px;
+  }
 `;
 
 const PlaybackSelect = styled.label`
   color: black;
   font-weight: bold;
-  margin: 2px 0px;
+  margin: 0;
   position: relative;
+
+  @media (max-width: 1200px) {
+    flex: 1;
+    min-width: 0;
+  }
+
   select {
     appearance: none;
     margin: 0px 5px;
     width: calc(100% - 10px);
-    height: 100%;
+    height: 26px;
     background: none;
     border: 2px solid var(--off-color-2);
     border-radius: 5px;
+    box-sizing: border-box;
     font-size: 12px;
     cursor: pointer;
     padding: 0 16px 0 33px;
     font-family: "RoobertMono";
+
+    &:hover {
+      background: var(--main-light);
+    }
   }
 `;
 
@@ -167,6 +246,15 @@ const PlaybackCaret = styled(FontAwesomeIcon)`
   transform: translateY(-50%);
 `;
 
+const SignatureCaret = styled(FontAwesomeIcon)`
+  align-self: center;
+  font-size: 10px;
+  grid-area: 1 / 1;
+  justify-self: end;
+  margin-right: 5px;
+  pointer-events: none;
+`;
+
 const _DisableMask = styled.div`
   position: absolute;
   top: 0;
@@ -189,8 +277,8 @@ export default function Controls() {
     useShallow((state) => [state.signature, state.setGridSignature]),
   );
   const dupeBar = useToneStore((state) => state.duplicateBarEvents);
-  const resetSequencer = useToneStore((state) => state.resetSequencer);
   const clearSchedule = useToneStore((state) => state.clearSchedule);
+  const isGridEmpty = useToneStore((state) => state.scheduledEvents.length === 0);
   const [playback, setPlayback] = useToneStore(
     useShallow((state) => [state.playbackSample, state.setPlaybackSample]),
   );
@@ -241,110 +329,114 @@ export default function Controls() {
     toggleRes(resolution);
   }
 
-  function _clearAll() {
-    resetSequencer();
-    InstrumentsService.pads.forEach((i) => {
-      SampleService.removeSample(i.id);
-    });
-  }
-
   return (
     <ControlBox>
-      <ControlSection>
-        <TransportButton
-          type="button"
-          $playing={isPlaying}
-          aria-pressed={isPlaying}
-          onClick={toggleTransporter}
-        >
-          <FontAwesomeIcon icon={faPlay} /> <span></span>
-          <FontAwesomeIcon icon={faStop} />
-        </TransportButton>
-        <BpmControl />
-        <SwingControl />
-        <button type="button" onClick={clearSchedule}>Clear Steps</button>
-      </ControlSection>
-      <BarLengthControl>
-        <BarLengthStepper>
+      <ControlGroup>
+        <ControlSection>
+          <TransportButton
+            type="button"
+            $playing={isPlaying}
+            aria-pressed={isPlaying}
+            onClick={toggleTransporter}
+          >
+            <FontAwesomeIcon icon={faPlay} /> <span />
+            <FontAwesomeIcon icon={faStop} />
+          </TransportButton>
+        </ControlSection>
+
+        <PlaybackSection>
+          <PlaybackSelect>
+            <IconBox>
+              <NoteIcon />
+            </IconBox>
+
+            <select
+              onChange={(e) => setPlayback(Number.parseInt(e.target.value))}
+              defaultValue={playback}
+            >
+              <option value={-1}>NO PLAYBACK</option>
+              {InstrumentsService.playbacks.map((pb, index) => (
+                <option key={pb.name} value={index}>
+                  {pb.name}
+                </option>
+              ))}
+            </select>
+            <PlaybackCaret icon={faCaretDown} aria-hidden="true" />
+          </PlaybackSelect>
+        </PlaybackSection>
+
+        <ControlSection>
+          <BpmControl />
+          <SignatureControl>
+            <select
+              aria-label="Time signature"
+              value={sig}
+              onChange={(event) =>
+                toggleSig(event.target.value as GridSignature)}
+            >
+              {GRID_SIGNATURES.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+            <SignatureCaret icon={faCaretDown} aria-hidden="true" />
+          </SignatureControl>
+          <SwingControl />
+        </ControlSection>
+      </ControlGroup>
+
+      <ControlGroup>
+        <BarControls>
+          <BarLengthStepper>
+            <button
+              type="button"
+              aria-label="Remove bar"
+              disabled={activeBars <= 1}
+              onClick={() => changeBars(-1)}
+            >
+              <FontAwesomeIcon icon={faMinus} />
+            </button>
+            <span>{activeBars} {activeBars === 1 ? "BAR" : "BARS"}</span>
+            <button
+              type="button"
+              aria-label="Add bar"
+              disabled={activeBars >= 4}
+              onClick={dupeBar}
+            >
+              <FontAwesomeIcon icon={faAdd} />
+            </button>
+          </BarLengthStepper>
           <button
             type="button"
-            aria-label="Remove bar"
-            disabled={activeBars <= 1}
-            onClick={() => changeBars(-1)}
+            disabled={isGridEmpty}
+            onClick={() => {
+              if (globalThis.confirm("Are you sure?")) clearSchedule();
+            }}
           >
-            <FontAwesomeIcon icon={faMinus} />
+            Clear Steps
           </button>
-          <span>{activeBars} {activeBars === 1 ? "BAR" : "BARS"}</span>
-          <button
-            type="button"
-            aria-label="Add bar"
-            disabled={activeBars >= 4}
-            onClick={dupeBar}
+        </BarControls>
+
+        <ControlSection>
+          <MultiSelectBtn
+            className={res === "8n" ? "active" : ""}
+            onClick={() => setGridResolution("8n")}
           >
-            <FontAwesomeIcon icon={faAdd} />
-          </button>
-        </BarLengthStepper>
-      </BarLengthControl>
-
-      {/* <Stretch /> */}
-
-      <ControlSection className="playback">
-        <PlaybackSelect>
-          <IconBox>
-            <NoteIcon />
-          </IconBox>
-
-          <select
-            onChange={(e) => setPlayback(parseInt(e.target.value))}
-            defaultValue={playback}
+            8THS
+          </MultiSelectBtn>
+          <MultiSelectBtn
+            className={res === "8t" ? "active" : ""}
+            onClick={() => setGridResolution("8t")}
           >
-            <option value={-1}>NO PLAYBACK</option>
-            {InstrumentsService.playbacks.map((pb, index) => (
-              <option key={pb.name} value={index}>
-                {pb.name}
-              </option>
-            ))}
-          </select>
-          <PlaybackCaret icon={faCaretDown} aria-hidden="true" />
-        </PlaybackSelect>
-      </ControlSection>
-
-      <ControlSection>
-        {/* {playback !== -1 && <DisableMask />} */}
-        <MultiSelectBtn
-          className={sig === "3" ? "active" : ""}
-          onClick={() => toggleSig("3")}
-        >
-          3/4
-        </MultiSelectBtn>
-        <MultiSelectBtn
-          className={sig === "4" ? "active" : ""}
-          onClick={() => toggleSig("4")}
-        >
-          4/4
-        </MultiSelectBtn>
-      </ControlSection>
-
-      <ControlSection>
-        <MultiSelectBtn
-          className={res === "8n" ? "active" : ""}
-          onClick={() => setGridResolution("8n")}
-        >
-          8THS
-        </MultiSelectBtn>
-        <MultiSelectBtn
-          className={res === "8t" ? "active" : ""}
-          onClick={() => setGridResolution("8t")}
-        >
-          TRIPLETS
-        </MultiSelectBtn>
-        <MultiSelectBtn
-          className={res === "16n" ? "active" : ""}
-          onClick={() => setGridResolution("16n")}
-        >
-          16THS
-        </MultiSelectBtn>
-      </ControlSection>
+            TRIPLETS
+          </MultiSelectBtn>
+          <MultiSelectBtn
+            className={res === "16n" ? "active" : ""}
+            onClick={() => setGridResolution("16n")}
+          >
+            16THS
+          </MultiSelectBtn>
+        </ControlSection>
+      </ControlGroup>
     </ControlBox>
   );
 }

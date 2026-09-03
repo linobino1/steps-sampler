@@ -12,11 +12,7 @@ import Mask from "./components/misc/Mask.tsx";
 import SamplerPanel from "./components/pads/Sampler.tsx";
 import SequencerService from "./services/transport/sequencer.ts";
 import useToneStore, { STORE_VERSION } from "./store/store.ts";
-import {
-  APP_HEADER_HEIGHT,
-  CTRLS_HEADER_HEIGHT,
-  SAMPLER_HEIGHT,
-} from "./constants.ts";
+import { APP_HEADER_HEIGHT, SAMPLER_HEIGHT } from "./constants.ts";
 
 const AppLayout = styled.div`
   display: grid;
@@ -38,7 +34,7 @@ const HeaderFrame = styled.div`
 `;
 const SequencerFrame = styled.div`
   display: grid;
-  grid-template-rows: ${SAMPLER_HEIGHT}px ${CTRLS_HEADER_HEIGHT}px 1fr;
+  grid-template-rows: ${SAMPLER_HEIGHT}px auto 1fr;
   grid-gap: 5px;
 `;
 

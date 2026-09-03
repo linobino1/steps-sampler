@@ -69,8 +69,9 @@ interface ToggleProps {
 
 export default function Toggle(props: ToggleProps) {
   const { bar } = GridService.parseTimeId(props.timeId);
+  const signature = useToneStore((state) => state.signature);
   const guideName = props.instrumentId === 0
-    ? GridService.timeIdToGuideName(props.timeId)
+    ? GridService.timeIdToGuideName(props.timeId, signature)
     : null;
   const addTriggerEvent = useToneStore((state) => state.addTriggerEvent);
   const removeTriggerEvent = useToneStore((state) => state.removeTriggerEvent);

@@ -1,8 +1,12 @@
 import useToneStore, {
   GridResolutions,
-  GridSignature,
 } from "../../store/store.ts";
-import { parseTimeId } from "./time.ts";
+import {
+  type GridSignature,
+  isTimeInSignature,
+  parseTimeId,
+  quarterNotesPerMeasure,
+} from "./time.ts";
 
 // TimeIds set the ActiveSlots in the store are used
 // to generate the UI Grid displayed in the Sequencer component
@@ -24,10 +28,13 @@ function generateTimeIds(
 ): Array<string> {
   const timeIds: Array<string> = [];
   Array.from(Array(bars).keys()).forEach((barNum) => {
-    Array.from(Array(parseInt(beats)).keys()).forEach((quarterNum) => {
-      quarterNoteDivisions[res].forEach((sixNum) =>
-        timeIds.push(`${barNum}:${quarterNum}:${sixNum}`)
-      );
+    const quarterCount = Math.ceil(quarterNotesPerMeasure(beats));
+    Array.from(Array(quarterCount).keys()).forEach((quarterNum) => {
+      quarterNoteDivisions[res].forEach((sixNum) => {
+        if (isTimeInSignature(quarterNum, sixNum, beats)) {
+          timeIds.push(`${barNum}:${quarterNum}:${sixNum}`);
+        }
+      });
     });
   });
   return timeIds;
@@ -42,8 +49,19 @@ function setGridTimeIds() {
   useToneStore.getState().setActiveTimeIds(activeTimeIds);
 }
 
-function timeIdToGuideName(timeId: string): string | undefined {
+function timeIdToGuideName(
+  timeId: string,
+  signature: GridSignature,
+): string | undefined {
   const { quarter, sixteenth } = parseTimeId(timeId);
+  const [, denominator] = signature.split("/");
+  if (denominator === "8") {
+    const eighthPosition = quarter * 2 + parseFloat(sixteenth) / 2;
+    if (Number.isInteger(eighthPosition)) {
+      return (eighthPosition + 1).toString();
+    }
+    return sixteenth === "1" || sixteenth === "3" ? "+" : undefined;
+  }
   const str16 = sixteenth.split(".")[0] as "1" | "2" | "3";
   return sixteenth === "0"
     ? (quarter + 1).toString()

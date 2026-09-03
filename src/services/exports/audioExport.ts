@@ -6,6 +6,7 @@ import {
   schedulePlaybackPlan,
 } from "../transport/sequencer.ts";
 import TriggersService from "../transport/triggers.ts";
+import { quarterNotesPerMeasure } from "../transport/time.ts";
 
 export type AudioFormat = "mp3" | "wav";
 
@@ -19,7 +20,7 @@ export async function recordAudio(
   const plan = TriggersService.createPlaybackPlan(state);
   const repetitionCount = Math.max(1, Math.min(99, Math.floor(repetitions)));
   const duration = plan.measures * repetitionCount *
-    parseInt(state.signature) * 60 / state.bpm;
+    quarterNotesPerMeasure(state.signature) * 60 / state.bpm;
 
   const rendered = await Offline(
     async ({ transport }) => {

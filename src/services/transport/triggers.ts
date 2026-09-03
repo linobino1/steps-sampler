@@ -1,10 +1,14 @@
 import { Voicing, VoicingDictionary } from "tonal";
 import type { SongArrangement, TrackParams } from "../core/interfaces.ts";
-import { parseTimeId } from "./time.ts";
+import {
+  type GridSignature,
+  isTimeInSignature,
+  parseTimeId,
+} from "./time.ts";
 
 interface PlaybackPlanState {
   activeBars: number;
-  signature: string;
+  signature: GridSignature;
   resolution: string;
   scheduledEvents: Array<string>;
   songArrangement: SongArrangement;
@@ -35,7 +39,10 @@ function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
     const { instrumentId } = parseTrigger(event);
     if (state.trackSettings[parseInt(instrumentId)]?.mute) return false;
     const { bar, quarter, sixteenth } = parseTimeId(event);
-    if (bar >= state.activeBars || quarter >= parseInt(state.signature)) {
+    if (
+      bar >= state.activeBars ||
+      !isTimeInSignature(quarter, sixteenth, state.signature)
+    ) {
       return false;
     }
     if (state.resolution === "8n") return ["0", "2"].includes(sixteenth);

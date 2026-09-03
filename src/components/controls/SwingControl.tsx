@@ -15,6 +15,7 @@ const SwingScrubber = styled.button`
   border: 2px solid var(--black) !important;
   box-sizing: border-box;
   display: flex;
+  height: 26px;
   margin: 0 !important;
   overflow: hidden;
   padding: 0 !important;
@@ -25,7 +26,7 @@ const SwingScrubber = styled.button`
   }
 
   &:disabled:hover {
-    background: var(--inactive-color);
+    background: var(--inactive-background);
   }
 `;
 
