@@ -91,13 +91,16 @@ export default function About() {
         <dd>Simon Bork, Panorama Studio</dd>
       </Team>
       <Logos aria-label="Project partners">
-        <IdeeBwLogo src="/img/IdeeBW_Logo_4C.svg" alt="IDEE BW" />
+        <IdeeBwLogo src="/partner-logos/IdeeBW_Logo_4C.svg" alt="IDEE BW" />
         <PhfrLogo
-          src="/img/PHFR-Logo_3Sprachen_rgb.svg"
+          src="/partner-logos/PHFR-Logo_3Sprachen_rgb.svg"
           alt="University of Education Freiburg"
         />
-        <DigellLogo src="/img/digell_logo.png" alt="Di-ge-LL" />
-        <FaceLogo src="/img/face_logo.png" alt="FACE School of Education" />
+        <DigellLogo src="/partner-logos/digell_logo.png" alt="Di-ge-LL" />
+        <FaceLogo
+          src="/partner-logos/face_logo.png"
+          alt="FACE School of Education"
+        />
       </Logos>
       <BackToApp />
     </InfoPage>

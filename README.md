@@ -8,6 +8,11 @@ This project is live at https://steps-sampler.de
 
 Audio sequencing and playback are powered by [Tone.js](https://tonejs.github.io/), which wraps the browser's Web Audio API. The [React](https://react.dev/) UI is bundled with [Vite](https://vite.dev/).
 
+## License
+
+See [the licensing overview](LICENSE.md) for the separate terms covering the
+source code, audio files, and partner logos.
+
 ### Browser Compatibility
 
 Production builds contain both a modern bundle and a transpiled legacy bundle

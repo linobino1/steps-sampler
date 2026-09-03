@@ -108,23 +108,33 @@ export default function Legal() {
           non-commercial educational activities and OER resources, provided that
           appropriate attribution is given.
         </Copy>
+        <Copy>
+          Partner logos and trademarks are excluded from these licenses. They
+          remain the property of their respective owners and may not be copied,
+          modified or reused without permission from the relevant rights holder.
+        </Copy>
       </section>
 
       <section>
-        <SectionHeading>Playbacks</SectionHeading>
+        <SectionHeading>Audio</SectionHeading>
         <Copy>
-          The playbacks included in the STePs Sampler are protected by
-          copyright.
+          The audio files included in the STePs Sampler are Open Educational
+          Resources licensed under the{" "}
+          <Link
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Creative Commons Attribution 4.0 International (CC BY 4.0)
+          </Link>
+          {" "}license.
         </Copy>
-        <Copy>Copyright &amp; composition: Simon Krickl</Copy>
+        <Copy>Creator, copyright &amp; composition: Simon Krickl</Copy>
         <Copy>
-          The playbacks are provided for use within the STePs Sampler and for
-          non-commercial educational purposes. They may not be extracted,
-          redistributed, or used separately from the STePs Sampler, in
-          particular not as part of commercial music productions or other
-          commercial projects, without prior permission from the rights holder.
+          You may copy, redistribute, remix, transform and build upon these
+          files for any purpose, provided that appropriate credit is given, a
+          link to the license is provided and changes are indicated.
         </Copy>
-        <Copy>Contact details for the rights holder are provided above.</Copy>
         <Copy>
           Individual components may be subject to different licenses or rights
           and are marked accordingly.
