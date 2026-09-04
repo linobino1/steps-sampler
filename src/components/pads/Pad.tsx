@@ -12,7 +12,7 @@ import useWindowResize from "../useWindowResize.ts";
 import TrashIcon from "./trashIcon.tsx";
 import WavesIcon from "./wavesIcon.tsx";
 import PadControl from "./PadControl.tsx";
-import SliderIcon from "./sliderlcon.tsx";
+import ControlsIcon from "./ControlsIcon.tsx";
 import { SAMPLER_PAD_HEIGHT } from "../../constants.ts";
 import { getTransport, now } from "tone";
 import SampleSlice, { normalizeSlice } from "./SampleSlice.tsx";
@@ -151,10 +151,19 @@ const TopBar = styled.div`
   cursor: default;
   & button {
     position: absolute;
+    top: -5px;
     right: 0px;
+    display: flex;
+    padding: 5px 6px;
+    align-items: center;
+    justify-content: center;
     background: none;
     font-weight: 600;
     border: 0px;
+  }
+
+  & button:not(:disabled):hover {
+    background: rgba(255, 107, 107, 0.18);
   }
 `;
 
@@ -167,29 +176,32 @@ const BottomBar = styled.div`
   color: var(--contrast);
   padding-left: 10px;
   display: flex;
-  & button {
-    background: var(--main-light);
-    display: flex;
-    width: 30px;
-    height: 30px;
-    padding: 5px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3.846px;
-    background: var(--Mittel-Grau, #b9abeb);
-  }
-`;
-
-const ButtonBox = styled.div`
-  margin: 5px;
-  position: absolute;
-  right: 0;
-  bottom: 0;
 `;
 
 const PadTitle = styled.div`
   margin-left: 8px;
+`;
+
+const ControlToggle = styled.button<{ $active: boolean }>`
+  position: absolute;
+  right: 5px;
+  bottom: 1px;
+  display: flex;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 3px;
+  align-items: center;
+  justify-content: center;
+  color: var(--contrast);
+  border: 0;
+  border-radius: 4px;
+  background: ${({ $active }) =>
+    $active ? "rgba(255, 107, 107, 0.18)" : "none"};
+
+  &&:hover {
+    background: rgba(255, 107, 107, 0.18);
+  }
 `;
 
 export default function Pad(props: { pad: Instrument }) {
@@ -263,6 +275,20 @@ export default function Pad(props: { pad: Instrument }) {
     slice.end,
     slice.start,
   ]);
+
+  useEffect(() => {
+    if (!showPadCtrl) return;
+
+    const hideControlsOutsidePad = (event: PointerEvent) => {
+      if (!padBoxRef.current?.contains(event.target as Node)) {
+        setShowPadCtrl(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", hideControlsOutsidePad);
+    return () =>
+      document.removeEventListener("pointerdown", hideControlsOutsidePad);
+  }, [showPadCtrl]);
 
   useEffect(() => {
     const transport = getTransport();
@@ -339,7 +365,13 @@ export default function Pad(props: { pad: Instrument }) {
     <PadBox ref={padBoxRef} onTouchEnd={() => stopRecording()}>
       <TopBar>
         {audioUrl && (
-          <button type="button" onClick={clearPad}>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              clearPad();
+            }}
+          >
             <TrashIcon />
           </button>
         )}
@@ -360,7 +392,10 @@ export default function Pad(props: { pad: Instrument }) {
       <RecordingBox
         onPointerDown={(e) => {
           e.preventDefault();
-          void recordOrPlay();
+          if (!audioUrl) void recordOrPlay();
+        }}
+        onClick={() => {
+          if (audioUrl) void recordOrPlay();
         }}
       >
         {!audioUrl && !recording && (
@@ -399,16 +434,17 @@ export default function Pad(props: { pad: Instrument }) {
           <WavesIcon />
         </div>
         <PadTitle>{props.pad.name}</PadTitle>
-        <ButtonBox>
-          {audioUrl && (
-            <button
-              type="button"
-              onClick={() => setShowPadCtrl(!showPadCtrl)}
-            >
-              <SliderIcon />
-            </button>
-          )}
-        </ButtonBox>
+        {audioUrl && (
+          <ControlToggle
+            type="button"
+            $active={showPadCtrl}
+            aria-label="Toggle sample controls"
+            aria-expanded={showPadCtrl}
+            onClick={() => setShowPadCtrl((show) => !show)}
+          >
+            <ControlsIcon />
+          </ControlToggle>
+        )}
       </BottomBar>
 
       {showPadCtrl && audioUrl && <PadControl padId={props.pad.id} />}
