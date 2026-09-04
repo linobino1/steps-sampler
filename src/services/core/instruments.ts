@@ -196,7 +196,7 @@ function wireSignalChain(
 function insertPitchShift(instrument: Instrument) {
   if (instrument.pitchShift) return;
   instrument.effectInput.disconnect(instrument.sampleVolume);
-  instrument.pitchShift = new PitchShift();
+  instrument.pitchShift = new PitchShift({ wet: 0 });
   instrument.effectInput.chain(instrument.pitchShift, instrument.sampleVolume);
 }
 
@@ -221,7 +221,9 @@ function syncInstrumentParam(
     i.fadeIn = param[EnvelopeParam.fadeIn] * unity;
     if (i.sampleVolume && i.pitchShift) {
       i.sampleVolume.volume.value = param[EnvelopeParam.amplitude];
-      i.pitchShift.pitch = param[EnvelopeParam.pitchShift];
+      const pitch = param[EnvelopeParam.pitchShift];
+      i.pitchShift.pitch = pitch;
+      i.pitchShift.wet.value = pitch === 0 ? 0 : 1;
     }
   }
 }
@@ -268,7 +270,8 @@ function connectInstruments() {
 async function startAudio() {
   if (context.state !== "running") await start();
   connectInstruments();
-  instruments.forEach(insertPitchShift);
+  instruments.filter((instrument) => instrument.type === InstrumentType.pad)
+    .forEach(insertPitchShift);
   if (currentParams) syncParams(currentParams);
 }
 
