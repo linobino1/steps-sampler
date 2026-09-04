@@ -32,11 +32,18 @@ const SwingScrubber = styled.button`
 
 const SwingValue = styled.span`
   align-items: center;
+  box-sizing: border-box;
   display: flex;
   font-size: 13px;
   justify-content: center;
-  min-width: 75px;
+  width: 75px;
   padding: 0 0 0 7px;
+`;
+
+const SwingAmount = styled.span`
+  margin-left: 1ch;
+  text-align: center;
+  min-width: 3ch;
 `;
 
 const DragIndicator = styled.span`
@@ -92,7 +99,12 @@ export default function SwingControl() {
         }
       }}
     >
-      <SwingValue>Swing {swingPercent}%</SwingValue>
+      <SwingValue>
+        Swing
+        <SwingAmount>
+          {swingPercent === MIN_SWING_PERCENT ? "off" : `${swingPercent}%`}
+        </SwingAmount>
+      </SwingValue>
       <DragIndicator aria-hidden="true">
         <FontAwesomeIcon icon={faCaretUp} />
         <FontAwesomeIcon icon={faCaretDown} />
