@@ -85,7 +85,8 @@ const FormatLabel = styled.label`
   }
 
   &:focus-within {
-    outline: -webkit-focus-ring-color auto 1px;
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
 
   &[data-selected="true"] {

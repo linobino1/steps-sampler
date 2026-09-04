@@ -10,7 +10,7 @@ input[type='range'] {
   margin: 0;
 
   &:focus {
-    outline-color: #f8b195;
+    outline-color: var(--focus);
   }
 }
 

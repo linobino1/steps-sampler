@@ -28,7 +28,7 @@ const MetronomeButton = styled.button<{ $enabled: boolean }>`
 
   &&:focus-visible {
     border-radius: 2px;
-    outline: 2px solid var(--main);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 `;

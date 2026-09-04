@@ -18,7 +18,7 @@ const StepMargin = styled.div`
   box-sizing: border-box;
 
   &:focus-visible {
-    outline: 2px solid var(--black);
+    outline: 2px solid var(--focus);
     outline-offset: -2px;
   }
 `;

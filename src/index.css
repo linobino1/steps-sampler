@@ -37,6 +37,7 @@ body {
   --main-light: #b9abeb;
   --main-faded: rgba(121, 92, 239, 0.3);
   --contrast: #ff6b6b;
+  --focus: blue;
 
   --kick: #77f57c;
   --snare: #f9fb92;
@@ -100,6 +101,11 @@ body::before {
   z-index: 1;
 }
 
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 button {
   font-family: inherit;
   line-height: normal;
@@ -132,7 +138,8 @@ button::-moz-focus-inner {
 }
 
 button:-moz-focusring {
-  outline: 1px dotted ButtonText;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 button:disabled {

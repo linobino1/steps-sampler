@@ -59,7 +59,7 @@ const Handle = styled.div`
   }
 
   &:focus-visible::after {
-    box-shadow: 0 0 0 3px var(--white);
+    box-shadow: 0 0 0 3px var(--focus);
   }
 
   &:active {

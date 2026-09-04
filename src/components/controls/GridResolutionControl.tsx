@@ -52,7 +52,7 @@ const ResolutionRadioGroup = styled.fieldset`
   }
 
   input:focus-visible + label {
-    outline: 2px solid var(--black);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 

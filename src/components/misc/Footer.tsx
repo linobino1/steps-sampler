@@ -25,8 +25,8 @@ const FooterLink = styled.a`
   }
 
   &:focus-visible {
-    outline: 1px dotted currentColor;
-    outline-offset: 3px;
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
 `;
 
