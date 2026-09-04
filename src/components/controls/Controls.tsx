@@ -2,6 +2,7 @@ import styled from "styled-components";
 import BarControls from "./BarControls.tsx";
 import BpmControl from "./BpmControl.tsx";
 import GridResolutionControl from "./GridResolutionControl.tsx";
+import MetronomeControl from "./MetronomeControl.tsx";
 import PlaybackControl from "./PlaybackControl.tsx";
 import SwingControl from "./SwingControl.tsx";
 import TimeSignatureControl from "./TimeSignatureControl.tsx";
@@ -70,6 +71,7 @@ export default function Controls() {
       <ControlGroup>
         <ControlSection>
           <TransportControl />
+          <MetronomeControl />
         </ControlSection>
         <PlaybackSection>
           <PlaybackControl />

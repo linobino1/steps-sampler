@@ -6,6 +6,7 @@ import TriggersService, { type PlaybackPlan } from "./triggers.ts";
 import GridService from "./grid.ts";
 import PadService from "../sampling/sample.ts";
 import { type GridSignature, signatureToToneTime } from "./time.ts";
+import MetronomeService from "./metronome.ts";
 
 // SETTING SYNCS
 
@@ -64,6 +65,7 @@ function syncSignature() {
   getTransport().timeSignature = signatureToToneTime(
     ToneStore.getState().signature,
   );
+  MetronomeService.syncInterval();
 }
 
 const scheduledEventIds = new Set<number>();
@@ -214,6 +216,7 @@ function initSequencer() {
   unsubSequencerSubscriptions();
   clearTransport();
   linkStepEmitter();
+  MetronomeService.init();
   addKeyboardListener();
   InstrumentsService.connectInstruments();
   PadService.loadSavedSamples();
@@ -282,6 +285,7 @@ function unsubSequencerSubscriptions() {
   unSubs = [];
   stepper?.dispose();
   stepper = null;
+  MetronomeService.dispose();
   getTransport().off("stop", emitStopStep);
   document.removeEventListener("keydown", handleTransportKeydown);
 }
