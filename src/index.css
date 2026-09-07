@@ -148,8 +148,10 @@ button:disabled {
   cursor: default;
 }
 
-button:not(:disabled):hover {
-  background-color: var(--main-light);
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover {
+    background-color: var(--main-light);
+  }
 }
 
 @keyframes tracker {
