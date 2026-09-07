@@ -31,6 +31,21 @@ const SignatureControl = styled.div`
     &:hover {
       background: var(--main-light);
     }
+
+    &:disabled {
+      background: var(--inactive-background);
+      color: var(--inactive-color);
+      cursor: default;
+      opacity: 1;
+    }
+
+    &:disabled:hover {
+      background: var(--inactive-background);
+    }
+
+    &:disabled + svg {
+      color: var(--inactive-color);
+    }
   }
 `;
 
@@ -47,11 +62,13 @@ export default function TimeSignatureControl() {
   const [signature, setSignature] = useToneStore(
     useShallow((state) => [state.signature, state.setGridSignature]),
   );
+  const playback = useToneStore((state) => state.playbackSample);
 
   return (
     <SignatureControl>
       <select
         aria-label="Time signature"
+        disabled={playback > -1}
         value={signature}
         onChange={(event) => setSignature(event.target.value as GridSignature)}
       >

@@ -55,6 +55,7 @@ export default function BpmControl() {
   const playback = useToneStore((state) => state.playbackSample);
   const dragStart = useRef({ y: 0, bpm });
   function updateBpm(value: number) {
+    if (playback > -1) return;
     setBpm(String(Math.min(MAX_BPM, Math.max(MIN_BPM, value))));
   }
 
