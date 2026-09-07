@@ -123,6 +123,8 @@ export function Track({
   const swing = useToneStore((state) => state.swing);
   const gesture = useRef<Gesture | null>(null);
   const [gestureMode, setGestureMode] = useState<GestureMode>("idle");
+  const defaultEmphasized = instrument.name === "kick" ||
+    instrument.name === "snare";
   const hasSound = instrumentParam.audioUrl ||
     instrument.id < 3 ||
     instrument.type === InstrumentType.chords;
@@ -147,7 +149,7 @@ export function Track({
       if (currentGesture.originScheduled) {
         removeTriggerEvent(timeId, instrument.id);
       } else {
-        addTriggerEvent(timeId, instrument.id, false);
+        addTriggerEvent(timeId, instrument.id, defaultEmphasized);
       }
     });
   }
@@ -279,6 +281,7 @@ export function Track({
                   trackName={instrument.name}
                   muted={trackParam.mute || instrument.channelVolume.mute ||
                     (instrument.id > 2 && !instrumentParam.audioUrl)}
+                  defaultEmphasized={defaultEmphasized}
                 />
               ))}
             </Bar>

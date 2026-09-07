@@ -65,6 +65,7 @@ interface ToggleProps {
   instrumentId: number;
   trackName: string;
   muted: boolean;
+  defaultEmphasized: boolean;
 }
 
 export default function Toggle(props: ToggleProps) {
@@ -120,7 +121,7 @@ export default function Toggle(props: ToggleProps) {
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          toggleStep(false);
+          toggleStep(props.defaultEmphasized);
         } else if (scheduled && event.key === "ArrowUp") {
           event.preventDefault();
           addTriggerEvent(props.timeId, props.instrumentId, true);
