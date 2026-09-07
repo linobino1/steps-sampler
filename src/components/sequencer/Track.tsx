@@ -272,7 +272,9 @@ export function Track({
           onPointerMove={handlePointerMove}
           onPointerUp={finishGesture}
           onPointerCancel={cancelGesture}
-          onLostPointerCapture={cancelGesture}
+          onLostPointerCapture={(event) => {
+            if (event.target === event.currentTarget) cancelGesture(event);
+          }}
         >
           {GridService.timeIdsByBar(timeIds).map((barInfo, _index, _arr) => (
             <Bar
