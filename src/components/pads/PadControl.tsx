@@ -4,29 +4,59 @@ import { EnvelopeParam } from "../../services/core/interfaces.ts";
 import useToneStore from "../../store/store.ts";
 
 const Box = styled.div`
-  width: 100%;
+  width: calc(100% + 3px);
   box-sizing: border-box;
   position: absolute;
-  top: 100%;
-  margin-top: 1px;
-  padding: 5px;
-  z-index: 1;
+  top: calc(100% + 8px);
+  left: -1.5px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 12px;
+  padding: 10px 12px;
+  z-index: 3;
   background: var(--main-light);
-  border-radius: 0px 0px 6px 6px;
-`;
+  border: 1.5px solid var(--black);
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 
-const Param = styled.div`
-  margin: 0.5rem;
-  text-align: center;
-  display: flex;
-  font-size: 0.8rem;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    bottom: 100%;
+    border: 8px solid transparent;
+    border-bottom-color: var(--black);
+  }
 
-  & input {
-    width: 80%;
+  &::after {
+    right: 12px;
+    border-width: 6px;
+    border-bottom-color: var(--main-light);
   }
 
   @media (hover: none), (pointer: coarse) {
+    display: block;
+  }
+
+`;
+
+const Param = styled.div`
+  margin: 0;
+  text-align: center;
+  display: contents;
+  font-size: 0.8rem;
+
+  & input {
+    --thumb-size: 14px;
+    width: 100%;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    display: flex;
     flex-direction: column;
+    gap: 8px;
     margin: 0.25rem 0.5rem;
 
     & input {

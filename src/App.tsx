@@ -8,21 +8,29 @@ import About from "./components/misc/About.tsx";
 import Footer from "./components/misc/Footer.tsx";
 import Legal from "./components/misc/Legal.tsx";
 import Mask from "./components/misc/Mask.tsx";
+import CompactNotice from "./components/misc/CompactNotice.tsx";
 
 import SamplerPanel from "./components/pads/Sampler.tsx";
 import SequencerService from "./services/transport/sequencer.ts";
 import useToneStore, { STORE_VERSION } from "./store/store.ts";
-import { APP_HEADER_HEIGHT, SAMPLER_HEIGHT } from "./constants.ts";
 
 const AppLayout = styled.div`
   display: grid;
-  grid-template-rows: ${APP_HEADER_HEIGHT}px minmax(min-content, 1fr) auto;
+  grid-template-rows: auto minmax(min-content, 1fr);
   min-height: 100vh;
+  min-height: 100dvh;
+`;
+
+const ContentFrame = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 const MainFrame = styled.div`
   width: 90%;
-  margin: auto;
+  margin: 0 auto;
+  padding-top: 10px;
 
   @media (max-width: 989px) {
     width: calc(100% - 20px);
@@ -30,7 +38,7 @@ const MainFrame = styled.div`
 `;
 
 const HeaderFrame = styled.div`
-  height: ${APP_HEADER_HEIGHT}px;
+  height: 35px;
   background: rgba(255, 255, 255, 0.01);
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(25px);
@@ -38,19 +46,28 @@ const HeaderFrame = styled.div`
 `;
 const SequencerFrame = styled.div`
   display: grid;
-  grid-template-rows: ${SAMPLER_HEIGHT}px auto 1fr;
+  grid-template-rows: auto auto 1fr;
   grid-gap: 5px;
 `;
 
 function Sampler() {
   const [sequencerOn, setSequencerOn] = useState(false);
   useEffect(() => {
+    const compactQuery = globalThis.matchMedia("(max-width: 800px)");
+    const handleCompactChange = (event: MediaQueryListEvent) =>
+      useToneStore.getState().setCompactMode(event.matches);
+
+    useToneStore.getState().setCompactMode(compactQuery.matches);
+    compactQuery.addEventListener("change", handleCompactChange);
     if (useToneStore.getState().storeVersion !== STORE_VERSION) {
       useToneStore.getState().resetStore();
     }
     SequencerService.initSequencer();
     setSequencerOn(true);
-    return SequencerService.unsubSequencerSubscriptions;
+    return () => {
+      compactQuery.removeEventListener("change", handleCompactChange);
+      SequencerService.unsubSequencerSubscriptions();
+    };
   }, []);
 
   return (
@@ -73,16 +90,19 @@ export default function App() {
   return (
     <>
       {!isInfoPage && <Mask />}
+      {!isInfoPage && <CompactNotice />}
       <AppLayout>
         <HeaderFrame>
           <Header showControls={!isInfoPage} />
         </HeaderFrame>
-        {path === "/about"
-          ? <About />
-          : path === "/legal"
-          ? <Legal />
-          : <Sampler />}
-        <Footer />
+        <ContentFrame>
+          {path === "/about"
+            ? <About />
+            : path === "/legal"
+            ? <Legal />
+            : <Sampler />}
+          <Footer />
+        </ContentFrame>
       </AppLayout>
     </>
   );

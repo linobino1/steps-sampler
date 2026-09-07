@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import GridService from "../../services/transport/grid.ts";
 import TriggersService from "../../services/transport/triggers.ts";
-import useToneStore from "../../store/store.ts";
+import useToneStore, { selectActiveBars } from "../../store/store.ts";
 import { useCallback, useLayoutEffect, useState } from "react";
 import SequencerService from "../../services/transport/sequencer.ts";
 
@@ -14,6 +14,7 @@ const StepMargin = styled.div`
   height: 100%;
   position: relative;
   cursor: inherit;
+  touch-action: none;
   border: 0.5px solid var(--main);
   box-sizing: border-box;
 
@@ -81,7 +82,7 @@ export default function Toggle(props: ToggleProps) {
       (e) => e.slice(0, -2) === `${props.timeId}|${props.instrumentId}`,
     )
   );
-  const activeBars = useToneStore((state) => state.activeBars);
+  const activeBars = useToneStore(selectActiveBars);
   const [isActive, setIsActive] = useState(false);
   const setStep = useCallback(
     (step: string) => {

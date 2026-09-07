@@ -1,6 +1,9 @@
 import { useCallback, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import useToneStore, { type GridResolutions } from "../../store/store.ts";
+import useToneStore, {
+  type GridResolutions,
+  selectActiveBars,
+} from "../../store/store.ts";
 import styled from "styled-components";
 import { Instrument, InstrumentType } from "../../services/core/interfaces.ts";
 import GridService from "../../services/transport/grid.ts";
@@ -45,7 +48,11 @@ const Grid = styled.div<{
       : props.$gestureMode === "paint"
       ? "crosshair"
       : "pointer"};
-  touch-action: none;
+  touch-action: pan-y;
+
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(${(props) => props.$activeBars}, 1fr);
+  }
 `;
 
 const Mask = styled.div`
@@ -118,7 +125,7 @@ export function Track({
   const trackParam = useToneStore(
     useCallback((state) => state.trackSettings[instrument.id], [instrument.id]),
   );
-  const activeBars = useToneStore((state) => state.activeBars);
+  const activeBars = useToneStore(selectActiveBars);
   const resolution = useToneStore((state) => state.resolution);
   const swing = useToneStore((state) => state.swing);
   const gesture = useRef<Gesture | null>(null);
@@ -158,8 +165,6 @@ export function Track({
     if (event.button !== 0 || gesture.current) return;
     const timeId = getTimeId(event.target);
     if (!timeId) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
     gesture.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -191,6 +196,7 @@ export function Track({
         : currentGesture.originScheduled
         ? "erase"
         : "paint";
+      event.currentTarget.setPointerCapture(event.pointerId);
       setGestureMode(currentGesture.mode);
       if (currentGesture.mode !== "velocity") {
         paint([currentGesture.originTimeId], currentGesture);

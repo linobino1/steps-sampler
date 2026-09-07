@@ -2,7 +2,7 @@ import { Key } from "tonal";
 import styled from "styled-components";
 import { useRef } from "react";
 import { useShallow } from "zustand/shallow";
-import useToneStore from "../../store/store.ts";
+import useToneStore, { selectActiveBars } from "../../store/store.ts";
 
 const ChordPlay = styled.div`
   margin-top: 2px;
@@ -57,7 +57,7 @@ export default function Chords() {
       state.updateArrangement,
     ]),
   );
-  const activeBars = useToneStore((state) => state.activeBars);
+  const activeBars = useToneStore(selectActiveBars);
 
   function ondrop(
     e: React.DragEvent,

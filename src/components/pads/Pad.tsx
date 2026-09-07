@@ -111,8 +111,15 @@ const RecordingNotice = styled.div`
 
 const WaveViewPort = styled.div`
   position: relative;
+  box-sizing: border-box;
+  width: 100%;
   padding: 5px;
   height: ${SAMPLER_PAD_HEIGHT}px;
+
+  @media (max-width: 800px) {
+    padding-inline: 0;
+  }
+
   canvas {
     position: absolute;
   }
@@ -125,6 +132,11 @@ const Wave = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+
+  @media (max-width: 800px) {
+    width: calc(100% - 48px);
+    margin-inline: 24px;
+  }
 `;
 
 const Playhead = styled.div`

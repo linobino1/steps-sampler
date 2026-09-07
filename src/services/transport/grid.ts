@@ -1,4 +1,7 @@
-import useToneStore, { GridResolutions } from "../../store/store.ts";
+import useToneStore, {
+  GridResolutions,
+  selectActiveBars,
+} from "../../store/store.ts";
 import {
   type GridSignature,
   isTimeInSignature,
@@ -39,7 +42,7 @@ function generateTimeIds(
 }
 
 function setGridTimeIds() {
-  const bars = useToneStore.getState().activeBars;
+  const bars = selectActiveBars(useToneStore.getState());
   const res = useToneStore.getState().resolution;
   const sig = useToneStore.getState().signature;
 

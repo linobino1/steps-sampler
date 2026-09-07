@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import InstrumentsService from "../../services/core/instruments.ts";
-import useToneStore from "../../store/store.ts";
+import useToneStore, { selectActiveBars } from "../../store/store.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import DrawerService from "../../services/sampling/waveRender.ts";
 import { getTransport } from "tone";
@@ -77,7 +77,7 @@ export default function DubTrack() {
   const overdubParam = useToneStore((state) =>
     state.instrumentParams[InstrumentsService.overdub.id]
   );
-  const activeBars = useToneStore((state) => state.activeBars);
+  const activeBars = useToneStore(selectActiveBars);
   const windowSize = useWindowResize();
 
   useEffect(() => {

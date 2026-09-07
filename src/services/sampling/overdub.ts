@@ -1,5 +1,5 @@
 import { getTransport } from "tone";
-import useToneStore from "../../store/store.ts";
+import useToneStore, { selectActiveBars } from "../../store/store.ts";
 import InstrumentsService from "../core/instruments.ts";
 import BlobService from "./blobStore.ts";
 import PadService from "./sample.ts";
@@ -22,7 +22,7 @@ async function recordOverdub() {
   await InstrumentsService.keyboardRecorder.start();
   const transport = getTransport();
   transport.on("stop", saveRecording);
-  transport.start().stop(`+${useToneStore.getState().activeBars}:0:0`);
+  transport.start().stop(`+${selectActiveBars(useToneStore.getState())}:0:0`);
 }
 
 function deleteOverdub() {

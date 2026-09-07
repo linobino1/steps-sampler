@@ -23,3 +23,27 @@ Deno.test("createPlaybackPlan excludes events on muted tracks", () => {
     throw new Error("Muted track event was included in the playback plan");
   }
 });
+
+Deno.test("createPlaybackPlan limits compact mode without deleting events", () => {
+  const plan = TriggersService.createPlaybackPlan({
+    activeBars: 3,
+    compactMode: true,
+    signature: "4",
+    resolution: "16n",
+    scheduledEvents: [
+      "0:0:0|3|1",
+      "0:0:0|4|1",
+      "0:0:0|5|1",
+      "1:0:0|0|0",
+    ],
+    songArrangement: [],
+    trackSettings: {},
+  });
+
+  if (
+    plan.measures !== 1 || plan.instrumentEvents.length !== 1 ||
+    plan.instrumentEvents[0].instrumentId !== 3
+  ) {
+    throw new Error("Compact playback was not limited to pad 1 and one bar");
+  }
+});

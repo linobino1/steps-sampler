@@ -253,6 +253,10 @@ function initSequencer() {
       GridService.setGridTimeIds,
     ),
     ToneStore.subscribe((state) => state.signature, GridService.setGridTimeIds),
+    ToneStore.subscribe(
+      (state) => state.compactMode,
+      GridService.setGridTimeIds,
+    ),
     // scheduled triggers
     ToneStore.subscribe(
       (state) => state.activeBars,
@@ -270,6 +274,7 @@ function initSequencer() {
       (state) => state.scheduledEvents,
       syncPlaybackPlan,
     ),
+    ToneStore.subscribe((state) => state.compactMode, syncPlaybackPlan),
 
     ToneStore.subscribe(
       (state) => state.songArrangement,

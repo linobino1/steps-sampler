@@ -8,7 +8,8 @@ const FooterFrame = styled.footer`
   justify-content: center;
   gap: 18px;
   min-height: 32px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  margin-top: 32px;
+  margin-bottom: max(32px, env(safe-area-inset-bottom));
   font-size: 0.7rem;
 `;
 

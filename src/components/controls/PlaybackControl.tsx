@@ -6,7 +6,7 @@ import InstrumentsService from "../../services/core/instruments.ts";
 import useToneStore from "../../store/store.ts";
 import NoteIcon from "./NoteIcon.tsx";
 
-const PlaybackSelect = styled.label`
+const PlaybackSelect = styled.label<{ $active: boolean }>`
   color: black;
   font-weight: bold;
   margin: 0;
@@ -19,29 +19,34 @@ const PlaybackSelect = styled.label`
 
   select {
     appearance: none;
-    margin: 0 5px;
-    width: calc(100% - 10px);
+    margin: 0;
+    width: 100%;
     height: 26px;
-    background: none;
+    background: ${(props) => props.$active ? "var(--main)" : "none"};
     border: 2px solid var(--off-color-2);
     border-radius: 5px;
     box-sizing: border-box;
+    color: ${(props) => props.$active ? "white" : "black"};
     font-size: 12px;
     cursor: pointer;
-    padding: 0 16px 0 33px;
+    padding: 0 19px 0 33px;
     font-family: "RoobertMono";
 
-    &:hover {
-      background: var(--main-light);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: ${(props) =>
+          props.$active ? "var(--main)" : "var(--main-light)"};
+      }
     }
   }
 `;
 
-const IconBox = styled.div`
+const IconBox = styled.div<{ $active: boolean }>`
   align-items: center;
+  color: ${(props) => props.$active ? "white" : "var(--main)"};
   display: flex;
   position: absolute;
-  left: 13px;
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
 
@@ -54,7 +59,7 @@ const PlaybackCaret = styled(FontAwesomeIcon)`
   font-size: 10px;
   pointer-events: none;
   position: absolute;
-  right: 12px;
+  right: 7px;
   top: 50%;
   transform: translateY(-50%);
 `;
@@ -65,8 +70,8 @@ export default function PlaybackControl() {
   );
 
   return (
-    <PlaybackSelect>
-      <IconBox>
+    <PlaybackSelect $active={playback >= 0}>
+      <IconBox $active={playback >= 0}>
         <NoteIcon />
       </IconBox>
       <select
@@ -79,7 +84,11 @@ export default function PlaybackControl() {
           <option key={item.name} value={index}>{item.name}</option>
         ))}
       </select>
-      <PlaybackCaret icon={faCaretDown} aria-hidden="true" />
+      <PlaybackCaret
+        icon={faCaretDown}
+        aria-hidden="true"
+        color={playback >= 0 ? "#fff" : "#000"}
+      />
     </PlaybackSelect>
   );
 }

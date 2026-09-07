@@ -16,12 +16,18 @@ export type { GridSignature } from "../services/transport/time.ts";
 
 export type GridResolutions = "16n" | "8n" | "8t";
 export const STORE_VERSION = 1.9;
+export function selectActiveBars(
+  state: { activeBars: number; compactMode?: boolean },
+) {
+  return state.compactMode ? 1 : state.activeBars;
+}
 const TRACKS_IDS = InstrumentsService.instruments.map((instrument) =>
   instrument.id
 );
 
 interface TonesState {
   storeVersion: number;
+  compactMode: boolean;
   activeTimeIds: Array<string>;
   activeTracks: number;
   activeBars: number;
@@ -35,6 +41,7 @@ interface TonesState {
   songArrangement: SongArrangement;
   updateArrangement: (arrangement: SongArrangement) => void;
   setGridSignature: (sig: GridSignature) => void;
+  setCompactMode: (compact: boolean) => void;
   setSwing: (swing: number) => void;
   setPlaybackSample: (s: number) => void;
   resetSequencer: () => void;
@@ -105,6 +112,7 @@ const cleanSequencer = {
 
 const initialState = {
   storeVersion: STORE_VERSION,
+  compactMode: false,
   // listeners listed in comment
   activeTimeIds: [], // WIDGET -> for bar generation
   bpm: defaultBPM, // SEQUENCER -> for setting bpm * TEMPO -> for button
@@ -121,7 +129,12 @@ const useToneStore = create<TonesState>()(
       subscribeWithSelector(
         (set, get) => ({
           ...initialState,
-          resetStore: () => set(initialState, false, "resetStore"),
+          resetStore: () =>
+            set(
+              (state) => ({ ...initialState, compactMode: state.compactMode }),
+              false,
+              "resetStore",
+            ),
           resetSequencer: () =>
             set((_state) => ({ ...cleanSequencer }), false, "resetSequencer"),
           setInstrumentParams: (id, params) => {
@@ -158,6 +171,8 @@ const useToneStore = create<TonesState>()(
             set((_state) => ({ swing }), false, "setSwing"),
           setGridSignature: (signature: GridSignature) =>
             set((_state) => ({ signature }), false, "setSignature"),
+          setCompactMode: (compactMode: boolean) =>
+            set({ compactMode }, false, "setCompactMode"),
           toggleResolution: (res: GridResolutions) =>
             set((_state) => ({ resolution: res }), false, "toggleResolution"),
           setActiveTimeIds: (timeIds: Array<string>) =>

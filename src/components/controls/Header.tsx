@@ -24,6 +24,10 @@ const Stretch = styled.div`
 
 const HeaderActions = styled.div`
   display: flex;
+
+  @media (max-width: 800px) {
+    display: none;
+  }
 `;
 
 export default function Header(

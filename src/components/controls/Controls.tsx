@@ -25,6 +25,10 @@ const ControlToolBar = styled.div`
   @media (max-width: 1200px) {
     justify-content: flex-start;
   }
+
+  @media (max-width: 800px) {
+    display: block;
+  }
 `;
 
 const ControlSection = styled.div`
@@ -58,6 +62,23 @@ const ControlGroup = styled.div`
   }
 `;
 
+const MainControls = styled(ControlGroup)`
+  @media (max-width: 800px) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+
+    > ${ControlSection}:last-child {
+      border-right: 0;
+    }
+  }
+`;
+
+const FullControls = styled(ControlGroup)`
+  @media (max-width: 800px) {
+    display: none;
+  }
+`;
+
 const PlaybackSection = styled(ControlSection)`
   @media (max-width: 1200px) {
     flex: 1;
@@ -65,10 +86,16 @@ const PlaybackSection = styled(ControlSection)`
   }
 `;
 
+const DesktopOnly = styled.div`
+  @media (max-width: 800px) {
+    display: none;
+  }
+`;
+
 export default function Controls() {
   return (
     <ControlToolBar>
-      <ControlGroup>
+      <MainControls>
         <ControlSection>
           <TransportControl />
           <MetronomeControl />
@@ -79,18 +106,20 @@ export default function Controls() {
         <ControlSection>
           <BpmControl />
           <TimeSignatureControl />
-          <SwingControl />
+          <DesktopOnly>
+            <SwingControl />
+          </DesktopOnly>
         </ControlSection>
-      </ControlGroup>
+      </MainControls>
 
-      <ControlGroup>
+      <FullControls>
         <ControlSection>
           <BarControls />
         </ControlSection>
         <ControlSection>
           <GridResolutionControl />
         </ControlSection>
-      </ControlGroup>
+      </FullControls>
     </ControlToolBar>
   );
 }

@@ -4,6 +4,7 @@ import { type GridSignature, isTimeInSignature, parseTimeId } from "./time.ts";
 
 interface PlaybackPlanState {
   activeBars: number;
+  compactMode?: boolean;
   signature: GridSignature;
   resolution: string;
   scheduledEvents: Array<string>;
@@ -29,14 +30,16 @@ export interface PlaybackPlan {
 }
 
 function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
+  const activeBars = state.compactMode ? 1 : state.activeBars;
   const cycles = state.songArrangement.length || 1;
   const activeEvents = new Map<string, string>();
   state.scheduledEvents.filter((event) => {
     const { instrumentId } = parseTrigger(event);
+    if (state.compactMode && ["4", "5"].includes(instrumentId)) return false;
     if (state.trackSettings[parseInt(instrumentId)]?.mute) return false;
     const { bar, quarter, sixteenth } = parseTimeId(event);
     if (
-      bar >= state.activeBars ||
+      bar >= activeBars ||
       !isTimeInSignature(quarter, sixteenth, state.signature)
     ) {
       return false;
@@ -55,7 +58,7 @@ function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
       const { timeId, instrumentId, emphasized } = parseTrigger(event);
       const { bar, quarter, sixteenth } = parseTimeId(timeId);
       instrumentEvents.push({
-        time: `${bar + cycle * state.activeBars}:${quarter}:${sixteenth}`,
+        time: `${bar + cycle * activeBars}:${quarter}:${sixteenth}`,
         instrumentId: parseInt(instrumentId),
         emphasis: emphasized,
       });
@@ -65,6 +68,7 @@ function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
   const chordEvents: Array<ChordEvent> = [];
   state.songArrangement.forEach((cycle, cycleIndex) => {
     cycle.forEach((bar, barIndex) => {
+      if (barIndex >= activeBars) return;
       (bar || []).forEach((chord, chordIndex) => {
         const notes = Voicing.search(
           chord,
@@ -73,7 +77,7 @@ function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
         )[0];
         if (!notes) return;
         chordEvents.push({
-          time: `${barIndex + cycleIndex * state.activeBars}:${
+          time: `${barIndex + cycleIndex * activeBars}:${
             chordIndex === 1 ? 2 : 0
           }:0`,
           notes,
@@ -83,7 +87,7 @@ function createPlaybackPlan(state: PlaybackPlanState): PlaybackPlan {
   });
 
   return {
-    measures: state.activeBars * cycles,
+    measures: activeBars * cycles,
     instrumentEvents,
     chordEvents,
   };
