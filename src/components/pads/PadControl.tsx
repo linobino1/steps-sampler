@@ -39,7 +39,6 @@ const Box = styled.div`
   @media (hover: none), (pointer: coarse) {
     display: block;
   }
-
 `;
 
 const Param = styled.div`
@@ -82,7 +81,24 @@ interface ParamCfg {
   min: number;
   max: number;
   step: number;
+  fromSlider?: (value: number) => number;
+  toSlider?: (value: number) => number;
 }
+
+const SILENT_VOLUME_DB = Number.NEGATIVE_INFINITY;
+
+function volumeFromSlider(value: number) {
+  if (value === 0) return SILENT_VOLUME_DB;
+  if (value <= 50) return 20 * Math.log10(value / 50);
+  return (value - 50) * 12 / 50;
+}
+
+function volumeToSlider(value: number) {
+  if (value <= SILENT_VOLUME_DB) return 0;
+  if (value <= 0) return 50 * 10 ** (value / 20);
+  return 50 + value * 50 / 12;
+}
+
 const paramConfigObj: { [key: string]: ParamCfg } = {
   // fadeIn: {displayName: 'f-in', name: EnvelopeParam.fadeIn, min: 0, max: 99, step: 1},
   fadeIn: {
@@ -109,9 +125,11 @@ const paramConfigObj: { [key: string]: ParamCfg } = {
   volume: {
     displayName: "volume",
     name: EnvelopeParam.amplitude,
-    min: -12,
-    max: 12,
+    min: 0,
+    max: 100,
     step: 0.1,
+    fromSlider: volumeFromSlider,
+    toSlider: volumeToSlider,
   },
 };
 const paramConfigs: Array<ParamCfg> = Array.from(Object.values(paramConfigObj));
@@ -128,10 +146,11 @@ export default function PadControl({ padId }: CmpProps) {
     ]),
   );
 
-  function updateParams(value: string, paramName: EnvelopeParam) {
+  function updateParams(value: string, config: ParamCfg) {
+    const sliderValue = parseFloat(value);
     setPadParams(padId, {
       ...padParams,
-      [paramName]: parseFloat(value),
+      [config.name]: config.fromSlider?.(sliderValue) ?? sliderValue,
       custom: true,
     });
   }
@@ -144,8 +163,8 @@ export default function PadControl({ padId }: CmpProps) {
           <ParamInput>
             <input
               type="range"
-              value={padParams[cfg.name]}
-              onChange={(e) => updateParams(e.target.value, cfg.name)}
+              value={cfg.toSlider?.(padParams[cfg.name]) ?? padParams[cfg.name]}
+              onChange={(e) => updateParams(e.target.value, cfg)}
               min={cfg.min}
               max={cfg.max}
               step={cfg.step}
