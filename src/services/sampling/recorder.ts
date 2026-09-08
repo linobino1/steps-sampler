@@ -47,7 +47,6 @@ async function setupRecorder(
 
   mediaRecorder.onstop = function (_e) {
     const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
-    console.debug({ size: blob.size, mimeType: blob.type });
     mediaDeviceStream.getTracks().forEach((track) => track.stop());
     const url = BlobService.storeBlob(blob, id);
     PadService.addSample(url, InstrumentsService.instruments[id]);
