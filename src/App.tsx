@@ -14,11 +14,20 @@ import SamplerPanel from "./components/pads/Sampler.tsx";
 import SequencerService from "./services/transport/sequencer.ts";
 import useToneStore, { STORE_VERSION } from "./store/store.ts";
 
-const AppLayout = styled.div`
+const AppLayout = styled.div<{ $disableSelection: boolean }>`
   display: grid;
   grid-template-rows: auto minmax(min-content, 1fr);
   min-height: 100vh;
   min-height: 100dvh;
+
+  ${({ $disableSelection }) => $disableSelection && `
+    &, & * {
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+  `}
 `;
 
 const ContentFrame = styled.div`
@@ -91,7 +100,7 @@ export default function App() {
     <>
       {!isInfoPage && <Mask />}
       {!isInfoPage && <CompactNotice />}
-      <AppLayout>
+      <AppLayout $disableSelection={!isInfoPage}>
         <HeaderFrame>
           <Header showControls={!isInfoPage} />
         </HeaderFrame>
