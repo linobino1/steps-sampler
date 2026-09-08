@@ -42,3 +42,4 @@ jobs:
           localDir: "build"
           remoteDir: "/"
           concurrency: 10
+          removeExtraFilesOnServer: true
