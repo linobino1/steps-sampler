@@ -1,5 +1,4 @@
 import {
-  context,
   now,
   PitchShift,
   Player,
@@ -10,6 +9,7 @@ import {
   ToneAudioNode,
   Volume,
 } from "tone";
+import enablePlayAndRecordAudioSession from "./audioSession.ts";
 import {
   EnvelopeParam,
   Instrument,
@@ -268,7 +268,11 @@ function connectInstruments() {
 }
 
 async function startAudio() {
-  if (context.state !== "running") await start();
+  enablePlayAndRecordAudioSession();
+
+  // iOS can leave the native audio session inactive while the context still
+  // reports that it is running, so resume it on every playback gesture.
+  await start();
   connectInstruments();
   instruments.filter((instrument) => instrument.type === InstrumentType.pad)
     .forEach(insertPitchShift);
