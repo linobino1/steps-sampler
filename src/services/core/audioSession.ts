@@ -5,12 +5,22 @@ export default function enablePlayAndRecordAudioSession() {
   if (audioSession) audioSession.type = "play-and-record";
 }
 
-// Configure the session before Tone creates its AudioContext, then restore the
-// mode when an installed iOS app returns from the background.
+export function installAudioSessionStarter(startAudio: () => Promise<void>) {
+  const requestStart = () => {
+    // Autoplay policy can reject the load-time attempt; the next user gesture
+    // retries synchronously while its user activation is still valid.
+    startAudio().catch(() => undefined);
+  };
+
+  requestStart();
+  document.addEventListener("pointerdown", requestStart, true);
+  document.addEventListener("keydown", requestStart, true);
+  document.addEventListener("click", requestStart, true);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") requestStart();
+  });
+  globalThis.addEventListener("pageshow", requestStart);
+}
+
+// Configure the session before Tone creates its AudioContext.
 enablePlayAndRecordAudioSession();
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") {
-    enablePlayAndRecordAudioSession();
-  }
-});
-globalThis.addEventListener("pageshow", enablePlayAndRecordAudioSession);

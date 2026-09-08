@@ -1,7 +1,6 @@
 import PadService from "./sample.ts";
 import InstrumentsService from "../core/instruments.ts";
 import BlobService from "./blobStore.ts";
-import enablePlayAndRecordAudioSession from "../core/audioSession.ts";
 
 // RECORDER
 let mediaRecorder: MediaRecorder | undefined;
@@ -19,7 +18,7 @@ async function setStream(): Promise<MediaStream> {
     throw new Error(reason);
   }
 
-  enablePlayAndRecordAudioSession();
+  await InstrumentsService.startAudio();
   return await navigator.mediaDevices.getUserMedia({ audio: true });
 }
 

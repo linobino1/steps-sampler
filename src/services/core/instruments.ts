@@ -1,4 +1,6 @@
-import enablePlayAndRecordAudioSession from "./audioSession.ts";
+import enablePlayAndRecordAudioSession, {
+  installAudioSessionStarter,
+} from "./audioSession.ts";
 import {
   now,
   PitchShift,
@@ -284,6 +286,8 @@ async function startAudio() {
     .forEach(insertPitchShift);
   if (currentParams) syncParams(currentParams);
 }
+
+installAudioSessionStarter(startAudio);
 
 function createInstrumentGraph(destination: ToneAudioNode) {
   return instruments.map((template) => {
