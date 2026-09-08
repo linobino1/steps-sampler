@@ -1,3 +1,4 @@
+import enablePlayAndRecordAudioSession from "./audioSession.ts";
 import {
   now,
   PitchShift,
@@ -10,7 +11,6 @@ import {
   Volume,
 } from "tone";
 import { padVolumeToAudioDb } from "../sampling/padVolume.ts";
-import enablePlayAndRecordAudioSession from "./audioSession.ts";
 import {
   EnvelopeParam,
   Instrument,
