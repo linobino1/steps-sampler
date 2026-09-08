@@ -31,6 +31,7 @@ export interface Instrument extends TriggerEnvelop, InstrumentDefn {
   channelVolume: Volume;
   effectInput: Volume;
   sampleVolume: Volume;
+  sampleVolumeDb: number;
   playHigh?: Player;
   playLow?: Player;
   playSampler?: Sampler;

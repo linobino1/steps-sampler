@@ -1,6 +1,10 @@
 import styled from "styled-components";
 import { useShallow } from "zustand/shallow";
 import { EnvelopeParam } from "../../services/core/interfaces.ts";
+import {
+  padVolumeFromSlider,
+  padVolumeToSlider,
+} from "../../services/sampling/padVolume.ts";
 import useToneStore from "../../store/store.ts";
 
 const Box = styled.div`
@@ -85,20 +89,6 @@ interface ParamCfg {
   toSlider?: (value: number) => number;
 }
 
-const SILENT_VOLUME_DB = Number.NEGATIVE_INFINITY;
-
-function volumeFromSlider(value: number) {
-  if (value === 0) return SILENT_VOLUME_DB;
-  if (value <= 50) return 20 * Math.log10(value / 50);
-  return (value - 50) * 12 / 50;
-}
-
-function volumeToSlider(value: number) {
-  if (value <= SILENT_VOLUME_DB) return 0;
-  if (value <= 0) return 50 * 10 ** (value / 20);
-  return 50 + value * 50 / 12;
-}
-
 const paramConfigObj: { [key: string]: ParamCfg } = {
   // fadeIn: {displayName: 'f-in', name: EnvelopeParam.fadeIn, min: 0, max: 99, step: 1},
   fadeIn: {
@@ -128,8 +118,8 @@ const paramConfigObj: { [key: string]: ParamCfg } = {
     min: 0,
     max: 100,
     step: 0.1,
-    fromSlider: volumeFromSlider,
-    toSlider: volumeToSlider,
+    fromSlider: padVolumeFromSlider,
+    toSlider: padVolumeToSlider,
   },
 };
 const paramConfigs: Array<ParamCfg> = Array.from(Object.values(paramConfigObj));

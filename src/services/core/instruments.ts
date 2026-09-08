@@ -9,6 +9,7 @@ import {
   ToneAudioNode,
   Volume,
 } from "tone";
+import { padVolumeToAudioDb } from "../sampling/padVolume.ts";
 import enablePlayAndRecordAudioSession from "./audioSession.ts";
 import {
   EnvelopeParam,
@@ -61,6 +62,7 @@ const instruments: Array<Instrument> = instDef.map((defn, index) => {
     channelVolume: new Volume(0),
     effectInput: new Volume(0),
     sampleVolume: new Volume(0), // only used for pads atm
+    sampleVolumeDb: 0,
   };
   if (inst.type === InstrumentType.stock) {
     const drumDefaults = { duration: 2, fadeOut: 0.2 };
@@ -129,6 +131,7 @@ function triggerInstrument(
   if (!instrument.source || !player?.loaded) return;
   const startTime = time >= 0 ? time : now();
   instrument.sampleVolume.mute = false;
+  instrument.sampleVolume.volume.value = instrument.sampleVolumeDb;
   player.fadeIn = instrument.fadeIn ?? 0;
   player.fadeOut = instrument.fadeOut ?? 0;
   if (instrument.type === InstrumentType.pad) {
@@ -220,7 +223,10 @@ function syncInstrumentParam(
     i.fadeOut = param[EnvelopeParam.fadeOut] * i.duration / 100;
     i.fadeIn = param[EnvelopeParam.fadeIn] * unity;
     if (i.sampleVolume && i.pitchShift) {
-      i.sampleVolume.volume.value = param[EnvelopeParam.amplitude];
+      i.sampleVolumeDb = padVolumeToAudioDb(
+        param[EnvelopeParam.amplitude],
+      );
+      i.sampleVolume.volume.value = i.sampleVolumeDb;
       const pitch = param[EnvelopeParam.pitchShift];
       i.pitchShift.pitch = pitch;
       i.pitchShift.wet.value = pitch === 0 ? 0 : 1;
@@ -293,6 +299,7 @@ function createInstrumentGraph(destination: ToneAudioNode) {
       channelVolume: new Volume(0),
       effectInput: new Volume(0),
       sampleVolume: new Volume(0),
+      sampleVolumeDb: 0,
     };
     const source = template.playHigh?.loaded
       ? template.playHigh.buffer
