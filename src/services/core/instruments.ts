@@ -1,7 +1,9 @@
-import applyAudioSessionType, {
-  installAudioSessionStarter,
+import {
+  configureAudioSession,
+  startPlaybackAudioSession,
 } from "./audioSession.ts";
 import {
+  getContext,
   now,
   PitchShift,
   Player,
@@ -276,23 +278,25 @@ function connectInstruments() {
   }
 }
 
-async function startAudio() {
-  applyAudioSessionType();
-
+async function prepareAudio() {
   // iOS can leave the native audio session inactive while the context still
   // reports that it is running, so resume it on every playback gesture.
   await start();
-  if (!audioStarted) {
-    console.debug("Audio session started");
-    audioStarted = true;
-  }
+  if (!audioStarted) audioStarted = true;
   connectInstruments();
   instruments.filter((instrument) => instrument.type === InstrumentType.pad)
     .forEach(insertPitchShift);
   if (currentParams) syncParams(currentParams);
 }
 
-installAudioSessionStarter(startAudio);
+configureAudioSession({
+  output: masterVolume,
+  start: prepareAudio,
+  async suspend() {
+    const rawContext = getContext().rawContext;
+    if ("suspend" in rawContext) await (rawContext as AudioContext).suspend();
+  },
+});
 
 function createInstrumentGraph(destination: ToneAudioNode) {
   return instruments.map((template) => {
@@ -332,7 +336,7 @@ const InstrumentsService = {
   instruments,
   playbacks,
   connectInstruments,
-  startAudio,
+  startAudio: startPlaybackAudioSession,
   createInstrumentGraph,
   createPlaybackPlayer,
   getPlayInstrumentTrigger,

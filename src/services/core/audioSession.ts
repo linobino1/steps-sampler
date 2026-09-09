@@ -1,31 +1,119 @@
-type AudioSessionType = "playback" | "play-and-record";
+export type AudioSessionState = "idle" | "playback" | "recording";
 
-let requestedType: AudioSessionType = "playback";
+interface PlaybackOutput {
+  mute: boolean;
+  volume: {
+    value: number;
+    rampTo(value: number, rampTime: number): unknown;
+  };
+}
 
-function applyAudioSessionType() {
+interface AudioSessionControls {
+  output: PlaybackOutput;
+  start(): Promise<void>;
+  suspend(): Promise<void>;
+}
+
+const playbackFadeMs = 40;
+const audioSessionTransitionMs = 60;
+const silentVolumeDb = -100;
+let state: AudioSessionState = "idle";
+let controls: AudioSessionControls | undefined;
+let playbackVolumeBeforeRecording: number | undefined;
+let starterInstalled = false;
+
+function wait(milliseconds: number) {
+  return new Promise<void>((resolve) =>
+    globalThis.setTimeout(resolve, milliseconds)
+  );
+}
+
+function applyAudioSessionType(type: "playback" | "play-and-record") {
   const audioSession = (navigator as Navigator & {
     audioSession?: { type: string };
   }).audioSession;
-  if (audioSession) audioSession.type = requestedType;
+  if (audioSession) audioSession.type = type;
 }
 
-export function enablePlaybackAudioSession() {
-  requestedType = "playback";
-  applyAudioSessionType();
+function isRecording() {
+  return state === "recording";
 }
 
-export function enablePlayAndRecordAudioSession() {
-  requestedType = "play-and-record";
-  applyAudioSessionType();
+export function getAudioSessionState() {
+  return state;
 }
 
-export default applyAudioSessionType;
+export async function startPlaybackAudioSession() {
+  if (isRecording()) return;
+  if (!controls) throw new Error("Audio session is not configured.");
 
-export function installAudioSessionStarter(startAudio: () => Promise<void>) {
+  applyAudioSessionType("playback");
+  await controls.start();
+  if (!isRecording()) state = "playback";
+}
+
+async function restorePlaybackAudioSession() {
+  if (!controls) return;
+
+  try {
+    applyAudioSessionType("playback");
+    await wait(audioSessionTransitionMs);
+    await controls.start().catch(() => undefined);
+
+    const previousVolume = playbackVolumeBeforeRecording;
+    if (previousVolume !== undefined) {
+      controls.output.volume.value = silentVolumeDb;
+      controls.output.mute = false;
+      controls.output.volume.rampTo(previousVolume, playbackFadeMs / 1000);
+      playbackVolumeBeforeRecording = undefined;
+    }
+  } finally {
+    state = "playback";
+  }
+}
+
+export async function beginRecordingAudioSession() {
+  if (isRecording()) return;
+  if (!controls) throw new Error("Audio session is not configured.");
+  if (!navigator.mediaDevices?.getUserMedia) {
+    const reason = globalThis.isSecureContext
+      ? "This browser does not support microphone recording."
+      : "Microphone recording requires HTTPS.";
+    throw new Error(reason);
+  }
+
+  state = "recording";
+  try {
+    await controls.start();
+    playbackVolumeBeforeRecording = controls.output.volume.value;
+    controls.output.volume.rampTo(silentVolumeDb, playbackFadeMs / 1000);
+    await wait(playbackFadeMs);
+    controls.output.mute = true;
+    await controls.suspend();
+    applyAudioSessionType("play-and-record");
+    return await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (error) {
+    await restorePlaybackAudioSession();
+    throw error;
+  }
+}
+
+export async function endRecordingAudioSession(stream?: MediaStream) {
+  stream?.getTracks().forEach((track) => {
+    track.stop();
+  });
+  await restorePlaybackAudioSession();
+}
+
+export function configureAudioSession(nextControls: AudioSessionControls) {
+  controls = nextControls;
+  if (starterInstalled) return;
+  starterInstalled = true;
+
   const requestStart = () => {
     // Autoplay policy can reject the load-time attempt; the next user gesture
     // retries synchronously while its user activation is still valid.
-    startAudio().catch(() => undefined);
+    startPlaybackAudioSession().catch(() => undefined);
   };
 
   requestStart();
@@ -39,4 +127,4 @@ export function installAudioSessionStarter(startAudio: () => Promise<void>) {
 }
 
 // Configure the session before Tone creates its AudioContext.
-enablePlaybackAudioSession();
+applyAudioSessionType("playback");
