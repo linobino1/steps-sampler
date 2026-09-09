@@ -116,10 +116,11 @@ export default function Legal() {
       </section>
 
       <section>
-        <SectionHeading>Audio</SectionHeading>
+        <SectionHeading>Playbacks & Sounds</SectionHeading>
         <Copy>
-          The audio files included in the STePs Sampler are Open Educational
-          Resources licensed under the{" "}
+          The audio included in the STePs Sampler, in particular the playback
+          tracks and drum sounds, is licensed as Open Educational Resources
+          under the{" "}
           <Link
             href="https://creativecommons.org/licenses/by/4.0/"
             target="_blank"
