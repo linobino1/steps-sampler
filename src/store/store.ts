@@ -138,10 +138,9 @@ const useToneStore = create<TonesState>()(
           resetSequencer: () =>
             set((_state) => ({ ...cleanSequencer }), false, "resetSequencer"),
           setInstrumentParams: (id, params) => {
-            // when instrument params are reverted we reset scheduling and track params
+            // Reverting instrument params also resets the track's mixer settings.
             if (!params) {
               get().resetTrackSetting(id);
-              get().removeTriggersForTrack(id);
             }
             set(
               (state) => (
