@@ -9,6 +9,7 @@ import {
 
 // RECORDER
 let mediaRecorder: MediaRecorder | undefined;
+let recordingInProgress = false;
 let recordingStartedAt = 0;
 let hasTimesliceData = false;
 let stopRequested = false;
@@ -120,9 +121,13 @@ async function setupRecorder(
 
   let chunks: Array<Blob> = [];
 
-  recorder.onstop = function (_e) {
-    void disposeRecorderStream(mediaDeviceStream);
-    if (mediaRecorder === recorder) mediaRecorder = undefined;
+  recorder.onstop = async function (_e) {
+    try {
+      await disposeRecorderStream(mediaDeviceStream);
+    } finally {
+      if (mediaRecorder === recorder) mediaRecorder = undefined;
+      recordingInProgress = false;
+    }
     const blob = new Blob(chunks, { type: recorder.mimeType });
     const url = BlobService.storeBlob(blob, id);
     PadService.addSample(url, InstrumentsService.instruments[id]);
@@ -145,8 +150,12 @@ async function setupRecorder(
 // EXPORTS
 
 async function startRecorder(id: number, parentEl: Element): Promise<boolean> {
+  if (recordingInProgress) return false;
+
+  recordingInProgress = true;
   stopRequested = false;
   let recorder: MediaRecorder | undefined;
+  let started = false;
   try {
     recorder = await setupRecorder(id, parentEl);
     if (!recorder) return false;
@@ -154,6 +163,7 @@ async function startRecorder(id: number, parentEl: Element): Promise<boolean> {
     hasTimesliceData = false;
     mediaRecorder.start(recordingTimeslice);
     recordingStartedAt = performance.now();
+    started = true;
     if (stopRequested) stopRecorder();
     return true;
   } catch (error) {
@@ -161,6 +171,8 @@ async function startRecorder(id: number, parentEl: Element): Promise<boolean> {
     mediaRecorder = undefined;
     console.error("Unable to start sample recording:", error);
     return false;
+  } finally {
+    if (!started) recordingInProgress = false;
   }
 }
 
