@@ -80,6 +80,13 @@ export default function About() {
         project was supported and funded by IDEE BW through the
         &ldquo;Idee-BW&rdquo; innovation competition.
       </Copy>
+      <Copy>
+        The playbacks are provided for use within the STePs Sampler and for
+        non-commercial educational purposes. They may not be extracted,
+        redistributed or used separately from the STePs Sampler, in particular
+        as part of commercial music productions or other commercial projects,
+        without prior permission from the rights holder.
+      </Copy>
       <Team>
         <dt>Project Lead</dt>
         <dd>Simon Krickl</dd>
@@ -87,6 +94,8 @@ export default function About() {
         <dd>Simon Krickl &amp; Andres Arguello</dd>
         <dt>Coding</dt>
         <dd>Andres Arguello &amp; Leo Hilsheimer</dd>
+        <dt>Playbacks &amp; Sounds</dt>
+        <dd>Simon Krickl</dd>
         <dt>Design</dt>
         <dd>Simon Bork, Panorama Studio</dd>
       </Team>
