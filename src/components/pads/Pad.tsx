@@ -22,14 +22,15 @@ const padPulse = keyframes`
   50% { filter: opacity(0.15); }
 `;
 
-const PadBox = styled.div`
+const PadBox = styled.div<{ $recording: boolean }>`
   position: relative;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
   height: 165px;
   border: 1.5px solid var(--black);
-  background: var(--main);
+  background: ${({ $recording }) =>
+    $recording ? "var(--contrast)" : "var(--main)"};
   border-radius: 3px;
   isolation: isolate;
 
@@ -231,7 +232,9 @@ export default function Pad(props: { pad: Instrument }) {
       state.setInstrumentParams,
     ]),
   );
-  const [recording, setRecording] = useState(false);
+  const [recordingState, setRecordingState] = useState<
+    "idle" | "preparing" | "recording"
+  >("idle");
   const [showPadCtrl, setShowPadCtrl] = useState(false);
   const windowSize = useWindowResize();
   const slice = normalizeSlice(
@@ -242,15 +245,16 @@ export default function Pad(props: { pad: Instrument }) {
 
   const startRecording = useCallback(async () => {
     if (!elementRef.current) return;
-    setRecording(true);
+    setRecordingState("preparing");
     const started = await RecorderService.startRecorder(
       props.pad.id,
       elementRef.current,
     );
     if (!started || !elementRef.current) {
-      setRecording(false);
+      setRecordingState("idle");
       return;
     }
+    setRecordingState("recording");
     DrawerService.clearAllCanvas(elementRef.current);
     setPadParams(props.pad.id);
   }, [props.pad.id, setPadParams]);
@@ -356,7 +360,7 @@ export default function Pad(props: { pad: Instrument }) {
         true,
       );
       trigger(now());
-    } else if (recording) {
+    } else if (recordingState !== "idle") {
       stopRecording();
     } else {
       startRecording();
@@ -365,7 +369,7 @@ export default function Pad(props: { pad: Instrument }) {
 
   function stopRecording() {
     RecorderService.stopRecorder();
-    setRecording(false);
+    setRecordingState("idle");
   }
 
   function clearPad() {
@@ -374,29 +378,39 @@ export default function Pad(props: { pad: Instrument }) {
   }
 
   return (
-    <PadBox ref={padBoxRef} onTouchEnd={() => stopRecording()}>
-      <TopBar>
-        {audioUrl && (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              clearPad();
-            }}
-          >
-            <TrashIcon />
-          </button>
-        )}
-      </TopBar>
+    <PadBox
+      ref={padBoxRef}
+      $recording={recordingState === "recording"}
+      onTouchEnd={() => stopRecording()}
+    >
+      {recordingState !== "recording" && (
+        <TopBar>
+          {audioUrl && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                clearPad();
+              }}
+            >
+              <TrashIcon />
+            </button>
+          )}
+        </TopBar>
+      )}
 
-      {!recording
+      {recordingState === "idle"
         ? (
           ""
         )
         : (
-          <Blur>
+          <Blur role="status" aria-live="polite">
             {" "}
-            <div>recording...</div>
+            <div>
+              {recordingState === "preparing"
+                ? "preparing microphone..."
+                : "recording..."}
+            </div>
             {" "}
           </Blur>
         )}
@@ -416,7 +430,7 @@ export default function Pad(props: { pad: Instrument }) {
           if (audioUrl) void recordOrPlay();
         }}
       >
-        {!audioUrl && !recording && (
+        {!audioUrl && recordingState === "idle" && (
           <RecordingNotice>
             <span className="desktop-instruction">
               Click to start recording
@@ -447,25 +461,29 @@ export default function Pad(props: { pad: Instrument }) {
         </WaveViewPort>
       </RecordingBox>
 
-      <BottomBar>
-        <div>
-          <WavesIcon />
-        </div>
-        <PadTitle>{props.pad.name}</PadTitle>
-        {audioUrl && (
-          <ControlToggle
-            type="button"
-            $active={showPadCtrl}
-            aria-label="Toggle sample controls"
-            aria-expanded={showPadCtrl}
-            onClick={() => setShowPadCtrl((show) => !show)}
-          >
-            <ControlsIcon />
-          </ControlToggle>
-        )}
-      </BottomBar>
+      {recordingState !== "recording" && (
+        <BottomBar>
+          <div>
+            <WavesIcon />
+          </div>
+          <PadTitle>{props.pad.name}</PadTitle>
+          {audioUrl && (
+            <ControlToggle
+              type="button"
+              $active={showPadCtrl}
+              aria-label="Toggle sample controls"
+              aria-expanded={showPadCtrl}
+              onClick={() => setShowPadCtrl((show) => !show)}
+            >
+              <ControlsIcon />
+            </ControlToggle>
+          )}
+        </BottomBar>
+      )}
 
-      {showPadCtrl && audioUrl && <PadControl padId={props.pad.id} />}
+      {recordingState !== "recording" && showPadCtrl && audioUrl && (
+        <PadControl padId={props.pad.id} />
+      )}
     </PadBox>
   );
 }
