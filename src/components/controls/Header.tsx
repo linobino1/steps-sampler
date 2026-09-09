@@ -4,7 +4,8 @@ import ProjectFileControls from "./ProjectFileControls.tsx";
 
 const HeaderDiv = styled.div`
   box-sizing: border-box;
-  padding: 5px 10px;
+  padding: 5px max(10px, env(safe-area-inset-right)) 5px
+    max(10px, env(safe-area-inset-left));
   display: flex;
   width: 100%;
   height: 100%;

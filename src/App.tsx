@@ -42,7 +42,9 @@ const MainFrame = styled.div`
   padding-top: 10px;
 
   @media (max-width: 989px) {
-    width: calc(100% - 20px);
+    width: auto;
+    margin-left: max(10px, env(safe-area-inset-left));
+    margin-right: max(10px, env(safe-area-inset-right));
   }
 `;
 
