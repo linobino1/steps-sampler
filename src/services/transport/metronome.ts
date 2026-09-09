@@ -8,7 +8,7 @@ const emitter = new Emitter();
 const synth = new Synth({
   oscillator: { type: "triangle" },
   envelope: { attack: 0.001, decay: 0.03, sustain: 0, release: 0.01 },
-}).toDestination();
+}).connect(InstrumentsService.masterVolume);
 synth.volume.value = -10;
 
 let enabled = false;

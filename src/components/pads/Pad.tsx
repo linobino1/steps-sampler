@@ -349,12 +349,12 @@ export default function Pad(props: { pad: Instrument }) {
   }, [props.pad.id]);
 
   async function recordOrPlay() {
-    await InstrumentsService.startAudio();
-    const trigger = InstrumentsService.getPlayInstrumentTrigger(
-      props.pad.id,
-      true,
-    );
     if (audioUrl) {
+      await InstrumentsService.startAudio();
+      const trigger = InstrumentsService.getPlayInstrumentTrigger(
+        props.pad.id,
+        true,
+      );
       trigger(now());
     } else if (recording) {
       stopRecording();
@@ -404,7 +404,13 @@ export default function Pad(props: { pad: Instrument }) {
       <RecordingBox
         onPointerDown={(e) => {
           e.preventDefault();
-          if (!audioUrl) void recordOrPlay();
+          if (!audioUrl) {
+            e.currentTarget.setPointerCapture(e.pointerId);
+            void recordOrPlay();
+          }
+        }}
+        onPointerCancel={() => {
+          if (!audioUrl) stopRecording();
         }}
         onClick={() => {
           if (audioUrl) void recordOrPlay();

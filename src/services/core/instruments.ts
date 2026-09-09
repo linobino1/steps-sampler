@@ -1,4 +1,4 @@
-import enablePlayAndRecordAudioSession, {
+import applyAudioSessionType, {
   installAudioSessionStarter,
 } from "./audioSession.ts";
 import {
@@ -265,6 +265,7 @@ function syncTrackSettings(
 
 let instrumentsConnected = false;
 let currentParams: InstrumentParams | undefined;
+let audioStarted = false;
 
 function connectInstruments() {
   if (!instrumentsConnected) {
@@ -276,11 +277,15 @@ function connectInstruments() {
 }
 
 async function startAudio() {
-  enablePlayAndRecordAudioSession();
+  applyAudioSessionType();
 
   // iOS can leave the native audio session inactive while the context still
   // reports that it is running, so resume it on every playback gesture.
   await start();
+  if (!audioStarted) {
+    console.debug("Audio session started");
+    audioStarted = true;
+  }
   connectInstruments();
   instruments.filter((instrument) => instrument.type === InstrumentType.pad)
     .forEach(insertPitchShift);

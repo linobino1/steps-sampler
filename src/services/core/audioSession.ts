@@ -1,9 +1,25 @@
-export default function enablePlayAndRecordAudioSession() {
+type AudioSessionType = "playback" | "play-and-record";
+
+let requestedType: AudioSessionType = "playback";
+
+function applyAudioSessionType() {
   const audioSession = (navigator as Navigator & {
     audioSession?: { type: string };
   }).audioSession;
-  if (audioSession) audioSession.type = "play-and-record";
+  if (audioSession) audioSession.type = requestedType;
 }
+
+export function enablePlaybackAudioSession() {
+  requestedType = "playback";
+  applyAudioSessionType();
+}
+
+export function enablePlayAndRecordAudioSession() {
+  requestedType = "play-and-record";
+  applyAudioSessionType();
+}
+
+export default applyAudioSessionType;
 
 export function installAudioSessionStarter(startAudio: () => Promise<void>) {
   const requestStart = () => {
@@ -23,4 +39,4 @@ export function installAudioSessionStarter(startAudio: () => Promise<void>) {
 }
 
 // Configure the session before Tone creates its AudioContext.
-enablePlayAndRecordAudioSession();
+enablePlaybackAudioSession();
