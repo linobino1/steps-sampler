@@ -423,6 +423,9 @@ export default function Pad(props: { pad: Instrument }) {
             void recordOrPlay();
           }
         }}
+        onPointerUp={(e) => {
+          if (!audioUrl && e.pointerType === "mouse") stopRecording();
+        }}
         onPointerCancel={() => {
           if (!audioUrl) stopRecording();
         }}
@@ -433,7 +436,7 @@ export default function Pad(props: { pad: Instrument }) {
         {!audioUrl && recordingState === "idle" && (
           <RecordingNotice>
             <span className="desktop-instruction">
-              Click to start recording
+              Click and hold to record
             </span>
             <span className="touch-instruction">
               Touch and hold to record
