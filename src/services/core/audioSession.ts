@@ -21,6 +21,8 @@ let state: AudioSessionState = "idle";
 let controls: AudioSessionControls | undefined;
 let playbackVolumeBeforeRecording: number | undefined;
 let starterInstalled = false;
+let playbackRecoveryNeeded = false;
+let playbackRecovery: Promise<void> | undefined;
 
 function wait(milliseconds: number) {
   return new Promise<void>((resolve) =>
@@ -43,12 +45,33 @@ export function getAudioSessionState() {
   return state;
 }
 
+async function recoverPlaybackAudioSession() {
+  if (!controls) return;
+
+  const wasMuted = controls.output.mute;
+  controls.output.mute = true;
+  try {
+    await controls.suspend();
+    await controls.start();
+    playbackRecoveryNeeded = false;
+  } finally {
+    controls.output.mute = wasMuted;
+  }
+}
+
 export async function startPlaybackAudioSession() {
   if (isRecording()) return;
   if (!controls) throw new Error("Audio session is not configured.");
 
   applyAudioSessionType("playback");
-  await controls.start();
+  if (playbackRecoveryNeeded) {
+    playbackRecovery ??= recoverPlaybackAudioSession().finally(() => {
+      playbackRecovery = undefined;
+    });
+    await playbackRecovery;
+  } else {
+    await controls.start();
+  }
   if (!isRecording()) state = "playback";
 }
 
@@ -121,7 +144,14 @@ export function configureAudioSession(nextControls: AudioSessionControls) {
   document.addEventListener("keydown", requestStart, true);
   document.addEventListener("click", requestStart, true);
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") requestStart();
+    if (document.visibilityState === "hidden") {
+      playbackRecoveryNeeded = true;
+    } else {
+      requestStart();
+    }
+  });
+  globalThis.addEventListener("pagehide", () => {
+    playbackRecoveryNeeded = true;
   });
   globalThis.addEventListener("pageshow", requestStart);
 }
