@@ -291,6 +291,9 @@ async function prepareAudio() {
 
 configureAudioSession({
   output: masterVolume,
+  contextState() {
+    return getContext().rawContext.state;
+  },
   start: prepareAudio,
   async suspend() {
     const rawContext = getContext().rawContext;

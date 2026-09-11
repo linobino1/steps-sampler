@@ -354,7 +354,7 @@ export default function Pad(props: { pad: Instrument }) {
 
   async function recordOrPlay() {
     if (audioUrl) {
-      await InstrumentsService.startAudio();
+      if (!await InstrumentsService.startAudio()) return;
       const trigger = InstrumentsService.getPlayInstrumentTrigger(
         props.pad.id,
         true,

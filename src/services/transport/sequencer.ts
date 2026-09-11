@@ -157,7 +157,7 @@ async function startTransport() {
   const request = ++transportStartRequest;
   transportStartPending = true;
   try {
-    await InstrumentsService.startAudio();
+    if (!await InstrumentsService.startAudio()) return;
     await loaded();
     if (request !== transportStartRequest) return;
 

@@ -17,7 +17,7 @@ async function saveRecording() {
 }
 
 async function recordOverdub() {
-  await InstrumentsService.startAudio();
+  if (!await InstrumentsService.startAudio()) return;
 
   await InstrumentsService.keyboardRecorder.start();
   const transport = getTransport();

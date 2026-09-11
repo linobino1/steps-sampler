@@ -10,19 +10,22 @@ interface PlaybackOutput {
 
 interface AudioSessionControls {
   output: PlaybackOutput;
+  contextState(): string;
   start(): Promise<void>;
   suspend(): Promise<void>;
 }
 
 const playbackFadeMs = 40;
 const audioSessionTransitionMs = 60;
+const playbackStartTimeoutMs = 1500;
+const playbackRetryMs = 500;
 const silentVolumeDb = -100;
 let state: AudioSessionState = "idle";
 let controls: AudioSessionControls | undefined;
 let playbackVolumeBeforeRecording: number | undefined;
 let starterInstalled = false;
-let playbackRecoveryNeeded = false;
-let playbackRecovery: Promise<void> | undefined;
+let foreground = document.visibilityState !== "hidden";
+let playbackRetry: ReturnType<typeof globalThis.setTimeout> | undefined;
 
 function wait(milliseconds: number) {
   return new Promise<void>((resolve) =>
@@ -30,10 +33,14 @@ function wait(milliseconds: number) {
   );
 }
 
-function applyAudioSessionType(type: "playback" | "play-and-record") {
-  const audioSession = (navigator as Navigator & {
-    audioSession?: { type: string };
+function getNativeAudioSession() {
+  return (navigator as Navigator & {
+    audioSession?: { state?: string; type: string };
   }).audioSession;
+}
+
+function applyAudioSessionType(type: "playback" | "play-and-record") {
+  const audioSession = getNativeAudioSession();
   if (audioSession) audioSession.type = type;
 }
 
@@ -45,34 +52,68 @@ export function getAudioSessionState() {
   return state;
 }
 
-async function recoverPlaybackAudioSession() {
-  if (!controls) return;
-
-  const wasMuted = controls.output.mute;
-  controls.output.mute = true;
-  try {
-    await controls.suspend();
-    await controls.start();
-    playbackRecoveryNeeded = false;
-  } finally {
-    controls.output.mute = wasMuted;
-  }
+export function getAudioSessionDebugState() {
+  const audioSession = getNativeAudioSession();
+  return {
+    appState: state,
+    contextState: controls?.contextState(),
+    foreground,
+    nativeState: audioSession?.state,
+    nativeType: audioSession?.type,
+    retryScheduled: playbackRetry !== undefined,
+    visibility: document.visibilityState,
+  };
 }
 
-export async function startPlaybackAudioSession() {
-  if (isRecording()) return;
+function clearPlaybackRetry() {
+  if (playbackRetry === undefined) return;
+  globalThis.clearTimeout(playbackRetry);
+  playbackRetry = undefined;
+}
+
+function schedulePlaybackRetry() {
+  if (!foreground || isRecording() || playbackRetry !== undefined) return;
+  playbackRetry = globalThis.setTimeout(() => {
+    playbackRetry = undefined;
+    void startPlaybackAudioSession();
+  }, playbackRetryMs);
+}
+
+export async function startPlaybackAudioSession(): Promise<boolean> {
+  if (isRecording()) return false;
   if (!controls) throw new Error("Audio session is not configured.");
 
+  clearPlaybackRetry();
   applyAudioSessionType("playback");
-  if (playbackRecoveryNeeded) {
-    playbackRecovery ??= recoverPlaybackAudioSession().finally(() => {
-      playbackRecovery = undefined;
-    });
-    await playbackRecovery;
-  } else {
-    await controls.start();
+  const startAttempt = controls.start();
+  let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
+  const timedOut = new Promise<"timeout">((resolve) => {
+    timeout = globalThis.setTimeout(
+      () => resolve("timeout"),
+      playbackStartTimeoutMs,
+    );
+  });
+  const outcome = await Promise.race([
+    startAttempt.then(
+      () => "started" as const,
+      () => "rejected" as const,
+    ),
+    timedOut,
+  ]);
+  if (timeout !== undefined) globalThis.clearTimeout(timeout);
+
+  if (outcome === "timeout") {
+    startAttempt.then(() => {
+      if (!foreground || isRecording()) return;
+      state = "playback";
+      clearPlaybackRetry();
+    }).catch(() => undefined);
+    schedulePlaybackRetry();
+    return false;
   }
+  if (outcome === "rejected") return false;
   if (!isRecording()) state = "playback";
+  return true;
 }
 
 async function restorePlaybackAudioSession() {
@@ -145,16 +186,36 @@ export function configureAudioSession(nextControls: AudioSessionControls) {
   document.addEventListener("click", requestStart, true);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
-      playbackRecoveryNeeded = true;
+      enterBackground();
     } else {
+      foreground = true;
       requestStart();
     }
   });
-  globalThis.addEventListener("pagehide", () => {
-    playbackRecoveryNeeded = true;
+  globalThis.addEventListener("pagehide", enterBackground);
+  globalThis.addEventListener("pageshow", () => {
+    foreground = true;
+    requestStart();
   });
-  globalThis.addEventListener("pageshow", requestStart);
+}
+
+function enterBackground() {
+  if (!foreground) return;
+  foreground = false;
+  clearPlaybackRetry();
+  if (isRecording() || !controls) return;
+
+  state = "idle";
+  // Start suspension before WebKit freezes the page. If it settles after the
+  // app returns, immediately reconcile the context back to playback.
+  controls.suspend().then(() => {
+    if (foreground) void startPlaybackAudioSession();
+  }).catch(() => undefined);
 }
 
 // Configure the session before Tone creates its AudioContext.
 applyAudioSessionType("playback");
+Object.defineProperty(globalThis, "stepsAudioDebug", {
+  configurable: true,
+  value: getAudioSessionDebugState,
+});
