@@ -20,6 +20,13 @@ const audioSessionTransitionMs = 60;
 const playbackStartTimeoutMs = 1500;
 const playbackRetryMs = 500;
 const silentVolumeDb = -100;
+const recordingAudioConstraints: MediaTrackConstraints = {
+  // Playback is muted while recording, so speech-oriented processing only
+  // removes level and dynamics from musical input.
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: false,
+};
 let state: AudioSessionState = "idle";
 let controls: AudioSessionControls | undefined;
 let playbackVolumeBeforeRecording: number | undefined;
@@ -151,11 +158,17 @@ export async function beginRecordingAudioSession() {
     await controls.start();
     playbackVolumeBeforeRecording = controls.output.volume.value;
     controls.output.volume.rampTo(silentVolumeDb, playbackFadeMs / 1000);
-    await wait(playbackFadeMs);
     controls.output.mute = true;
-    await controls.suspend();
     applyAudioSessionType("play-and-record");
-    return await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Do not make microphone startup wait for WebKit to suspend the output
+    // context. The output is already muted, and the two operations are
+    // independent on browsers that implement the audio session API.
+    const suspend = controls.suspend();
+    const [stream] = await Promise.all([
+      navigator.mediaDevices.getUserMedia({ audio: recordingAudioConstraints }),
+      suspend,
+    ]);
+    return stream;
   } catch (error) {
     await restorePlaybackAudioSession();
     throw error;
