@@ -43,7 +43,7 @@ export default defineConfig(() => {
       }),
     ],
     server: {
-      allowedHosts: ["localhost", "steps.leohilsheimer.com"],
+      allowedHosts: ["localhost", "dev.leohilsheimer.com"],
     },
   };
 });
